@@ -2,7 +2,7 @@
 
 ## 职责与非职责
 
-未来 Chunker 仅消费已结构化的 V2.4 `Document`，依据 Clause 有序内容、顶层 Table 引用和来源 Block 构建 `ChunkBatch`。Task 0.1 没有切分算法。Chunker 不执行 PDF/OCR、章节或条文识别，也不合并跨页表格或写检索索引。
+未来 Chunker 仅消费已结构化的 V2.4 `Document`，按引用式 ContentUnit 解析 PageBlock、顶层 LogicalTable、Equation 与 Asset，构建 `ChunkBatch`。Task 0.2 没有切分算法。Chunker 不执行 PDF/OCR、章节或条文识别，不合并跨页表格、不判定强制性，也不写检索索引。
 
 ## 公开路径与签名
 
@@ -17,7 +17,7 @@ class ChunkingService(Protocol):
 
 ## 校验、错误和部分成功
 
-无效输入、配置或悬空来源应明确失败。对 `processing.partial=true`，未来实现须明确拒绝或仅处理已确认内容并记录范围，不得把未处理页当空白，也不得返回伪成功批次。空 ChunkBatch 不能单独证明完整切分；未聚合表格片段不能当作完整表格。
+无效输入、配置或悬空来源应明确失败。Chunker 必须以引用内容为准；`plain_text` 仅在 renderer 版本与来源摘要有效时可作缓存。对 `processing.partial=true`，未来实现须明确拒绝或仅处理已确认内容并记录范围，不得把未处理页、`raw_grid=null` 或 `latex=null` 当成空内容，也不得返回伪成功批次。
 
 ## 副作用、幂等、排序与依赖
 

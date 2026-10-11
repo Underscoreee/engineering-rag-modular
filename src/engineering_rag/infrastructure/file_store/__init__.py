@@ -1,3 +1,3 @@
-from .api import FileStore
+from .api import DocumentMigrationService, FileStore
 
-__all__ = ["FileStore"]
+__all__ = ["DocumentMigrationService", "FileStore"]

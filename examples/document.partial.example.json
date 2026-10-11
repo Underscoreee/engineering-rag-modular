@@ -9,12 +9,33 @@
     {"page_number": 1, "page_type": "outer_cover", "width": 600, "height": 800, "page_type_basis": "sequence_inference", "content_extraction_status": "not_processed", "blocks": []},
     {"page_number": 2, "page_type": "body", "width": 600, "height": 800, "page_type_basis": "manually_reviewed", "content_extraction_status": "partially_transcribed", "blocks": [
       {"block_id": "pending-table-fragment", "block_type": "table", "bbox": {"x_min": 40, "y_min": 150, "x_max": 550, "y_max": 450}, "bbox_status": "manual_approximate", "reading_order": 0, "recognition_status": "not_transcribed", "ocr": {"text": "表格区域已定位，数据未转录"}, "table_id": "pending-table", "fragment_index": 0, "fragment_status": "not_transcribed"},
-      {"block_id": "pending-formula", "block_type": "formula", "bbox": {"x_min": 100, "y_min": 500, "x_max": 500, "y_max": 600}, "bbox_status": "manual_approximate", "reading_order": 1, "recognition_status": "unverified", "formula_group_id": "pending-fg", "ocr": {"text": "公式图像待核验", "formula_group": {"equations": [{"formula_id": "pending-f-1", "equation_number": null, "equation_number_status": "unknown", "latex": null, "text": null, "recognition_status": "unverified"}], "symbol_explanations": null}}}
+      {"block_id": "pending-formula", "block_type": "formula", "bbox": {"x_min": 100, "y_min": 500, "x_max": 500, "y_max": 600}, "bbox_status": "manual_approximate", "reading_order": 1, "recognition_status": "unverified", "formula_group_id": "pending-fg", "ocr": {"text": "公式图像待核验", "formula_group": {"equations": [{"formula_id": "pending-f-1", "equation_number": null, "equation_number_status": "unknown", "latex": null, "text": null, "recognition_status": "unverified"}], "symbol_explanations": null}}},
+      {"block_id": "pending-clause-body", "block_type": "body", "bbox": {"x_min": 40, "y_min": 620, "x_max": 550, "y_max": 680}, "bbox_status": "manual_approximate", "reading_order": 2, "recognition_status": "unverified", "ocr": {"text": "4.2.1 虚构条文片段，内容与强制性均待核验。"}}
     ]},
     {"page_number": 3, "page_type": "unknown", "width": 600, "height": 800, "content_extraction_status": "not_processed", "blocks": []}
   ],
-  "sections": [],
-  "tables": [],
-  "clauses": {"normative": [], "explanations": []},
+  "sections": [
+    {"section_id": "partial-n-4", "number": "4", "title": "虚构待核验章", "section_type": "chapter", "content_group": "normative", "parent_section_id": null, "structure_path": ["4"]}
+  ],
+  "tables": [
+    {
+      "table_id": "pending-table",
+      "table_number": null,
+      "title": null,
+      "page_start": 2,
+      "page_end": 2,
+      "source_block_ids": ["pending-table-fragment"],
+      "fragments": [
+        {"page_number": 2, "block_id": "pending-table-fragment", "fragment_index": 0}
+      ],
+      "columns": [],
+      "data": null,
+      "notes": null,
+      "raw_grid": null,
+      "extraction_status": "structure_only",
+      "normalization_warning": "表格内容尚未转录，raw_grid=null 不表示不存在表格。"
+    }
+  ],
+  "clauses": {"normative": [{"clause_id": "partial-n-4.2.1", "clause_number": "4.2.1", "section_id": "partial-n-4", "clause_content": {"plain_text": null, "content_units": [{"order": 0, "content_type": "body", "source_block_ids": ["pending-clause-body"]}], "transcription_status": "unverified", "review_warning": "内容与强制性均待核验。"}, "page_start": 2, "page_end": 2, "source_block_ids": ["pending-clause-body"], "is_mandatory": null, "mandatory_evidence": [{"evidence_id": "partial-mandatory-pending", "source_type": "reviewed_record", "verification_status": "pending", "conclusion": null}]}], "explanations": []},
   "processing": {"parser_id": "synthetic-partial-fixture", "parser_version": "2.4", "partial": true, "is_complete_document_ocr": false, "warnings": [{"code": "unsupported", "message": "页面尚未全部 OCR；空 blocks 不表示空白。", "field": "pages"}, {"code": "invalid_input", "message": "表格及公式的坐标为人工估计，内容待核验。", "field": "pages.1.blocks"}]}
 }

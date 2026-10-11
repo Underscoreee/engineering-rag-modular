@@ -13,7 +13,8 @@ def test_normative_and_explanation_identity_and_order(document_data: dict[str, o
     assert normative.clause_number == explanation.clause_number == "4.2.1"
     assert normative.clause_id != explanation.clause_id
     assert explanation.explains_clause_id == normative.clause_id
-    assert normative.is_mandatory is None
+    assert normative.is_mandatory is True
+    assert normative.mandatory_evidence[0].verification_status.value == "verified"
     assert normative.page_start == 1 and normative.page_end == 2
     assert [unit.content_type.value for unit in normative.clause_content.content_units] == [
         "body",

@@ -3,6 +3,7 @@ from pathlib import Path
 from pydantic import TypeAdapter
 
 from engineering_rag.contracts.answers import AnswerResult, validate_answer_citations
+from engineering_rag.contracts.artifacts import ArtifactManifest
 from engineering_rag.contracts.chunks import ChunkBatch
 from engineering_rag.contracts.documents import Document
 from engineering_rag.contracts.retrieval import RetrievalResult
@@ -14,6 +15,10 @@ def test_every_public_example_round_trips() -> None:
     for name in ("document.example.json", "document.partial.example.json"):
         document = Document.model_validate_json((EXAMPLES / name).read_text(encoding="utf-8"))
         assert Document.model_validate_json(document.model_dump_json()) == document
+    manifest = ArtifactManifest.model_validate_json(
+        (EXAMPLES / "artifact_manifest.example.json").read_text(encoding="utf-8")
+    )
+    assert ArtifactManifest.model_validate_json(manifest.model_dump_json()) == manifest
     batch = ChunkBatch.model_validate_json(
         (EXAMPLES / "chunk_batch.example.json").read_text(encoding="utf-8")
     )

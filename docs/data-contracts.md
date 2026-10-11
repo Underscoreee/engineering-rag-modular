@@ -1,39 +1,57 @@
-# 公共数据契约：Document V2.4
+# 公共数据契约：Document V2.4 冻结候选
 
-`engineering_rag.contracts` 是唯一公共模型来源。Pydantic v2 使用 `extra='forbid'`；`Document.schema_version` 必填且只接受 `"2.4"`。Task 0.1 未改版的 Chunk、检索等持久化对象仍为 `1.0`。JSON 以 `model_validate_json()` / `model_dump_json()` 读写。`examples/` 中的规范文字全部为虚构演示。
+`engineering_rag.contracts` 是唯一公共模型来源。所有 DTO 使用 Pydantic v2 和 `extra='forbid'`；`Document.schema_version` 只接受正式目标值 `"2.4"`。`2.4-proposal`、V2.3 和 Task 0.1 候选 JSON 不会静默迁移。示例内容均为虚构测试文本。
 
-## 字段与空值
+## Document 顶层与页面
 
-| 模型 | 必填 | 可空或默认 | 语义 |
-|---|---|---|---|
-| `Document` | `schema_version`, `document_id`, `bbox_coordinate_system`, `source_file`, `standard`, `page_count`, `processing` | `pages=[]`, `sections=[]`, `tables=[]`, `clauses` 两组默认空 | 具体解析对象；`page_count` 是 PDF 页数，partial 时 `pages` 可少于它 |
-| `StandardMetadata` | `standard_name`, `standard_code` | `edition`, `revision`, `language` 可空 | 标准代码、版次和文档 ID 各有独立含义 |
-| `Page` | `page_number`, `page_type`, `width`, `height`, `content_extraction_status` | `blocks=[]`, `page_type_basis=null` | 物理页，1-based，尺寸为正数 |
-| `PageBlock` | `block_id`, `block_type`, `bbox`, `reading_order` | `ocr`, `asset` 和表格/公式关联字段可空；`recognition_status=verified`, `bbox_status=detected` | 本页物理片段，未识别内容以状态和资源保留 |
-| `LogicalTable` | `table_id`, `page_start`, `page_end`, `source_block_ids`, `fragments`, `extraction_status` | `columns=[]`, `data=null`, `notes=null`，编号和标题可空 | 单页或跨页的唯一逻辑表 |
-| `Section` | `section_id`, `title`, `section_type`, `content_group`, `structure_path` | `number`, `parent_section_id` 可空 | 正文/说明分组内的章、节、附录 |
-| `Clause` | `clause_id`, `clause_number`, `section_id`, `clause_content`, `page_start`, `page_end`, `source_block_ids` | `is_mandatory=null`, `explains_clause_id=null` | 可跨页的单个条文 |
-| `ClauseContent` | 无 | `plain_text=null`, `content_units=[]`, `transcription_status=verified`, `review_warning=null` | 有序逻辑内容，保留 `plain_text` |
-| `ProcessingMetadata` | `parser_id`, `parser_version`, `partial`, `is_complete_document_ocr` | `warnings=[]` | 处理范围和待核验问题 |
+`Document` 必填 `document_id`、文档级 `bbox_coordinate_system={pdf_points,top_left}`、`source_file`、`standard`、`page_count` 和 `processing`，并包含 `pages[]/sections[]/tables[]/clauses`。`document_id` 与 standard code、edition、Parser 版本及 Artifact 版本含义不同。
 
-ID 非空。Document 构造时调用纯函数 `validate_document_references()` 校验 ID、页码、bbox、Section 环、Table fragment、Formula 和 Clause 引用。bbox 只含四个坐标，统一按文档级 `{"unit":"pdf_points","origin":"top_left"}` 解释；超出页面尺寸会被拒绝。`bbox_status=manual_approximate` 表示人工估计，不能用于精确高亮。
+`Page.page_number` 从 1 开始且不超过 `page_count`；尺寸为正。PageType 恰为 13 种指定类型加 `unknown`，BlockType 恰为 `title/body/table/image/formula`。bbox 只有四坐标且不得越过页面。`not_processed + blocks=[]` 表示尚未处理，不是空白页；partial Document 可省略尚未声明的 Page，但已声明引用仍必须有效。
 
-`PageType` 恰有 13 个指定类型及 `unknown`；`BlockType` 恰有 `title/body/table/image/formula`。V2.4 禁用 `printed_page_label`、`primary_page_type`、`region_type`、Block 的 `clause_id/section_id`、Standard 的 `is_synthetic_example`。Section 的 `structure_path` 暂保留。
+`processing.partial=false` 要求所有页均存在且 complete，`is_complete_document_ocr=true`。反向地，`is_complete_document_ocr=true` 也要求全部页存在且 complete；完整 OCR 后仍可因为语义结构未完成而 `partial=true`。
 
-## 表格：物理片段与逻辑结构
+## Table 与 RawGrid
 
-每个 `pages[].blocks[]` 的 table Block 表示本页一个片段，持有 `table_id`。完整的单页/跨页表只在顶层 `tables[]` 保存。`fragments` 从 0 连续编号，顺序和 `source_block_ids` 一致；页码、Block 类型与 `table_id` 均交叉验证。只有 partial Document 中明确为 `not_processed` 或 `not_transcribed` 的待聚合片段，才可暂时没有顶层 Table；此时不能虚构完整 `data`。
+Page table Block 只保存本页 bbox、reading order、局部 OCR、`table_id/fragment_index/fragment_status`。完整结构只在顶层 `LogicalTable`：
 
-`columns[].key` 唯一；`header_path` 非空，`role` 为 `row_header/column_header/dimension/value`。`derived=true` 说明此列由合并单元格展开。`data[]` 是扁平记录，业务键必须恰好对应所有 column key，值只能是原文字符串或 `null`；额外仅允许 `source_page`（本表页范围内整数）和 `source_block_id`（本表片段 ID）两个来源键。`notes` 只能是 `null` 或非空的编号注解数组，序号正整数且表内唯一。`columns/data` 是查询用规范化视图，不能无损复原合并单元格；`raw_grid` 仍待决定。
+- `fragments` 从 0 连续编号，顺序与 `source_block_ids` 一致，页码和 Block 关系双向校验；
+- `columns[].header_path` 支持多级表头，`role` 区分横向/纵向语义，`derived=true` 表示展开派生；
+- `data[]` 的业务键必须恰好等于 column keys，额外只允许 `source_page/source_block_id`；
+- `notes` 只能为 null 或唯一正顺序号的 `{number,content}` 数组；
+- `raw_grid` 可为 null。非空时 row/col 从 0 开始、span 为正且不越界/重叠；complete 必须全覆盖，partial 可有缺口；未识别 cell 使用 `text=null` 和非 verified 状态。
 
-## 公式、Clause 与来源
+`columns/data` 是检索友好记录，`raw_grid` 是最佳可用印刷拓扑，两者职责不同且都不在 Page Block 中复制。
 
-一个 formula Block 使用 `formula_group_id` 与 `ocr.formula_group` 保存有序 Equation 和可空的 `symbol_explanations`。每条 Equation 必须有全文唯一的 `formula_id`。编号分三态：`printed` 要求非空 `equation_number`；`confirmed_absent` 要求编号 `null` 且公式已核验；`unknown` 表示编号尚未确认，此时编号也用 `null` 占位，但绝不宣称原文无号。已核验公式需要非空 `latex`；未转录/待核验可为 `null`。多行 LaTeX 通过 JSON 字符串原样往返。不使用独立 `unit`、`intro`、`line_index`。
+## Formula 与引用式 ClauseContent
 
-`clauses.normative[]` 与 `clauses.explanations[]` 分别保存正文与说明。相同条文号可复用，`clause_id` 必须全文唯一；说明的 `explains_clause_id` 只能指向已声明正文 Clause 或为 `null`。Section 的 `content_group` 与 Clause 分组一致。Clause 和 unit 的 `source_block_ids` 必须存在、处于 Clause 页码范围内；table unit 的来源须覆盖该 Table 全部片段，且只引用 `table_id`，不复制整表。`list_item` 是逻辑单元，只能来自 body Block。`is_mandatory=null` 表示未判定，不据措辞或字体推断效力。
+每条 Equation 都必须有快照内唯一 `formula_id`。`equation_number_status=printed` 要求编号；`confirmed_absent` 要求编号为 null 且公式已核验；`unknown` 表示尚未确认编号，不能冒充无号。未识别公式可保留 `latex/text=null`。禁止旧字段 `line_index`，SymbolExplanation 禁止 `intro/unit`。
 
-## 部分解析、兼容与真实参考样本
+正文与说明分别位于 `clauses.normative/explanations`，同号可以共存但 `clause_id` 不同；说明可用 `explains_clause_id` 指向正文。`Clause.source_block_ids` 是按 ContentUnit 顺序去重后的索引缓存，必须完全一致。
 
-`not_processed` 页的 `blocks=[]` 表示未处理，**不表示空白**；`partially_transcribed` 表示仅部分内容转录；`complete` 才表示本页已完整提取。`processing.partial=true` 允许页面清单不全、尚无语义条文，但已声明引用仍不可悬空。坐标、表格、公式可分别标记人工估计、未转录与待核验。`partial=false` 要求页清单齐全、每页 complete、`is_complete_document_ocr=true`。
+ContentUnit 仅引用权威内容：body/list_item 引用 body Block；table 引用顶层 table 并覆盖所有片段；formula 引用公式 Block 与其中的 `formula_ids`；image 引用 image Block 与 `asset_id`。旧 `text/table/formula_group` 副本会因 strict Schema 被拒绝。
 
-V2.3、Task 0 与 V2.4 不兼容，旧 JSON 不自动升级；`2.4-proposal` 也不静默接受。真实参考样本的明确迁移清单见 [architecture-decisions.md](architecture-decisions.md)。
+`ClauseContent.plain_text` 可空。非空时必须带 `plain_text_renderer_version` 和 `plain_text_source_digest`；`derive_clause_plain_text()` 只读取有序引用对象，并由 Document 校验结果和摘要。来源改变、renderer 升版或数据仍缺失时必须清空/重算缓存，不能人工独立编辑。
+
+## MandatoryEvidence
+
+正文 Clause 的 `is_mandatory` 是三态。`mandatory_evidence[]` 字段包括证据 ID、明确来源枚举、可选来源 Document/page 或 URI、引用说明、pending/verified/rejected、bool/null 结论、审阅标识与 UTC 时间。
+
+- null 可无证据或保留 pending/冲突证据；
+- true/false 至少需要一条 verified 且一致的结论；
+- verified 证据必须有具体文档页或外部 URI，且有审阅人标识和 UTC 时间；
+- conflicting verified 证据禁止确定结论；未知结论可由 `collect_document_diagnostics()` 报 conflict；
+- 说明 Clause 不得携带强条证据。
+
+证据仅表示经声明的审阅材料，不是系统法律保证，也不能由“应/必须”、粗体或模型输出推断。
+
+## ArtifactManifest 与版本
+
+`ArtifactManifest` 必填 `artifact_id/artifact_version/schema_version/created_at/source_document_id/processing_status/document_json_ref`，资源引用含 URI、media type、SHA-256 和大小；`assets=[]`、`parser_version=null` 可选。时间必须为 UTC。`DocumentArtifact` 把 Manifest 与 Document 做内存一致性校验；failed Artifact 不携带 Document。
+
+静态模型不打开 URI、不验证真实字节，也不实现原子存储。`ArtifactIntegrityErrorCode` 为未来 I/O 明确区分 resource not found、checksum mismatch、unsupported schema version 和 snapshot conflict。未来 FileStore 以 `document.json + assets/ + manifest.json` 提交不可变快照；同一键不可覆盖。显式迁移边界由 `DocumentMigrationService` 声明，当前不实现转换器。
+
+## 删除字段与序列化
+
+继续拒绝 `Standard.is_synthetic_example`、Page `printed_page_label/primary_page_type/region_type`、PageBlock `region_type/clause_id/section_id`、bbox 的局部坐标声明、公式 `line_index`、符号 `intro/unit`。保留 `structure_path`、`processing`、Asset 版本、`page_count` 和 `ocr.text`。
+
+JSON 使用 `model_validate_json()` 与 `model_dump_json()` 往返。完整、部分与 Manifest 示例见 `examples/`；详细身份和 Artifact 规则见 `id-policy.md` 与 `artifact-policy.md`。

@@ -1,0 +1,31 @@
+{
+  "artifact_id": "artifact-synthetic-partial-v24",
+  "artifact_version": "1",
+  "schema_version": "2.4",
+  "created_at": "2026-01-01T00:00:00Z",
+  "source_document_id": "doc-synthetic-partial-v24",
+  "processing_status": "partial",
+  "document_json_ref": {
+    "artifact_id": "artifact-synthetic-partial-v24",
+    "artifact_type": "document_json",
+    "uri": "artifact://synthetic/snapshots/artifact-synthetic-partial-v24/1/document.json",
+    "media_type": "application/json",
+    "schema_version": "2.4",
+    "artifact_version": "1",
+    "sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+    "size_bytes": 4096
+  },
+  "assets": [
+    {
+      "artifact_id": "asset-synthetic-pending-formula",
+      "artifact_type": "formula_crop",
+      "uri": "artifact://synthetic/snapshots/artifact-synthetic-partial-v24/1/assets/formula.png",
+      "media_type": "image/png",
+      "schema_version": "2.4",
+      "artifact_version": "1",
+      "sha256": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+      "size_bytes": 1024
+    }
+  ],
+  "parser_version": "synthetic-parser-0.2"
+}

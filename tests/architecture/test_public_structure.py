@@ -33,5 +33,9 @@ def test_required_top_level_documents_exist() -> None:
         "dependency-rules.md",
         "development-guide.md",
         "architecture-decisions.md",
+        "id-policy.md",
+        "artifact-policy.md",
+        "schema-changelog.md",
+        "schema-freeze-checklist.md",
     ):
         assert (ROOT / "docs" / name).is_file()

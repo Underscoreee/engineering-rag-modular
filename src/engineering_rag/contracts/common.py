@@ -47,6 +47,8 @@ class ArtifactRef(ContractModel):
     media_type: NonEmptyStr
     schema_version: NonEmptyStr = SCHEMA_VERSION
     artifact_version: NonEmptyStr
+    sha256: Sha256 | None = None
+    size_bytes: Annotated[int, Field(ge=0)] | None = None
 
 
 class BoundingBox(ContractModel):

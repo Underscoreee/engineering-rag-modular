@@ -6,6 +6,7 @@ from pathlib import Path
 from typing import BinaryIO, Protocol, runtime_checkable
 
 from .answers import AnswerResult, GenerationRequest
+from .artifacts import ArtifactManifest, DocumentArtifact
 from .chunks import ChunkBatch, ChunkingConfig
 from .common import ArtifactRef, FileRef, NonEmptyStr, TraceContext
 from .documents import Document, ParseRequest
@@ -69,6 +70,15 @@ class FileStore(Protocol):
     def read(self, reference: FileRef | ArtifactRef) -> AbstractContextManager[BinaryIO]: ...
     def exists(self, reference: FileRef | ArtifactRef) -> bool: ...
     def delete(self, reference: FileRef | ArtifactRef) -> bool: ...
+    def commit_artifact(self, artifact: DocumentArtifact) -> ArtifactManifest: ...
+    def get_artifact(self, artifact_id: str, artifact_version: str) -> DocumentArtifact: ...
+
+
+@runtime_checkable
+class DocumentMigrationService(Protocol):
+    def migrate_document(
+        self, source: DocumentArtifact, target_schema_version: str
+    ) -> DocumentArtifact: ...
 
 
 @runtime_checkable

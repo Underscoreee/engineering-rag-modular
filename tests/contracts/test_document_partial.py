@@ -50,6 +50,7 @@ def test_unaggregated_fragment_requires_explicit_pending_state() -> None:
     data = json.loads((EXAMPLES / "document.partial.example.json").read_text())
     invalid = deepcopy(data)
     invalid["pages"][1]["blocks"][0]["fragment_status"] = "verified"
+    invalid["pages"][1]["blocks"][0]["table_id"] = "missing-table"
     with pytest.raises(ValidationError, match="unknown table_id"):
         Document.model_validate(invalid)
     data["processing"]["partial"] = False

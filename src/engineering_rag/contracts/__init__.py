@@ -1,6 +1,7 @@
 """Canonical public schemas and protocols."""
 
 from .answers import *  # noqa: F403
+from .artifacts import *  # noqa: F403
 from .chunks import *  # noqa: F403
 from .common import *  # noqa: F403
 from .documents import *  # noqa: F403
