@@ -6,11 +6,11 @@
 
 开发面向工程建设规范、标准、图集等 PDF 的 RAG 系统。核心质量要求：**结构准确、条文可追溯、标准版本可区分、引用可靠、检索评估可复现、模块可独立迭代**。
 
-**当前阶段：Architecture Task 0.2，提交 Document Schema V2.4 冻结候选并落实 7 项 ADR、公共接口、文档和契约测试；维护者验收前不得称为 Frozen。**
+**当前阶段：Architecture Task 0.2 已完成，Document Schema V2.4 已于 2026-10-11 正式冻结（FROZEN）。下一阶段的 Document Parser 独立实现尚未开始。**
 
 这是从零开始的新项目，**不存在任何需要保留、迁移、兼容或引用的旧 Task 1～5 代码**。不得假设旧工程路径、模型或算法仍存在。
 
-Task 0 禁止实现 PDF/OCR 解析、Chunking 算法、Elasticsearch/Milvus 接入、Embedding、检索融合算法、查询改写/HyDE、LLM 调用、HTTP 服务、后台任务和部署设施。
+Architecture Task 0/0.2 阶段禁止实现 PDF/OCR 解析、Chunking 算法、Elasticsearch/Milvus 接入、Embedding、检索融合算法、查询改写/HyDE、LLM 调用、HTTP 服务、后台任务和部署设施。该限制是已完成阶段的历史边界；后续能力只能由维护者通过独立任务明确启动，不能因 Schema 已冻结而视为已经授权或实现。
 
 ## 2. 总体架构：模块化单体（Modular Monolith）
 
@@ -167,7 +167,7 @@ engineering-rag/
 2. 验证七个业务模块可分别运行测试。
 3. 验证 examples 中 JSON 与 Pydantic 模型相符。
 4. 汇报变更文件、公共接口、实际执行的测试结果、遗留问题与后续建议。
-5. **停在 Architecture Task 0，不实现业务算法。**
+5. **停在当前任务明确授权的范围；未经维护者启动后续任务，不实现业务算法。**
 
 ## 9. 顶层优先级
 

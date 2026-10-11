@@ -39,8 +39,10 @@ PageBlock 是正文/公式物理内容来源，LogicalTable 是完整表格来�
 
 ## V2.4 状态与真实样本边界
 
-Task 0.1 的 `2.4` 是未发布候选；仓库没有提交历史或外部消费者证据。本次允许在相同目标版本定稿，但其 ContentUnit 格式与 Task 0.1 候选不兼容，差异记录于 `schema-changelog.md`。`references/GB50010_2015_document.v2.4.partial.json` 保持只读：它是 `2.4-proposal`、含 441 页目录但只有少量人工区域，不会被正式模型静默接收，也不声明完整 OCR。
+Task 0.1 的 `2.4` 是未发布候选，当时没有发布标签或外部消费者证据，因此允许在相同目标版本定稿；其 ContentUnit 格式与 Task 0.1 候选不兼容，差异记录于 `schema-changelog.md`。`references/GB50010_2015_document.v2.4.partial.json` 保持只读：它是 `2.4-proposal`、含 441 页目录但只有少量人工区域，不会被正式模型静默接收，也不声明完整 OCR。
 
-## 尚待维护者确认
+## V2.4 冻结决议
 
-代码与自动化门槛通过后状态只能是 `READY_FOR_REVIEW`。维护者确认、冻结日期以及提交 SHA/标签仍需人工填写；确认前不得声明 **Document Schema V2.4 — Frozen**。
+维护者于 2026-10-11 批准 Architecture Task 0.2 修复验收并授权正式冻结。ADR-001～ADR-007 均保持 **Adopted**，Document Schema V2.4 状态为 **FROZEN**；冻结证据与 Git 标识见 `schema-v2.4-freeze-record.md`。
+
+冻结后不得在 `2.4` 下修改已验收的 Pydantic Schema、公共 Protocol 或数据验证语义。兼容的文档澄清与测试增强可以在不改变契约行为的前提下进行；任何破坏性字段、校验或接口变更必须升级 Schema 版本，新增 ADR，并提供显式迁移机制。ADR-003 所述 Parser 技术评估仍是后续独立任务，不因本次冻结自动开始。

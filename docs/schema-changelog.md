@@ -1,4 +1,10 @@
-# Document Schema 变更记录
+# Document Schema 变更记录（V2.4 FROZEN）
+
+## V2.4 正式冻结 — 2026-10-11
+
+维护者已批准 Architecture Task 0.2 修复验收，自动化门槛全部通过，Document Schema V2.4 从 `READY_FOR_REVIEW` 升级为 `FROZEN`。本次冻结登记不修改 Pydantic Schema、公共 Protocol 或数据验证逻辑；正式记录见 `schema-v2.4-freeze-record.md`，权威验收结果见 `schema-freeze-checklist.md`。
+
+V2.4 冻结后，兼容性澄清和不改变契约行为的测试增强可继续进行；任何破坏性字段、校验或接口变更必须使用新的 Schema 版本、记录 ADR，并提供显式迁移机制。
 
 ## Task 0.1 候选 → Task 0.2 V2.4 冻结候选
 

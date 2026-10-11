@@ -1,6 +1,6 @@
 # Document Schema V2.4 冻结验收表
 
-> 核查日期：2026-10-11。状态：**READY_FOR_REVIEW**。自动化门槛已通过时 `ready_to_freeze=true`，但维护者尚未确认，因此本文件不声明 Frozen。
+> 核查及冻结日期：2026-10-11。状态：**FROZEN**。维护者已明确批准 Architecture Task 0.2 修复验收，并授权将 Document Schema V2.4 正式冻结。本文件是仓库内唯一权威冻结验收表。
 
 ## A. 版本和 ADR
 
@@ -39,26 +39,27 @@
 
 | 检查命令 | 实际结果 | 备注 |
 |---|---|---|
-| `.venv/bin/python -m pytest tests/contracts/test_freeze_gaps.py -q` | `6 passed in 0.22s` | 修复前已确认同文件 `6 failed` |
-| `.venv/bin/python -m pytest tests/contracts -q` | `114 passed in 0.73s` | 完整/部分/Manifest 往返及正反例 |
+| `.venv/bin/python -m pytest tests/contracts/test_freeze_gaps.py -q` | `6 passed` | 修复前已确认同文件 `6 failed` |
+| `.venv/bin/python -m pytest tests/contracts -q` | `114 passed` | 完整/部分/Manifest 往返及正反例 |
 | Parser 模块独立测试 | `1 passed` | 无 OCR/PDF 实现 |
 | Chunking 模块独立测试 | `1 passed` | 无切分算法实现 |
 | 其余五业务模块独立测试 | 各 `1 passed` | 仅既有 Protocol 骨架 |
-| `.venv/bin/python -m pytest -q` | `127 passed in 0.79s` | 无 skip、xfail 或失败 |
+| `.venv/bin/python -m pytest -q` | `127 passed` | 无 skip、xfail 或失败 |
 | `.venv/bin/ruff check .` | 通过 | 无 lint 错误 |
-| `.venv/bin/ruff format --check .` | `110 files already formatted` | 通过 |
-| 完整/部分 Document 与 Manifest JSON 往返 | 通过 | `tests/contracts/test_examples.py` 等 |
+| `.venv/bin/ruff format --check .` | `112 files already formatted` | 通过 |
+| 完整/部分 Document 与 Manifest JSON 往返 | 通过 | 两份 Document 及部分 Document + Manifest 组合均完成回环 |
 | ID / 引用非法反例 | 通过 | duplicates、dangling refs、raw grid、evidence、cache |
 
 环境没有全局 `python` 命令；任务书原始 `python -m pytest -q` 首次返回 `python: command not found`。项目 `.venv/bin/python` 为 Python 3.11.17 项目解释器，后续全部结果均明确使用该入口。该解释器也未内置 pip，故 `.venv/bin/python -m pip install -e '.[dev]'` 返回 `No module named pip`；经批准使用等价的 `uv pip install --python .venv/bin/python -e '.[dev]'` 成功安装 editable package，并按 pyproject 将 pytest 从 9.1.1 校准为 8.4.2。
 
 ## E. 审核结论
 
-- `ready_to_freeze`: **true（等待维护者验收）**
-- 状态：`READY_FOR_REVIEW`
+- `ready_to_freeze`: **true（门槛已通过并已执行冻结）**
+- 状态：`FROZEN`
 - 自动化阻塞事项：独立评审提出的 3 项 P1、3 项 P2 已修复；无剩余自动化阻塞。
 - 不兼容变更处理：Task 0.1 是未发布候选；差异和显式 Migration Protocol 已记录，未提供猜测式迁移器。
-- 维护者确认：**待用户验收**
-- 最终冻结日期、提交 SHA / 标签：**待维护者填写**
+- 维护者确认：**已批准**；依据 2026-10-11 的正式 Freeze Release 指令。
+- 最终冻结日期：**2026-10-11**。
+- Git：修复基线提交 `d7b23d0`；冻结提交由 annotated tag `document-schema-v2.4` 唯一解析（`git rev-parse document-schema-v2.4^{commit}`）。未推送远程。
 
-> 只有维护者确认后才可声明 **Document Schema V2.4 — Frozen**。之后的破坏性变更必须升级 Schema 并提供显式迁移方案。
+> **Document Schema V2.4 — Frozen.** 冻结期间不得修改已验收的 Pydantic Schema、Protocol 或数据验证逻辑；之后的破坏性变更必须升级 Schema 版本并提供显式迁移方案。

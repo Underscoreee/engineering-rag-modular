@@ -1,6 +1,6 @@
-# 公共数据契约：Document V2.4 冻结候选
+# 公共数据契约：Document V2.4（FROZEN）
 
-`engineering_rag.contracts` 是唯一公共模型来源。所有 DTO 使用 Pydantic v2 和 `extra='forbid'`；`Document.schema_version` 只接受正式目标值 `"2.4"`。`2.4-proposal`、V2.3 和 Task 0.1 候选 JSON 不会静默迁移。示例内容均为虚构测试文本。
+`engineering_rag.contracts` 是唯一公共模型来源。Document Schema V2.4 已于 2026-10-11 冻结。所有 DTO 使用 Pydantic v2 和 `extra='forbid'`；`Document.schema_version` 只接受 `"2.4"`。`2.4-proposal`、V2.3 和 Task 0.1 候选 JSON 不会静默迁移。示例内容均为虚构测试文本。冻结后的破坏性变更必须升级 Schema 版本并提供显式迁移机制。
 
 ## Document 顶层与页面
 
