@@ -14,4 +14,5 @@ build/
 data/
 models/
 credentials/
+outputs/
 

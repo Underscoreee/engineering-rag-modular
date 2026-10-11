@@ -1,0 +1,482 @@
+FFFFFF                                                                   [100%]
+=================================== FAILURES ===================================
+__________ test_text_layer_bbox_agrees_with_rotated_visible_page[90] ___________
+
+rotation = 90
+
+    @pytest.mark.parametrize('rotation', [90,180,270])
+    def test_text_layer_bbox_agrees_with_rotated_visible_page(rotation):
+        source=make_text_pdf(['SHORT TEXT'],rotate=rotation)
+        with pymupdf.open(stream=source,filetype='pdf') as doc:
+            p=doc[0]
+            raw=p.get_text('blocks')[0]
+            expected=pymupdf.Rect(raw[:4])*p.rotation_matrix
+            expected_tuple=tuple(expected)
+        with PyMuPdfBackend().open(BytesIO(source),max_bytes=200_000) as pdf:
+            actual=pdf.extract_text_spans(1)[0].bbox
+>       assert (actual.x_min,actual.y_min,actual.x_max,actual.y_max)==pytest.approx(expected_tuple, abs=1e-3)
+E       assert (36.0, 52.650...8200378417969) == approx((162.6...9922 ± 0.001))
+E         
+E         comparison failed. Mismatched elements: 4 / 4:
+E         Max absolute difference: 126.61799621582031
+E         Max relative difference: 3.5171665615505643
+E         Index | Obtained           | Expected                  
+E         0     | 36.0               | 162.6179962158203 ± 0.001 
+E         1     | 52.650001525878906 | 36.0 ± 0.001              
+E         2     | 150.0120086669922  | 187.35000610351562 ± 0.001
+E         3     | 77.38200378417969  | 150.0120086669922 ± 0.001
+
+../task1_1_review/test_task1_1_audit_gaps.py:23: AssertionError
+__________ test_text_layer_bbox_agrees_with_rotated_visible_page[180] __________
+
+rotation = 180
+
+    @pytest.mark.parametrize('rotation', [90,180,270])
+    def test_text_layer_bbox_agrees_with_rotated_visible_page(rotation):
+        source=make_text_pdf(['SHORT TEXT'],rotate=rotation)
+        with pymupdf.open(stream=source,filetype='pdf') as doc:
+            p=doc[0]
+            raw=p.get_text('blocks')[0]
+            expected=pymupdf.Rect(raw[:4])*p.rotation_matrix
+            expected_tuple=tuple(expected)
+        with PyMuPdfBackend().open(BytesIO(source),max_bytes=200_000) as pdf:
+            actual=pdf.extract_text_spans(1)[0].bbox
+>       assert (actual.x_min,actual.y_min,actual.x_max,actual.y_max)==pytest.approx(expected_tuple, abs=1e-3)
+E       assert (36.0, 52.650...8200378417969) == approx((209.9...1562 ± 0.001))
+E         
+E         comparison failed. Mismatched elements: 4 / 4:
+E         Max absolute difference: 173.9879913330078
+E         Max relative difference: 4.832999759250217
+E         Index | Obtained           | Expected                  
+E         0     | 36.0               | 209.9879913330078 ± 0.001 
+E         1     | 52.650001525878906 | 162.6179962158203 ± 0.001 
+E         2     | 150.0120086669922  | 324.0 ± 0.001             
+E         3     | 77.38200378417969  | 187.35000610351562 ± 0.001
+
+../task1_1_review/test_task1_1_audit_gaps.py:23: AssertionError
+__________ test_text_layer_bbox_agrees_with_rotated_visible_page[270] __________
+
+rotation = 270
+
+    @pytest.mark.parametrize('rotation', [90,180,270])
+    def test_text_layer_bbox_agrees_with_rotated_visible_page(rotation):
+        source=make_text_pdf(['SHORT TEXT'],rotate=rotation)
+        with pymupdf.open(stream=source,filetype='pdf') as doc:
+            p=doc[0]
+            raw=p.get_text('blocks')[0]
+            expected=pymupdf.Rect(raw[:4])*p.rotation_matrix
+            expected_tuple=tuple(expected)
+        with PyMuPdfBackend().open(BytesIO(source),max_bytes=200_000) as pdf:
+            actual=pdf.extract_text_spans(1)[0].bbox
+>       assert (actual.x_min,actual.y_min,actual.x_max,actual.y_max)==pytest.approx(expected_tuple, abs=1e-3)
+E       assert (36.0, 52.650...8200378417969) == approx((52.65...24.0 ± 0.001))
+E         
+E         comparison failed. Mismatched elements: 4 / 4:
+E         Max absolute difference: 246.6179962158203
+E         Max relative difference: 3.187020032508385
+E         Index | Obtained           | Expected                  
+E         0     | 36.0               | 52.650001525878906 ± 0.001
+E         1     | 52.650001525878906 | 209.9879913330078 ± 0.001 
+E         2     | 150.0120086669922  | 77.38200378417969 ± 0.001 
+E         3     | 77.38200378417969  | 324.0 ± 0.001
+
+../task1_1_review/test_task1_1_audit_gaps.py:23: AssertionError
+__________ test_rotated_and_cropped_text_layer_returns_valid_document __________
+
+self = <engineering_rag.modules.document_parser.internal.parser.PyMuPdfDocumentParser object at 0x7fae8175bcb0>
+request = ParseRequest(source_file=FileRef(file_id='file-test-pdf', uri='memory://test.pdf', mime_type='application/pdf', sha256...seConfig(config_id='task1.1-test', options={'page_selection': '1', 'dpi': 144, 'min_text_layer_chars': 1}), trace=None)
+
+    def parse(self, request: ParseRequest) -> Document:
+        self.last_diagnostics = None
+        if request.supplied_standard is None:
+            raise ParserConfigurationError(
+                "supplied_standard is required; Task 1.1 does not infer identity from filenames"
+            )
+        settings = ParserSettings.from_contract(request.config)
+        self._check_backend_option(settings.ocr_backend)
+        if (
+            request.source_file.size_bytes is not None
+            and request.source_file.size_bytes > settings.max_pdf_bytes
+        ):
+            raise SourceReadError(
+                f"source size exceeds configured {settings.max_pdf_bytes}-byte limit"
+            )
+        source_context = self._read_source(request.source_file)
+        try:
+            with (
+                source_context as source,
+                self._pdf_backend.open(source, max_bytes=settings.max_pdf_bytes) as pdf,
+            ):
+                page_count = pdf.page_count
+                selected_pages = settings.resolve_pages(page_count)
+                selected = set(selected_pages)
+                document_id = _document_id(request)
+                pages: list[Page] = []
+                warnings: list[ContractError] = []
+                page_diagnostics: list[PageDiagnostic] = []
+                for page_number in range(1, page_count + 1):
+                    metadata = pdf.page_metadata(page_number)
+                    if page_number not in selected:
+                        pages.append(
+                            Page(
+                                page_number=page_number,
+                                page_type=PageType.UNKNOWN,
+                                width=metadata.width,
+                                height=metadata.height,
+                                content_extraction_status=(ContentExtractionStatus.NOT_PROCESSED),
+                                blocks=[],
+                            )
+                        )
+                        page_diagnostics.append(
+                            PageDiagnostic(
+                                page_number=page_number,
+                                status="not_processed",
+                                source="none",
+                                text_item_count=0,
+                                elapsed_seconds=0.0,
+                            )
+                        )
+                        continue
+                    started = perf_counter()
+                    try:
+                        blocks, source_name, messages = self._process_page(
+                            pdf,
+                            document_id=document_id,
+                            page_number=page_number,
+                            settings=settings,
+                        )
+                        pages.append(
+                            Page(
+                                page_number=page_number,
+                                page_type=PageType.UNKNOWN,
+                                page_type_basis="task1.1_no_page_classifier",
+                                width=metadata.width,
+                                height=metadata.height,
+                                content_extraction_status=(
+                                    ContentExtractionStatus.PARTIALLY_TRANSCRIBED
+                                ),
+                                blocks=blocks,
+                            )
+                        )
+                        if not blocks:
+                            warning = ContractError(
+                                code=ErrorCode.INTERNAL,
+                                message=(
+                                    "selected page produced no positioned text; remains partial"
+                                ),
+                                field=f"pages[{page_number}]",
+                                retryable=False,
+                            )
+                            warnings.append(warning)
+                            messages.append(warning.message)
+                        page_diagnostics.append(
+                            PageDiagnostic(
+                                page_number=page_number,
+                                status="partially_transcribed",
+                                source=source_name,
+                                text_item_count=len(blocks),
+                                elapsed_seconds=perf_counter() - started,
+                                messages=messages,
+                            )
+                        )
+                    except Exception as exc:
+                        if settings.on_page_error == "raise":
+                            raise PageProcessingError(
+                                f"page {page_number} processing failed: {exc}"
+                            ) from exc
+                        warning = ContractError(
+                            code=ErrorCode.INTERNAL,
+                            message=f"page processing failed: {exc}",
+                            field=f"pages[{page_number}]",
+                            retryable=True,
+                        )
+                        warnings.append(warning)
+                        pages.append(
+                            Page(
+                                page_number=page_number,
+                                page_type=PageType.UNKNOWN,
+                                width=metadata.width,
+                                height=metadata.height,
+                                content_extraction_status=(ContentExtractionStatus.NOT_PROCESSED),
+                                blocks=[],
+                            )
+                        )
+                        page_diagnostics.append(
+                            PageDiagnostic(
+                                page_number=page_number,
+                                status="failed",
+                                source="none",
+                                text_item_count=0,
+                                elapsed_seconds=perf_counter() - started,
+                                messages=[str(exc)],
+                            )
+                        )
+>               document = Document(
+                    schema_version="2.4",
+                    document_id=document_id,
+                    bbox_coordinate_system=BboxCoordinateSystem(
+                        unit="pdf_points", origin="top_left"
+                    ),
+                    source_file=request.source_file,
+                    standard=request.supplied_standard,
+                    page_count=page_count,
+                    pages=pages,
+                    sections=[],
+                    tables=[],
+                    clauses=ClauseGroups(),
+                    processing=ProcessingMetadata(
+                        parser_id=PARSER_ID,
+                        parser_version=PARSER_VERSION,
+                        partial=True,
+                        is_complete_document_ocr=False,
+                        warnings=warnings,
+                    ),
+                )
+E               pydantic_core._pydantic_core.ValidationError: 1 validation error for Document
+E                 Value error, blk-3302659b27585adcb7d96acbf715c63c: bbox exceeds page dimensions [type=value_error, input_value={'schema_version': '2.4',...ocr=False, warnings=[])}, input_type=dict]
+E                   For further information visit https://errors.pydantic.dev/2.13/v/value_error
+
+src/engineering_rag/modules/document_parser/internal/parser.py:187: ValidationError
+
+The above exception was the direct cause of the following exception:
+
+    def test_rotated_and_cropped_text_layer_returns_valid_document():
+        source=make_text_pdf(['VALID TEXT ROTATED'],rotate=90,crop=True)
+        store, request=request_for(source, options={'min_text_layer_chars':1})
+>       doc=PyMuPdfDocumentParser(store,recognizer=FakeRecognizer(error=AssertionError('OCR must not be used'))).parse(request)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+../task1_1_review/test_task1_1_audit_gaps.py:29: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <engineering_rag.modules.document_parser.internal.parser.PyMuPdfDocumentParser object at 0x7fae8175bcb0>
+request = ParseRequest(source_file=FileRef(file_id='file-test-pdf', uri='memory://test.pdf', mime_type='application/pdf', sha256...seConfig(config_id='task1.1-test', options={'page_selection': '1', 'dpi': 144, 'min_text_layer_chars': 1}), trace=None)
+
+    def parse(self, request: ParseRequest) -> Document:
+        self.last_diagnostics = None
+        if request.supplied_standard is None:
+            raise ParserConfigurationError(
+                "supplied_standard is required; Task 1.1 does not infer identity from filenames"
+            )
+        settings = ParserSettings.from_contract(request.config)
+        self._check_backend_option(settings.ocr_backend)
+        if (
+            request.source_file.size_bytes is not None
+            and request.source_file.size_bytes > settings.max_pdf_bytes
+        ):
+            raise SourceReadError(
+                f"source size exceeds configured {settings.max_pdf_bytes}-byte limit"
+            )
+        source_context = self._read_source(request.source_file)
+        try:
+            with (
+                source_context as source,
+                self._pdf_backend.open(source, max_bytes=settings.max_pdf_bytes) as pdf,
+            ):
+                page_count = pdf.page_count
+                selected_pages = settings.resolve_pages(page_count)
+                selected = set(selected_pages)
+                document_id = _document_id(request)
+                pages: list[Page] = []
+                warnings: list[ContractError] = []
+                page_diagnostics: list[PageDiagnostic] = []
+                for page_number in range(1, page_count + 1):
+                    metadata = pdf.page_metadata(page_number)
+                    if page_number not in selected:
+                        pages.append(
+                            Page(
+                                page_number=page_number,
+                                page_type=PageType.UNKNOWN,
+                                width=metadata.width,
+                                height=metadata.height,
+                                content_extraction_status=(ContentExtractionStatus.NOT_PROCESSED),
+                                blocks=[],
+                            )
+                        )
+                        page_diagnostics.append(
+                            PageDiagnostic(
+                                page_number=page_number,
+                                status="not_processed",
+                                source="none",
+                                text_item_count=0,
+                                elapsed_seconds=0.0,
+                            )
+                        )
+                        continue
+                    started = perf_counter()
+                    try:
+                        blocks, source_name, messages = self._process_page(
+                            pdf,
+                            document_id=document_id,
+                            page_number=page_number,
+                            settings=settings,
+                        )
+                        pages.append(
+                            Page(
+                                page_number=page_number,
+                                page_type=PageType.UNKNOWN,
+                                page_type_basis="task1.1_no_page_classifier",
+                                width=metadata.width,
+                                height=metadata.height,
+                                content_extraction_status=(
+                                    ContentExtractionStatus.PARTIALLY_TRANSCRIBED
+                                ),
+                                blocks=blocks,
+                            )
+                        )
+                        if not blocks:
+                            warning = ContractError(
+                                code=ErrorCode.INTERNAL,
+                                message=(
+                                    "selected page produced no positioned text; remains partial"
+                                ),
+                                field=f"pages[{page_number}]",
+                                retryable=False,
+                            )
+                            warnings.append(warning)
+                            messages.append(warning.message)
+                        page_diagnostics.append(
+                            PageDiagnostic(
+                                page_number=page_number,
+                                status="partially_transcribed",
+                                source=source_name,
+                                text_item_count=len(blocks),
+                                elapsed_seconds=perf_counter() - started,
+                                messages=messages,
+                            )
+                        )
+                    except Exception as exc:
+                        if settings.on_page_error == "raise":
+                            raise PageProcessingError(
+                                f"page {page_number} processing failed: {exc}"
+                            ) from exc
+                        warning = ContractError(
+                            code=ErrorCode.INTERNAL,
+                            message=f"page processing failed: {exc}",
+                            field=f"pages[{page_number}]",
+                            retryable=True,
+                        )
+                        warnings.append(warning)
+                        pages.append(
+                            Page(
+                                page_number=page_number,
+                                page_type=PageType.UNKNOWN,
+                                width=metadata.width,
+                                height=metadata.height,
+                                content_extraction_status=(ContentExtractionStatus.NOT_PROCESSED),
+                                blocks=[],
+                            )
+                        )
+                        page_diagnostics.append(
+                            PageDiagnostic(
+                                page_number=page_number,
+                                status="failed",
+                                source="none",
+                                text_item_count=0,
+                                elapsed_seconds=perf_counter() - started,
+                                messages=[str(exc)],
+                            )
+                        )
+                document = Document(
+                    schema_version="2.4",
+                    document_id=document_id,
+                    bbox_coordinate_system=BboxCoordinateSystem(
+                        unit="pdf_points", origin="top_left"
+                    ),
+                    source_file=request.source_file,
+                    standard=request.supplied_standard,
+                    page_count=page_count,
+                    pages=pages,
+                    sections=[],
+                    tables=[],
+                    clauses=ClauseGroups(),
+                    processing=ProcessingMetadata(
+                        parser_id=PARSER_ID,
+                        parser_version=PARSER_VERSION,
+                        partial=True,
+                        is_complete_document_ocr=False,
+                        warnings=warnings,
+                    ),
+                )
+                self.last_diagnostics = ParserDiagnostics(
+                    parser_id=PARSER_ID,
+                    parser_version=PARSER_VERSION,
+                    pdf_backend=f"PyMuPDF {pdf.backend_version}",
+                    ocr_engine=self._recognizer.engine_name,
+                    ocr_version=self._recognizer.engine_version,
+                    page_count=page_count,
+                    selected_pages=list(selected_pages),
+                    dpi=settings.dpi,
+                    pages=page_diagnostics,
+                )
+                return Document.model_validate_json(document.model_dump_json())
+        except (ParserConfigurationError, DocumentParserError):
+            raise
+        except Exception as exc:
+>           raise DocumentParserError(f"document parsing failed: {exc}") from exc
+E           engineering_rag.modules.document_parser.internal.parser.DocumentParserError: document parsing failed: 1 validation error for Document
+E             Value error, blk-3302659b27585adcb7d96acbf715c63c: bbox exceeds page dimensions [type=value_error, input_value={'schema_version': '2.4',...ocr=False, warnings=[])}, input_type=dict]
+E               For further information visit https://errors.pydantic.dev/2.13/v/value_error
+
+src/engineering_rag/modules/document_parser/internal/parser.py:223: DocumentParserError
+____________________ test_file_sha256_mismatch_is_rejected _____________________
+
+    def test_file_sha256_mismatch_is_rejected():
+        source=make_text_pdf(['SHORT TEXT'])
+        store,request=request_for(source,options={'min_text_layer_chars':1})
+        reference=request.source_file.model_copy(update={'sha256':'0'*64})
+        wrong=ParseRequest(source_file=reference,supplied_standard=request.supplied_standard,config=request.config)
+>       with pytest.raises(Exception,match='(?i)sha256|checksum|digest|integrity'):
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       Failed: DID NOT RAISE <class 'Exception'>
+
+../task1_1_review/test_task1_1_audit_gaps.py:38: Failed
+_________________ test_declared_file_size_mismatch_is_rejected _________________
+
+    def test_declared_file_size_mismatch_is_rejected():
+        source=make_text_pdf(['SHORT TEXT'])
+        store,request=request_for(source,options={'min_text_layer_chars':1})
+        reference=request.source_file.model_copy(update={'size_bytes':len(source)+1000})
+        wrong=ParseRequest(source_file=reference,supplied_standard=request.supplied_standard,config=request.config)
+>       with pytest.raises(Exception,match='(?i)size|bytes|integrity'):
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       Failed: DID NOT RAISE <class 'Exception'>
+
+../task1_1_review/test_task1_1_audit_gaps.py:47: Failed
+=========================== short test summary info ============================
+FAILED ../task1_1_review/test_task1_1_audit_gaps.py::test_text_layer_bbox_agrees_with_rotated_visible_page[90] - assert (36.0, 52.650...8200378417969) == approx((162.6...9922 ± 0.001))
+  
+  comparison failed. Mismatched elements: 4 / 4:
+  Max absolute difference: 126.61799621582031
+  Max relative difference: 3.5171665615505643
+  Index | Obtained           | Expected                  
+  0     | 36.0               | 162.6179962158203 ± 0.001 
+  1     | 52.650001525878906 | 36.0 ± 0.001              
+  2     | 150.0120086669922  | 187.35000610351562 ± 0.001
+  3     | 77.38200378417969  | 150.0120086669922 ± 0.001
+FAILED ../task1_1_review/test_task1_1_audit_gaps.py::test_text_layer_bbox_agrees_with_rotated_visible_page[180] - assert (36.0, 52.650...8200378417969) == approx((209.9...1562 ± 0.001))
+  
+  comparison failed. Mismatched elements: 4 / 4:
+  Max absolute difference: 173.9879913330078
+  Max relative difference: 4.832999759250217
+  Index | Obtained           | Expected                  
+  0     | 36.0               | 209.9879913330078 ± 0.001 
+  1     | 52.650001525878906 | 162.6179962158203 ± 0.001 
+  2     | 150.0120086669922  | 324.0 ± 0.001             
+  3     | 77.38200378417969  | 187.35000610351562 ± 0.001
+FAILED ../task1_1_review/test_task1_1_audit_gaps.py::test_text_layer_bbox_agrees_with_rotated_visible_page[270] - assert (36.0, 52.650...8200378417969) == approx((52.65...24.0 ± 0.001))
+  
+  comparison failed. Mismatched elements: 4 / 4:
+  Max absolute difference: 246.6179962158203
+  Max relative difference: 3.187020032508385
+  Index | Obtained           | Expected                  
+  0     | 36.0               | 52.650001525878906 ± 0.001
+  1     | 52.650001525878906 | 209.9879913330078 ± 0.001 
+  2     | 150.0120086669922  | 77.38200378417969 ± 0.001 
+  3     | 77.38200378417969  | 324.0 ± 0.001
+FAILED ../task1_1_review/test_task1_1_audit_gaps.py::test_rotated_and_cropped_text_layer_returns_valid_document - engineering_rag.modules.document_parser.internal.parser.DocumentParserError: document parsing failed: 1 validation error for Document
+  Value error, blk-3302659b27585adcb7d96acbf715c63c: bbox exceeds page dimensions [type=value_error, input_value={'schema_version': '2.4',...ocr=False, warnings=[])}, input_type=dict]
+    For further information visit https://errors.pydantic.dev/2.13/v/value_error
+FAILED ../task1_1_review/test_task1_1_audit_gaps.py::test_file_sha256_mismatch_is_rejected - Failed: DID NOT RAISE <class 'Exception'>
+FAILED ../task1_1_review/test_task1_1_audit_gaps.py::test_declared_file_size_mismatch_is_rejected - Failed: DID NOT RAISE <class 'Exception'>
+6 failed in 0.21s

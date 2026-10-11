@@ -1,0 +1,31 @@
+{
+  "dataset_id": "GB50010-2015-task1-candidates-v0",
+  "dataset_role": "annotation_queue_not_golden_ground_truth",
+  "verification_status": "candidate_pending_human_review",
+  "exclude_from_accuracy_metrics_until_verified": true,
+  "source": {
+    "standard_code": "GB 50010-2010",
+    "expected_page_count": 441,
+    "source_pdf_sha256": null
+  },
+  "cases": [
+    {"case_id": "P001", "physical_pages": [1], "focus": "outer cover"},
+    {"case_id": "P016", "physical_pages": [16], "focus": "normative body text"},
+    {"case_id": "P024", "physical_pages": [24], "focus": "multiple numbered formulas"},
+    {"case_id": "P028029", "physical_pages": [28, 29], "focus": "cross-page table"},
+    {"case_id": "P050", "physical_pages": [50], "focus": "formula group"},
+    {"case_id": "P126127", "physical_pages": [126, 127], "focus": "table continuation boundary"},
+    {"case_id": "P277", "physical_pages": [277], "focus": "explanation cover"},
+    {"case_id": "P282", "physical_pages": [282], "focus": "explanation body"},
+    {"case_id": "P301", "physical_pages": [301], "focus": "possibly unnumbered formula"}
+  ],
+  "review_required_for": [
+    "source_pdf_sha256",
+    "text",
+    "bbox",
+    "page_type",
+    "table_structure",
+    "formula",
+    "clause_boundaries"
+  ]
+}

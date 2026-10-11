@@ -1,1 +1,1 @@
-"""Reserved for a future parser implementation."""
+"""Private Task 1.1 parser implementation; no public contracts live here."""
