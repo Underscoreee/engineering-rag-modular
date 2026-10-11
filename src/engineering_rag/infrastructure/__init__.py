@@ -1,0 +1,1 @@
+"""Horizontal infrastructure capability interfaces."""

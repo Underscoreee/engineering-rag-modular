@@ -1,0 +1,5290 @@
+{
+  "schema_version": "2.4-proposal",
+  "document_id": "gb50010-2010-2015-43048a647d59",
+  "bbox_coordinate_system": {
+    "unit": "pdf_points",
+    "origin": "top_left"
+  },
+  "source_file": {
+    "file_id": "sha256:43048a647d595fc8e16545851491bab82d3df851b91fe227ba2f7f84f5b64682",
+    "name": "混凝土结构设计规范(2015年版) GB 50010-2010_纯图版.pdf",
+    "uri": null,
+    "mime_type": "application/pdf",
+    "size_bytes": 154122112,
+    "sha256": "43048a647d595fc8e16545851491bab82d3df851b91fe227ba2f7f84f5b64682"
+  },
+  "standard": {
+    "standard_name": "混凝土结构设计规范",
+    "standard_code": "GB 50010-2010",
+    "edition": "2015年版",
+    "language": "zh-CN"
+  },
+  "page_count": 441,
+  "pages": [
+    {
+      "page_number": 1,
+      "page_type": "outer_cover",
+      "page_type_basis": "visually_checked",
+      "width": 394.062,
+      "height": 592.496,
+      "content_extraction_status": "partially_transcribed",
+      "blocks": [
+        {
+          "block_id": "p001_title",
+          "block_type": "title",
+          "bbox": {
+            "x_min": 105,
+            "y_min": 170,
+            "x_max": 302,
+            "y_max": 206
+          },
+          "bbox_status": "manual_approximate",
+          "reading_order": 0,
+          "ocr": {
+            "text": "混凝土结构设计规范"
+          },
+          "extraction_method": "manual_visual_inspection"
+        }
+      ]
+    },
+    {
+      "page_number": 2,
+      "page_type": "inner_cover",
+      "page_type_basis": "visually_checked",
+      "width": 388.346,
+      "height": 583.937,
+      "content_extraction_status": "partially_transcribed",
+      "blocks": [
+        {
+          "block_id": "p002_title",
+          "block_type": "title",
+          "bbox": {
+            "x_min": 110,
+            "y_min": 100,
+            "x_max": 300,
+            "y_max": 155
+          },
+          "bbox_status": "manual_approximate",
+          "reading_order": 0,
+          "ocr": {
+            "text": "混凝土结构设计规范"
+          },
+          "extraction_method": "manual_visual_inspection"
+        }
+      ]
+    },
+    {
+      "page_number": 3,
+      "page_type": "publication_notice",
+      "page_type_basis": "visually_checked",
+      "width": 388.346,
+      "height": 583.937,
+      "content_extraction_status": "partially_transcribed",
+      "blocks": [
+        {
+          "block_id": "p003_notice",
+          "block_type": "title",
+          "bbox": {
+            "x_min": 70,
+            "y_min": 85,
+            "x_max": 325,
+            "y_max": 122
+          },
+          "bbox_status": "manual_approximate",
+          "reading_order": 0,
+          "ocr": {
+            "text": "中华人民共和国住房和城乡建设部公告"
+          },
+          "extraction_method": "manual_visual_inspection"
+        }
+      ]
+    },
+    {
+      "page_number": 4,
+      "page_type": "revision_notes",
+      "page_type_basis": "visually_checked",
+      "width": 388.346,
+      "height": 583.937,
+      "content_extraction_status": "partially_transcribed",
+      "blocks": [
+        {
+          "block_id": "p004_revision",
+          "block_type": "title",
+          "bbox": {
+            "x_min": 138,
+            "y_min": 55,
+            "x_max": 248,
+            "y_max": 100
+          },
+          "bbox_status": "manual_approximate",
+          "reading_order": 0,
+          "ocr": {
+            "text": "修订说明"
+          },
+          "extraction_method": "manual_visual_inspection"
+        }
+      ]
+    },
+    {
+      "page_number": 5,
+      "page_type": "publication_notice",
+      "page_type_basis": "visually_checked",
+      "width": 388.346,
+      "height": 583.937,
+      "content_extraction_status": "partially_transcribed",
+      "blocks": [
+        {
+          "block_id": "p005_notice",
+          "block_type": "title",
+          "bbox": {
+            "x_min": 70,
+            "y_min": 80,
+            "x_max": 320,
+            "y_max": 115
+          },
+          "bbox_status": "manual_approximate",
+          "reading_order": 0,
+          "ocr": {
+            "text": "中华人民共和国住房和城乡建设部公告"
+          },
+          "extraction_method": "manual_visual_inspection"
+        }
+      ]
+    },
+    {
+      "page_number": 6,
+      "page_type": "preface",
+      "page_type_basis": "visually_checked",
+      "width": 388.346,
+      "height": 583.937,
+      "content_extraction_status": "not_processed",
+      "blocks": []
+    },
+    {
+      "page_number": 7,
+      "page_type": "preface",
+      "page_type_basis": "sequence_inference_from_checked_boundaries",
+      "width": 388.346,
+      "height": 583.937,
+      "content_extraction_status": "not_processed",
+      "blocks": []
+    },
+    {
+      "page_number": 8,
+      "page_type": "preface",
+      "page_type_basis": "sequence_inference_from_checked_boundaries",
+      "width": 388.346,
+      "height": 583.937,
+      "content_extraction_status": "not_processed",
+      "blocks": []
+    },
+    {
+      "page_number": 9,
+      "page_type": "toc_zh",
+      "page_type_basis": "visually_checked",
+      "width": 388.346,
+      "height": 583.937,
+      "content_extraction_status": "not_processed",
+      "blocks": []
+    },
+    {
+      "page_number": 10,
+      "page_type": "toc_zh",
+      "page_type_basis": "sequence_inference_from_checked_boundaries",
+      "width": 388.346,
+      "height": 583.937,
+      "content_extraction_status": "not_processed",
+      "blocks": []
+    },
+    {
+      "page_number": 11,
+      "page_type": "toc_zh",
+      "page_type_basis": "sequence_inference_from_checked_boundaries",
+      "width": 388.346,
+      "height": 583.937,
+      "content_extraction_status": "not_processed",
+      "blocks": []
+    },
+    {
+      "page_number": 12,
+      "page_type": "toc_en",
+      "page_type_basis": "visually_checked",
+      "width": 388.346,
+      "height": 583.937,
+      "content_extraction_status": "not_processed",
+      "blocks": []
+    },
+    {
+      "page_number": 13,
+      "page_type": "toc_en",
+      "page_type_basis": "sequence_inference_from_checked_boundaries",
+      "width": 388.346,
+      "height": 583.937,
+      "content_extraction_status": "not_processed",
+      "blocks": []
+    },
+    {
+      "page_number": 14,
+      "page_type": "toc_en",
+      "page_type_basis": "sequence_inference_from_checked_boundaries",
+      "width": 388.346,
+      "height": 583.937,
+      "content_extraction_status": "not_processed",
+      "blocks": []
+    },
+    {
+      "page_number": 15,
+      "page_type": "toc_en",
+      "page_type_basis": "sequence_inference_from_checked_boundaries",
+      "width": 388.346,
+      "height": 583.937,
+      "content_extraction_status": "not_processed",
+      "blocks": []
+    },
+    {
+      "page_number": 16,
+      "page_type": "body",
+      "page_type_basis": "visually_checked",
+      "width": 388.346,
+      "height": 583.937,
+      "content_extraction_status": "partially_transcribed",
+      "blocks": [
+        {
+          "block_id": "p016_ch1",
+          "block_type": "title",
+          "bbox": {
+            "x_min": 128,
+            "y_min": 68,
+            "x_max": 270,
+            "y_max": 102
+          },
+          "bbox_status": "manual_approximate",
+          "reading_order": 0,
+          "ocr": {
+            "text": "1 总则"
+          },
+          "extraction_method": "manual_visual_inspection"
+        },
+        {
+          "block_id": "p016_c101",
+          "block_type": "body",
+          "bbox": {
+            "x_min": 42,
+            "y_min": 110,
+            "x_max": 306,
+            "y_max": 138
+          },
+          "bbox_status": "manual_approximate",
+          "reading_order": 1,
+          "ocr": {
+            "text": "1.0.1 为了在混凝土结构设计中贯彻执行国家的技术经济政策，做到安全、适用、经济，保证质量，制定本规范。"
+          },
+          "extraction_method": "manual_visual_inspection"
+        }
+      ]
+    },
+    {
+      "page_number": 17,
+      "page_type": "body",
+      "page_type_basis": "sequence_inference_from_checked_boundaries",
+      "width": 388.346,
+      "height": 583.937,
+      "content_extraction_status": "not_processed",
+      "blocks": []
+    },
+    {
+      "page_number": 18,
+      "page_type": "body",
+      "page_type_basis": "sequence_inference_from_checked_boundaries",
+      "width": 388.346,
+      "height": 583.937,
+      "content_extraction_status": "not_processed",
+      "blocks": []
+    },
+    {
+      "page_number": 19,
+      "page_type": "body",
+      "page_type_basis": "sequence_inference_from_checked_boundaries",
+      "width": 388.346,
+      "height": 583.937,
+      "content_extraction_status": "not_processed",
+      "blocks": []
+    },
+    {
+      "page_number": 20,
+      "page_type": "body",
+      "page_type_basis": "sequence_inference_from_checked_boundaries",
+      "width": 388.346,
+      "height": 583.937,
+      "content_extraction_status": "not_processed",
+      "blocks": []
+    },
+    {
+      "page_number": 21,
+      "page_type": "body",
+      "page_type_basis": "sequence_inference_from_checked_boundaries",
+      "width": 388.346,
+      "height": 583.937,
+      "content_extraction_status": "not_processed",
+      "blocks": []
+    },
+    {
+      "page_number": 22,
+      "page_type": "body",
+      "page_type_basis": "sequence_inference_from_checked_boundaries",
+      "width": 388.346,
+      "height": 583.937,
+      "content_extraction_status": "not_processed",
+      "blocks": []
+    },
+    {
+      "page_number": 23,
+      "page_type": "body",
+      "page_type_basis": "sequence_inference_from_checked_boundaries",
+      "width": 388.346,
+      "height": 583.937,
+      "content_extraction_status": "not_processed",
+      "blocks": []
+    },
+    {
+      "page_number": 24,
+      "page_type": "body",
+      "page_type_basis": "visually_checked",
+      "width": 388.346,
+      "height": 583.937,
+      "content_extraction_status": "partially_transcribed",
+      "blocks": [
+        {
+          "block_id": "p024_sec33",
+          "block_type": "title",
+          "bbox": {
+            "x_min": 98,
+            "y_min": 66,
+            "x_max": 300,
+            "y_max": 93
+          },
+          "bbox_status": "manual_approximate",
+          "reading_order": 0,
+          "ocr": {
+            "text": "3.3 承载能力极限状态计算"
+          },
+          "extraction_method": "manual_visual_inspection"
+        },
+        {
+          "block_id": "p024_c332",
+          "block_type": "body",
+          "bbox": {
+            "x_min": 41,
+            "y_min": 172,
+            "x_max": 313,
+            "y_max": 211
+          },
+          "bbox_status": "manual_approximate",
+          "reading_order": 1,
+          "ocr": {
+            "text": "3.3.2 对持久设计状况、短暂设计状况和地震设计状况，当用内力的形式表达时，结构构件应采用下列承载能力极限状态设计表达式："
+          },
+          "extraction_method": "manual_visual_inspection"
+        },
+        {
+          "block_id": "p024_f332",
+          "block_type": "formula",
+          "bbox": {
+            "x_min": 60,
+            "y_min": 216,
+            "x_max": 310,
+            "y_max": 510
+          },
+          "bbox_status": "manual_approximate",
+          "reading_order": 2,
+          "ocr": {
+            "text": "γ₀S≤R (3.3.2-1)；R=R(f_c,f_s,a_k,…) /γ_Rd (3.3.2-2)。式中：γ₀、S、R 等符号的说明在后续页面还有延续。",
+            "formula_group": {
+              "equations": [
+                {
+                  "formula_id": "f-3.3.2-1",
+                  "equation_number": "(3.3.2-1)",
+                  "text": "γ₀ S ≤ R",
+                  "latex": "\\gamma_0 S\\le R",
+                  "recognition_status": "visually_verified"
+                },
+                {
+                  "formula_id": "f-3.3.2-2",
+                  "equation_number": "(3.3.2-2)",
+                  "text": "R = R(f_c, f_s, a_k, …) / γ_Rd",
+                  "latex": "R=\\frac{R(f_c,f_s,a_k,\\ldots)}{\\gamma_{Rd}}",
+                  "recognition_status": "visually_verified"
+                }
+              ],
+              "symbol_explanations": {
+                "items": [
+                  {
+                    "symbol": "γ₀",
+                    "latex": "\\gamma_0",
+                    "description": "结构重要性系数"
+                  },
+                  {
+                    "symbol": "S",
+                    "latex": "S",
+                    "description": "承载能力极限状态下作用组合的效应设计值"
+                  },
+                  {
+                    "symbol": "R",
+                    "latex": "R",
+                    "description": "结构构件的抗力设计值"
+                  }
+                ]
+              },
+              "symbol_explanations_status": "partial_verified_continues_next_page"
+            }
+          },
+          "extraction_method": "manual_visual_inspection",
+          "formula_group_id": "fg-3.3.2"
+        }
+      ]
+    },
+    {
+      "page_number": 25,
+      "page_type": "body",
+      "page_type_basis": "sequence_inference_from_checked_boundaries",
+      "width": 388.346,
+      "height": 583.937,
+      "content_extraction_status": "not_processed",
+      "blocks": []
+    },
+    {
+      "page_number": 26,
+      "page_type": "body",
+      "page_type_basis": "visually_checked",
+      "width": 388.346,
+      "height": 583.937,
+      "content_extraction_status": "not_processed",
+      "blocks": []
+    },
+    {
+      "page_number": 27,
+      "page_type": "body",
+      "page_type_basis": "sequence_inference_from_checked_boundaries",
+      "width": 388.346,
+      "height": 583.937,
+      "content_extraction_status": "not_processed",
+      "blocks": []
+    },
+    {
+      "page_number": 28,
+      "page_type": "body",
+      "page_type_basis": "visually_checked",
+      "width": 388.346,
+      "height": 583.937,
+      "content_extraction_status": "partially_transcribed",
+      "blocks": [
+        {
+          "block_id": "p028_t352_part1",
+          "block_type": "table",
+          "bbox": {
+            "x_min": 50,
+            "y_min": 215,
+            "x_max": 345,
+            "y_max": 515
+          },
+          "bbox_status": "manual_approximate",
+          "reading_order": 0,
+          "ocr": {
+            "text": "表3.5.2 混凝土结构的环境类别（第一页，结构未完整转录）"
+          },
+          "extraction_method": "manual_visual_inspection",
+          "table_id": "table-3.5.2",
+          "fragment_index": 0,
+          "fragment_status": "not_transcribed"
+        }
+      ]
+    },
+    {
+      "page_number": 29,
+      "page_type": "body",
+      "page_type_basis": "visually_checked",
+      "width": 388.346,
+      "height": 583.937,
+      "content_extraction_status": "partially_transcribed",
+      "blocks": [
+        {
+          "block_id": "p029_t352_part2",
+          "block_type": "table",
+          "bbox": {
+            "x_min": 47,
+            "y_min": 55,
+            "x_max": 342,
+            "y_max": 258
+          },
+          "bbox_status": "manual_approximate",
+          "reading_order": 0,
+          "ocr": {
+            "text": "续表3.5.2（第二页，含续表数据与表注，未完整转录）"
+          },
+          "extraction_method": "manual_visual_inspection",
+          "table_id": "table-3.5.2",
+          "fragment_index": 1,
+          "fragment_status": "not_transcribed"
+        }
+      ]
+    },
+    {
+      "page_number": 30,
+      "page_type": "body",
+      "page_type_basis": "sequence_inference_from_checked_boundaries",
+      "width": 388.346,
+      "height": 583.937,
+      "content_extraction_status": "not_processed",
+      "blocks": []
+    },
+    {
+      "page_number": 31,
+      "page_type": "body",
+      "page_type_basis": "sequence_inference_from_checked_boundaries",
+      "width": 388.346,
+      "height": 583.937,
+      "content_extraction_status": "not_processed",
+      "blocks": []
+    },
+    {
+      "page_number": 32,
+      "page_type": "body",
+      "page_type_basis": "sequence_inference_from_checked_boundaries",
+      "width": 388.346,
+      "height": 583.937,
+      "content_extraction_status": "not_processed",
+      "blocks": []
+    },
+    {
+      "page_number": 33,
+      "page_type": "body",
+      "page_type_basis": "sequence_inference_from_checked_boundaries",
+      "width": 388.346,
+      "height": 583.937,
+      "content_extraction_status": "not_processed",
+      "blocks": []
+    },
+    {
+      "page_number": 34,
+      "page_type": "body",
+      "page_type_basis": "sequence_inference_from_checked_boundaries",
+      "width": 388.346,
+      "height": 583.937,
+      "content_extraction_status": "not_processed",
+      "blocks": []
+    },
+    {
+      "page_number": 35,
+      "page_type": "body",
+      "page_type_basis": "sequence_inference_from_checked_boundaries",
+      "width": 388.346,
+      "height": 583.937,
+      "content_extraction_status": "not_processed",
+      "blocks": []
+    },
+    {
+      "page_number": 36,
+      "page_type": "body",
+      "page_type_basis": "sequence_inference_from_checked_boundaries",
+      "width": 388.346,
+      "height": 583.937,
+      "content_extraction_status": "not_processed",
+      "blocks": []
+    },
+    {
+      "page_number": 37,
+      "page_type": "body",
+      "page_type_basis": "visually_checked",
+      "width": 388.346,
+      "height": 583.937,
+      "content_extraction_status": "partially_transcribed",
+      "blocks": [
+        {
+          "block_id": "p037_t422_part1",
+          "block_type": "table",
+          "bbox": {
+            "x_min": 48,
+            "y_min": 440,
+            "x_max": 342,
+            "y_max": 570
+          },
+          "bbox_status": "manual_approximate",
+          "reading_order": 0,
+          "ocr": {
+            "text": "表4.2.2-2 预应力筋强度标准值（首段，未完整转录）"
+          },
+          "extraction_method": "manual_visual_inspection",
+          "table_id": "table-4.2.2-2",
+          "fragment_index": 0,
+          "fragment_status": "not_transcribed"
+        }
+      ]
+    },
+    {
+      "page_number": 38,
+      "page_type": "body",
+      "page_type_basis": "visually_checked",
+      "width": 388.346,
+      "height": 583.937,
+      "content_extraction_status": "partially_transcribed",
+      "blocks": [
+        {
+          "block_id": "p038_t422_part2",
+          "block_type": "table",
+          "bbox": {
+            "x_min": 45,
+            "y_min": 35,
+            "x_max": 342,
+            "y_max": 415
+          },
+          "bbox_status": "manual_approximate",
+          "reading_order": 0,
+          "ocr": {
+            "text": "续表4.2.2-2（含多级表头与合并单元格，未完整转录）"
+          },
+          "extraction_method": "manual_visual_inspection",
+          "table_id": "table-4.2.2-2",
+          "fragment_index": 1,
+          "fragment_status": "not_transcribed"
+        }
+      ]
+    },
+    {
+      "page_number": 39,
+      "page_type": "body",
+      "page_type_basis": "sequence_inference_from_checked_boundaries",
+      "width": 388.346,
+      "height": 583.937,
+      "content_extraction_status": "not_processed",
+      "blocks": []
+    },
+    {
+      "page_number": 40,
+      "page_type": "body",
+      "page_type_basis": "sequence_inference_from_checked_boundaries",
+      "width": 388.346,
+      "height": 583.937,
+      "content_extraction_status": "not_processed",
+      "blocks": []
+    },
+    {
+      "page_number": 41,
+      "page_type": "body",
+      "page_type_basis": "sequence_inference_from_checked_boundaries",
+      "width": 388.346,
+      "height": 583.937,
+      "content_extraction_status": "not_processed",
+      "blocks": []
+    },
+    {
+      "page_number": 42,
+      "page_type": "body",
+      "page_type_basis": "sequence_inference_from_checked_boundaries",
+      "width": 388.346,
+      "height": 583.937,
+      "content_extraction_status": "not_processed",
+      "blocks": []
+    },
+    {
+      "page_number": 43,
+      "page_type": "body",
+      "page_type_basis": "sequence_inference_from_checked_boundaries",
+      "width": 388.346,
+      "height": 583.937,
+      "content_extraction_status": "not_processed",
+      "blocks": []
+    },
+    {
+      "page_number": 44,
+      "page_type": "body",
+      "page_type_basis": "sequence_inference_from_checked_boundaries",
+      "width": 388.346,
+      "height": 583.937,
+      "content_extraction_status": "not_processed",
+      "blocks": []
+    },
+    {
+      "page_number": 45,
+      "page_type": "body",
+      "page_type_basis": "sequence_inference_from_checked_boundaries",
+      "width": 388.346,
+      "height": 583.937,
+      "content_extraction_status": "not_processed",
+      "blocks": []
+    },
+    {
+      "page_number": 46,
+      "page_type": "body",
+      "page_type_basis": "sequence_inference_from_checked_boundaries",
+      "width": 388.346,
+      "height": 583.937,
+      "content_extraction_status": "not_processed",
+      "blocks": []
+    },
+    {
+      "page_number": 47,
+      "page_type": "body",
+      "page_type_basis": "sequence_inference_from_checked_boundaries",
+      "width": 388.346,
+      "height": 583.937,
+      "content_extraction_status": "not_processed",
+      "blocks": []
+    },
+    {
+      "page_number": 48,
+      "page_type": "body",
+      "page_type_basis": "sequence_inference_from_checked_boundaries",
+      "width": 388.346,
+      "height": 583.937,
+      "content_extraction_status": "not_processed",
+      "blocks": []
+    },
+    {
+      "page_number": 49,
+      "page_type": "body",
+      "page_type_basis": "sequence_inference_from_checked_boundaries",
+      "width": 388.346,
+      "height": 583.937,
+      "content_extraction_status": "not_processed",
+      "blocks": []
+    },
+    {
+      "page_number": 50,
+      "page_type": "body",
+      "page_type_basis": "visually_checked",
+      "width": 388.346,
+      "height": 583.937,
+      "content_extraction_status": "partially_transcribed",
+      "blocks": [
+        {
+          "block_id": "p050_fg621",
+          "block_type": "formula",
+          "bbox": {
+            "x_min": 53,
+            "y_min": 72,
+            "x_max": 308,
+            "y_max": 345
+          },
+          "bbox_status": "manual_approximate",
+          "reading_order": 0,
+          "ocr": {
+            "text": "(6.2.1-1)～(6.2.1-5) 混凝土受压应力-应变相关公式及“式中”符号说明。",
+            "formula_group": {
+              "equations": [
+                {
+                  "formula_id": "f-6.2.1-1",
+                  "equation_number": "(6.2.1-1)",
+                  "text": "σ_c = f_c [1-(1-ε_c/ε_0)^n]",
+                  "latex": "\\sigma_c=f_c\\left[1-\\left(1-\\frac{\\varepsilon_c}{\\varepsilon_0}\\right)^n\\right]",
+                  "recognition_status": "visually_verified"
+                },
+                {
+                  "formula_id": "f-6.2.1-2",
+                  "equation_number": "(6.2.1-2)",
+                  "text": "σ_c = f_c",
+                  "latex": "\\sigma_c=f_c",
+                  "recognition_status": "visually_verified"
+                },
+                {
+                  "formula_id": "f-6.2.1-3",
+                  "equation_number": "(6.2.1-3)",
+                  "text": "n = 2 - (f_cu,k-50)/60",
+                  "latex": "n=2-\\frac{f_{cu,k}-50}{60}",
+                  "recognition_status": "visually_verified"
+                },
+                {
+                  "formula_id": "f-6.2.1-4",
+                  "equation_number": "(6.2.1-4)",
+                  "text": "ε_0 = 0.002 + 0.5(f_cu,k-50)×10^-5",
+                  "latex": "\\varepsilon_0=0.002+0.5(f_{cu,k}-50)\\times10^{-5}",
+                  "recognition_status": "visually_verified"
+                },
+                {
+                  "formula_id": "f-6.2.1-5",
+                  "equation_number": "(6.2.1-5)",
+                  "text": "ε_cu = 0.0033 - (f_cu,k-50)×10^-5",
+                  "latex": "\\varepsilon_{cu}=0.0033-(f_{cu,k}-50)\\times10^{-5}",
+                  "recognition_status": "visually_verified"
+                }
+              ],
+              "symbol_explanations": {
+                "items": [
+                  {
+                    "symbol": "σ_c",
+                    "latex": "\\sigma_c",
+                    "description": "混凝土压应变为 ε_c 时的混凝土压应力"
+                  },
+                  {
+                    "symbol": "f_c",
+                    "latex": "f_c",
+                    "description": "混凝土轴心抗压强度设计值"
+                  },
+                  {
+                    "symbol": "ε_0",
+                    "latex": "\\varepsilon_0",
+                    "description": "混凝土压应力达到 f_c 时的混凝土压应变"
+                  },
+                  {
+                    "symbol": "ε_cu",
+                    "latex": "\\varepsilon_{cu}",
+                    "description": "正截面的混凝土极限压应变"
+                  },
+                  {
+                    "symbol": "f_cu,k",
+                    "latex": "f_{cu,k}",
+                    "description": "混凝土立方体抗压强度标准值"
+                  },
+                  {
+                    "symbol": "n",
+                    "latex": "n",
+                    "description": "系数"
+                  }
+                ]
+              },
+              "symbol_explanations_status": "verified_abbreviated"
+            }
+          },
+          "extraction_method": "manual_visual_inspection",
+          "formula_group_id": "fg-6.2.1-a"
+        },
+        {
+          "block_id": "p050_fg621b",
+          "block_type": "formula",
+          "bbox": {
+            "x_min": 51,
+            "y_min": 359,
+            "x_max": 311,
+            "y_max": 510
+          },
+          "bbox_status": "manual_approximate",
+          "reading_order": 1,
+          "ocr": {
+            "text": "(6.2.1-6)、(6.2.1-7) 钢筋应力相关公式及其符号说明（未完整转录）。",
+            "formula_group": {
+              "equations": [
+                {
+                  "formula_id": "f-6.2.1-6",
+                  "equation_number": "(6.2.1-6)",
+                  "text": null,
+                  "latex": null,
+                  "recognition_status": "not_transcribed"
+                },
+                {
+                  "formula_id": "f-6.2.1-7",
+                  "equation_number": "(6.2.1-7)",
+                  "text": null,
+                  "latex": null,
+                  "recognition_status": "not_transcribed"
+                }
+              ],
+              "symbol_explanations": null
+            }
+          },
+          "extraction_method": "manual_visual_inspection",
+          "formula_group_id": "fg-6.2.1-b"
+        }
+      ]
+    },
+    {
+      "page_number": 51,
+      "page_type": "body",
+      "page_type_basis": "sequence_inference_from_checked_boundaries",
+      "width": 388.346,
+      "height": 583.937,
+      "content_extraction_status": "not_processed",
+      "blocks": []
+    },
+    {
+      "page_number": 52,
+      "page_type": "body",
+      "page_type_basis": "sequence_inference_from_checked_boundaries",
+      "width": 388.346,
+      "height": 583.937,
+      "content_extraction_status": "not_processed",
+      "blocks": []
+    },
+    {
+      "page_number": 53,
+      "page_type": "body",
+      "page_type_basis": "sequence_inference_from_checked_boundaries",
+      "width": 388.346,
+      "height": 583.937,
+      "content_extraction_status": "not_processed",
+      "blocks": []
+    },
+    {
+      "page_number": 54,
+      "page_type": "body",
+      "page_type_basis": "sequence_inference_from_checked_boundaries",
+      "width": 388.346,
+      "height": 583.937,
+      "content_extraction_status": "not_processed",
+      "blocks": []
+    },
+    {
+      "page_number": 55,
+      "page_type": "body",
+      "page_type_basis": "sequence_inference_from_checked_boundaries",
+      "width": 388.346,
+      "height": 583.937,
+      "content_extraction_status": "not_processed",
+      "blocks": []
+    },
+    {
+      "page_number": 56,
+      "page_type": "body",
+      "page_type_basis": "sequence_inference_from_checked_boundaries",
+      "width": 388.346,
+      "height": 583.937,
+      "content_extraction_status": "not_processed",
+      "blocks": []
+    },
+    {
+      "page_number": 57,
+      "page_type": "body",
+      "page_type_basis": "sequence_inference_from_checked_boundaries",
+      "width": 388.346,
+      "height": 583.937,
+      "content_extraction_status": "not_processed",
+      "blocks": []
+    },
+    {
+      "page_number": 58,
+      "page_type": "body",
+      "page_type_basis": "sequence_inference_from_checked_boundaries",
+      "width": 388.346,
+      "height": 583.937,
+      "content_extraction_status": "not_processed",
+      "blocks": []
+    },
+    {
+      "page_number": 59,
+      "page_type": "body",
+      "page_type_basis": "sequence_inference_from_checked_boundaries",
+      "width": 388.346,
+      "height": 583.937,
+      "content_extraction_status": "not_processed",
+      "blocks": []
+    },
+    {
+      "page_number": 60,
+      "page_type": "body",
+      "page_type_basis": "sequence_inference_from_checked_boundaries",
+      "width": 388.346,
+      "height": 583.937,
+      "content_extraction_status": "not_processed",
+      "blocks": []
+    },
+    {
+      "page_number": 61,
+      "page_type": "body",
+      "page_type_basis": "sequence_inference_from_checked_boundaries",
+      "width": 388.346,
+      "height": 583.937,
+      "content_extraction_status": "not_processed",
+      "blocks": []
+    },
+    {
+      "page_number": 62,
+      "page_type": "body",
+      "page_type_basis": "sequence_inference_from_checked_boundaries",
+      "width": 388.346,
+      "height": 583.937,
+      "content_extraction_status": "not_processed",
+      "blocks": []
+    },
+    {
+      "page_number": 63,
+      "page_type": "body",
+      "page_type_basis": "sequence_inference_from_checked_boundaries",
+      "width": 388.346,
+      "height": 583.937,
+      "content_extraction_status": "not_processed",
+      "blocks": []
+    },
+    {
+      "page_number": 64,
+      "page_type": "body",
+      "page_type_basis": "sequence_inference_from_checked_boundaries",
+      "width": 388.346,
+      "height": 583.937,
+      "content_extraction_status": "not_processed",
+      "blocks": []
+    },
+    {
+      "page_number": 65,
+      "page_type": "body",
+      "page_type_basis": "sequence_inference_from_checked_boundaries",
+      "width": 388.346,
+      "height": 583.937,
+      "content_extraction_status": "not_processed",
+      "blocks": []
+    },
+    {
+      "page_number": 66,
+      "page_type": "body",
+      "page_type_basis": "sequence_inference_from_checked_boundaries",
+      "width": 388.346,
+      "height": 583.937,
+      "content_extraction_status": "not_processed",
+      "blocks": []
+    },
+    {
+      "page_number": 67,
+      "page_type": "body",
+      "page_type_basis": "sequence_inference_from_checked_boundaries",
+      "width": 388.346,
+      "height": 583.937,
+      "content_extraction_status": "not_processed",
+      "blocks": []
+    },
+    {
+      "page_number": 68,
+      "page_type": "body",
+      "page_type_basis": "sequence_inference_from_checked_boundaries",
+      "width": 388.346,
+      "height": 583.937,
+      "content_extraction_status": "not_processed",
+      "blocks": []
+    },
+    {
+      "page_number": 69,
+      "page_type": "body",
+      "page_type_basis": "sequence_inference_from_checked_boundaries",
+      "width": 388.346,
+      "height": 583.937,
+      "content_extraction_status": "not_processed",
+      "blocks": []
+    },
+    {
+      "page_number": 70,
+      "page_type": "body",
+      "page_type_basis": "sequence_inference_from_checked_boundaries",
+      "width": 388.346,
+      "height": 583.937,
+      "content_extraction_status": "not_processed",
+      "blocks": []
+    },
+    {
+      "page_number": 71,
+      "page_type": "body",
+      "page_type_basis": "sequence_inference_from_checked_boundaries",
+      "width": 388.346,
+      "height": 583.937,
+      "content_extraction_status": "not_processed",
+      "blocks": []
+    },
+    {
+      "page_number": 72,
+      "page_type": "body",
+      "page_type_basis": "sequence_inference_from_checked_boundaries",
+      "width": 388.346,
+      "height": 583.937,
+      "content_extraction_status": "not_processed",
+      "blocks": []
+    },
+    {
+      "page_number": 73,
+      "page_type": "body",
+      "page_type_basis": "sequence_inference_from_checked_boundaries",
+      "width": 388.346,
+      "height": 583.937,
+      "content_extraction_status": "not_processed",
+      "blocks": []
+    },
+    {
+      "page_number": 74,
+      "page_type": "body",
+      "page_type_basis": "sequence_inference_from_checked_boundaries",
+      "width": 388.346,
+      "height": 583.937,
+      "content_extraction_status": "not_processed",
+      "blocks": []
+    },
+    {
+      "page_number": 75,
+      "page_type": "body",
+      "page_type_basis": "sequence_inference_from_checked_boundaries",
+      "width": 388.346,
+      "height": 583.937,
+      "content_extraction_status": "not_processed",
+      "blocks": []
+    },
+    {
+      "page_number": 76,
+      "page_type": "body",
+      "page_type_basis": "sequence_inference_from_checked_boundaries",
+      "width": 388.346,
+      "height": 583.937,
+      "content_extraction_status": "not_processed",
+      "blocks": []
+    },
+    {
+      "page_number": 77,
+      "page_type": "body",
+      "page_type_basis": "sequence_inference_from_checked_boundaries",
+      "width": 388.346,
+      "height": 583.937,
+      "content_extraction_status": "not_processed",
+      "blocks": []
+    },
+    {
+      "page_number": 78,
+      "page_type": "body",
+      "page_type_basis": "sequence_inference_from_checked_boundaries",
+      "width": 388.346,
+      "height": 583.937,
+      "content_extraction_status": "not_processed",
+      "blocks": []
+    },
+    {
+      "page_number": 79,
+      "page_type": "body",
+      "page_type_basis": "sequence_inference_from_checked_boundaries",
+      "width": 388.346,
+      "height": 583.937,
+      "content_extraction_status": "not_processed",
+      "blocks": []
+    },
+    {
+      "page_number": 80,
+      "page_type": "body",
+      "page_type_basis": "sequence_inference_from_checked_boundaries",
+      "width": 388.346,
+      "height": 583.937,
+      "content_extraction_status": "not_processed",
+      "blocks": []
+    },
+    {
+      "page_number": 81,
+      "page_type": "body",
+      "page_type_basis": "sequence_inference_from_checked_boundaries",
+      "width": 388.346,
+      "height": 583.937,
+      "content_extraction_status": "not_processed",
+      "blocks": []
+    },
+    {
+      "page_number": 82,
+      "page_type": "body",
+      "page_type_basis": "sequence_inference_from_checked_boundaries",
+      "width": 388.346,
+      "height": 583.937,
+      "content_extraction_status": "not_processed",
+      "blocks": []
+    },
+    {
+      "page_number": 83,
+      "page_type": "body",
+      "page_type_basis": "sequence_inference_from_checked_boundaries",
+      "width": 388.346,
+      "height": 583.937,
+      "content_extraction_status": "not_processed",
+      "blocks": []
+    },
+    {
+      "page_number": 84,
+      "page_type": "body",
+      "page_type_basis": "sequence_inference_from_checked_boundaries",
+      "width": 388.346,
+      "height": 583.937,
+      "content_extraction_status": "not_processed",
+      "blocks": []
+    },
+    {
+      "page_number": 85,
+      "page_type": "body",
+      "page_type_basis": "sequence_inference_from_checked_boundaries",
+      "width": 388.346,
+      "height": 583.937,
+      "content_extraction_status": "not_processed",
+      "blocks": []
+    },
+    {
+      "page_number": 86,
+      "page_type": "body",
+      "page_type_basis": "sequence_inference_from_checked_boundaries",
+      "width": 388.346,
+      "height": 583.937,
+      "content_extraction_status": "not_processed",
+      "blocks": []
+    },
+    {
+      "page_number": 87,
+      "page_type": "body",
+      "page_type_basis": "sequence_inference_from_checked_boundaries",
+      "width": 388.346,
+      "height": 583.937,
+      "content_extraction_status": "not_processed",
+      "blocks": []
+    },
+    {
+      "page_number": 88,
+      "page_type": "body",
+      "page_type_basis": "sequence_inference_from_checked_boundaries",
+      "width": 388.346,
+      "height": 583.937,
+      "content_extraction_status": "not_processed",
+      "blocks": []
+    },
+    {
+      "page_number": 89,
+      "page_type": "body",
+      "page_type_basis": "sequence_inference_from_checked_boundaries",
+      "width": 388.346,
+      "height": 583.937,
+      "content_extraction_status": "not_processed",
+      "blocks": []
+    },
+    {
+      "page_number": 90,
+      "page_type": "body",
+      "page_type_basis": "sequence_inference_from_checked_boundaries",
+      "width": 388.346,
+      "height": 583.937,
+      "content_extraction_status": "not_processed",
+      "blocks": []
+    },
+    {
+      "page_number": 91,
+      "page_type": "body",
+      "page_type_basis": "sequence_inference_from_checked_boundaries",
+      "width": 388.346,
+      "height": 583.937,
+      "content_extraction_status": "not_processed",
+      "blocks": []
+    },
+    {
+      "page_number": 92,
+      "page_type": "body",
+      "page_type_basis": "sequence_inference_from_checked_boundaries",
+      "width": 388.346,
+      "height": 583.937,
+      "content_extraction_status": "not_processed",
+      "blocks": []
+    },
+    {
+      "page_number": 93,
+      "page_type": "body",
+      "page_type_basis": "sequence_inference_from_checked_boundaries",
+      "width": 388.346,
+      "height": 583.937,
+      "content_extraction_status": "not_processed",
+      "blocks": []
+    },
+    {
+      "page_number": 94,
+      "page_type": "body",
+      "page_type_basis": "sequence_inference_from_checked_boundaries",
+      "width": 388.346,
+      "height": 583.937,
+      "content_extraction_status": "not_processed",
+      "blocks": []
+    },
+    {
+      "page_number": 95,
+      "page_type": "body",
+      "page_type_basis": "sequence_inference_from_checked_boundaries",
+      "width": 388.346,
+      "height": 583.937,
+      "content_extraction_status": "not_processed",
+      "blocks": []
+    },
+    {
+      "page_number": 96,
+      "page_type": "body",
+      "page_type_basis": "sequence_inference_from_checked_boundaries",
+      "width": 388.346,
+      "height": 583.937,
+      "content_extraction_status": "not_processed",
+      "blocks": []
+    },
+    {
+      "page_number": 97,
+      "page_type": "body",
+      "page_type_basis": "sequence_inference_from_checked_boundaries",
+      "width": 388.346,
+      "height": 583.937,
+      "content_extraction_status": "not_processed",
+      "blocks": []
+    },
+    {
+      "page_number": 98,
+      "page_type": "body",
+      "page_type_basis": "sequence_inference_from_checked_boundaries",
+      "width": 388.346,
+      "height": 583.937,
+      "content_extraction_status": "not_processed",
+      "blocks": []
+    },
+    {
+      "page_number": 99,
+      "page_type": "body",
+      "page_type_basis": "sequence_inference_from_checked_boundaries",
+      "width": 388.346,
+      "height": 583.937,
+      "content_extraction_status": "not_processed",
+      "blocks": []
+    },
+    {
+      "page_number": 100,
+      "page_type": "body",
+      "page_type_basis": "sequence_inference_from_checked_boundaries",
+      "width": 388.346,
+      "height": 583.937,
+      "content_extraction_status": "not_processed",
+      "blocks": []
+    },
+    {
+      "page_number": 101,
+      "page_type": "body",
+      "page_type_basis": "sequence_inference_from_checked_boundaries",
+      "width": 388.346,
+      "height": 583.937,
+      "content_extraction_status": "not_processed",
+      "blocks": []
+    },
+    {
+      "page_number": 102,
+      "page_type": "body",
+      "page_type_basis": "sequence_inference_from_checked_boundaries",
+      "width": 388.346,
+      "height": 583.937,
+      "content_extraction_status": "not_processed",
+      "blocks": []
+    },
+    {
+      "page_number": 103,
+      "page_type": "body",
+      "page_type_basis": "sequence_inference_from_checked_boundaries",
+      "width": 388.346,
+      "height": 583.937,
+      "content_extraction_status": "not_processed",
+      "blocks": []
+    },
+    {
+      "page_number": 104,
+      "page_type": "body",
+      "page_type_basis": "sequence_inference_from_checked_boundaries",
+      "width": 388.346,
+      "height": 583.937,
+      "content_extraction_status": "not_processed",
+      "blocks": []
+    },
+    {
+      "page_number": 105,
+      "page_type": "body",
+      "page_type_basis": "sequence_inference_from_checked_boundaries",
+      "width": 388.346,
+      "height": 583.937,
+      "content_extraction_status": "not_processed",
+      "blocks": []
+    },
+    {
+      "page_number": 106,
+      "page_type": "body",
+      "page_type_basis": "sequence_inference_from_checked_boundaries",
+      "width": 388.346,
+      "height": 583.937,
+      "content_extraction_status": "not_processed",
+      "blocks": []
+    },
+    {
+      "page_number": 107,
+      "page_type": "body",
+      "page_type_basis": "sequence_inference_from_checked_boundaries",
+      "width": 388.346,
+      "height": 583.937,
+      "content_extraction_status": "not_processed",
+      "blocks": []
+    },
+    {
+      "page_number": 108,
+      "page_type": "body",
+      "page_type_basis": "sequence_inference_from_checked_boundaries",
+      "width": 388.346,
+      "height": 583.937,
+      "content_extraction_status": "not_processed",
+      "blocks": []
+    },
+    {
+      "page_number": 109,
+      "page_type": "body",
+      "page_type_basis": "sequence_inference_from_checked_boundaries",
+      "width": 388.346,
+      "height": 583.937,
+      "content_extraction_status": "not_processed",
+      "blocks": []
+    },
+    {
+      "page_number": 110,
+      "page_type": "body",
+      "page_type_basis": "sequence_inference_from_checked_boundaries",
+      "width": 388.346,
+      "height": 583.937,
+      "content_extraction_status": "not_processed",
+      "blocks": []
+    },
+    {
+      "page_number": 111,
+      "page_type": "body",
+      "page_type_basis": "sequence_inference_from_checked_boundaries",
+      "width": 388.346,
+      "height": 583.937,
+      "content_extraction_status": "not_processed",
+      "blocks": []
+    },
+    {
+      "page_number": 112,
+      "page_type": "body",
+      "page_type_basis": "sequence_inference_from_checked_boundaries",
+      "width": 388.346,
+      "height": 583.937,
+      "content_extraction_status": "not_processed",
+      "blocks": []
+    },
+    {
+      "page_number": 113,
+      "page_type": "body",
+      "page_type_basis": "sequence_inference_from_checked_boundaries",
+      "width": 388.346,
+      "height": 583.937,
+      "content_extraction_status": "not_processed",
+      "blocks": []
+    },
+    {
+      "page_number": 114,
+      "page_type": "body",
+      "page_type_basis": "sequence_inference_from_checked_boundaries",
+      "width": 388.346,
+      "height": 583.937,
+      "content_extraction_status": "not_processed",
+      "blocks": []
+    },
+    {
+      "page_number": 115,
+      "page_type": "body",
+      "page_type_basis": "sequence_inference_from_checked_boundaries",
+      "width": 388.346,
+      "height": 583.937,
+      "content_extraction_status": "not_processed",
+      "blocks": []
+    },
+    {
+      "page_number": 116,
+      "page_type": "body",
+      "page_type_basis": "sequence_inference_from_checked_boundaries",
+      "width": 388.346,
+      "height": 583.937,
+      "content_extraction_status": "not_processed",
+      "blocks": []
+    },
+    {
+      "page_number": 117,
+      "page_type": "body",
+      "page_type_basis": "sequence_inference_from_checked_boundaries",
+      "width": 388.346,
+      "height": 583.937,
+      "content_extraction_status": "not_processed",
+      "blocks": []
+    },
+    {
+      "page_number": 118,
+      "page_type": "body",
+      "page_type_basis": "sequence_inference_from_checked_boundaries",
+      "width": 388.346,
+      "height": 583.937,
+      "content_extraction_status": "not_processed",
+      "blocks": []
+    },
+    {
+      "page_number": 119,
+      "page_type": "body",
+      "page_type_basis": "sequence_inference_from_checked_boundaries",
+      "width": 388.346,
+      "height": 583.937,
+      "content_extraction_status": "not_processed",
+      "blocks": []
+    },
+    {
+      "page_number": 120,
+      "page_type": "body",
+      "page_type_basis": "sequence_inference_from_checked_boundaries",
+      "width": 388.346,
+      "height": 583.937,
+      "content_extraction_status": "not_processed",
+      "blocks": []
+    },
+    {
+      "page_number": 121,
+      "page_type": "body",
+      "page_type_basis": "sequence_inference_from_checked_boundaries",
+      "width": 388.346,
+      "height": 583.937,
+      "content_extraction_status": "not_processed",
+      "blocks": []
+    },
+    {
+      "page_number": 122,
+      "page_type": "body",
+      "page_type_basis": "sequence_inference_from_checked_boundaries",
+      "width": 388.346,
+      "height": 583.937,
+      "content_extraction_status": "not_processed",
+      "blocks": []
+    },
+    {
+      "page_number": 123,
+      "page_type": "body",
+      "page_type_basis": "sequence_inference_from_checked_boundaries",
+      "width": 388.346,
+      "height": 583.937,
+      "content_extraction_status": "not_processed",
+      "blocks": []
+    },
+    {
+      "page_number": 124,
+      "page_type": "body",
+      "page_type_basis": "sequence_inference_from_checked_boundaries",
+      "width": 388.346,
+      "height": 583.937,
+      "content_extraction_status": "not_processed",
+      "blocks": []
+    },
+    {
+      "page_number": 125,
+      "page_type": "body",
+      "page_type_basis": "sequence_inference_from_checked_boundaries",
+      "width": 388.346,
+      "height": 583.937,
+      "content_extraction_status": "not_processed",
+      "blocks": []
+    },
+    {
+      "page_number": 126,
+      "page_type": "body",
+      "page_type_basis": "visually_checked",
+      "width": 388.346,
+      "height": 583.937,
+      "content_extraction_status": "partially_transcribed",
+      "blocks": [
+        {
+          "block_id": "p126_ch9",
+          "block_type": "title",
+          "bbox": {
+            "x_min": 110,
+            "y_min": 65,
+            "x_max": 274,
+            "y_max": 89
+          },
+          "bbox_status": "manual_approximate",
+          "reading_order": 0,
+          "ocr": {
+            "text": "9 结构构件的基本规定"
+          },
+          "extraction_method": "manual_visual_inspection"
+        },
+        {
+          "block_id": "p126_sec91",
+          "block_type": "title",
+          "bbox": {
+            "x_min": 137,
+            "y_min": 94,
+            "x_max": 238,
+            "y_max": 111
+          },
+          "bbox_status": "manual_approximate",
+          "reading_order": 1,
+          "ocr": {
+            "text": "9.1 板"
+          },
+          "extraction_method": "manual_visual_inspection"
+        },
+        {
+          "block_id": "p126_c912",
+          "block_type": "body",
+          "bbox": {
+            "x_min": 40,
+            "y_min": 262,
+            "x_max": 306,
+            "y_max": 351
+          },
+          "bbox_status": "manual_approximate",
+          "reading_order": 2,
+          "ocr": {
+            "text": "9.1.2 现浇混凝土板的尺寸宜符合下列规定：\n1 板的跨厚比：钢筋混凝土单向板不大于30，双向板不大于40；无梁支承的有柱帽板不大于35，无梁支承的无柱帽板不大于30。预应力板可适当增加；当板的荷载、跨度较大时宜适当减小。\n2 现浇钢筋混凝土板的厚度不应小于表9.1.2规定的数值。"
+          },
+          "extraction_method": "manual_visual_inspection"
+        },
+        {
+          "block_id": "p126_t912_p1",
+          "block_type": "table",
+          "bbox": {
+            "x_min": 39,
+            "y_min": 348,
+            "x_max": 295,
+            "y_max": 440
+          },
+          "bbox_status": "manual_approximate",
+          "reading_order": 3,
+          "ocr": {
+            "text": "表9.1.2 现浇钢筋混凝土板的最小厚度（mm），前四行"
+          },
+          "extraction_method": "manual_visual_inspection",
+          "table_id": "table-9.1.2",
+          "fragment_index": 0
+        }
+      ]
+    },
+    {
+      "page_number": 127,
+      "page_type": "body",
+      "page_type_basis": "visually_checked",
+      "width": 388.346,
+      "height": 583.937,
+      "content_extraction_status": "partially_transcribed",
+      "blocks": [
+        {
+          "block_id": "p127_t912_p2",
+          "block_type": "table",
+          "bbox": {
+            "x_min": 44,
+            "y_min": 35,
+            "x_max": 301,
+            "y_max": 159
+          },
+          "bbox_status": "manual_approximate",
+          "reading_order": 0,
+          "ocr": {
+            "text": "续表9.1.2，后七行"
+          },
+          "extraction_method": "manual_visual_inspection",
+          "table_id": "table-9.1.2",
+          "fragment_index": 1
+        },
+        {
+          "block_id": "p127_c913",
+          "block_type": "body",
+          "bbox": {
+            "x_min": 44,
+            "y_min": 165,
+            "x_max": 304,
+            "y_max": 204
+          },
+          "bbox_status": "manual_approximate",
+          "reading_order": 1,
+          "ocr": {
+            "text": "9.1.3 板中受力钢筋的间距，当板厚不大于150mm时不宜大于200mm；当板厚大于150mm时不宜大于板厚的1.5倍，且不宜大于250mm。"
+          },
+          "extraction_method": "manual_visual_inspection"
+        }
+      ]
+    },
+    {
+      "page_number": 128,
+      "page_type": "body",
+      "page_type_basis": "sequence_inference_from_checked_boundaries",
+      "width": 388.346,
+      "height": 583.937,
+      "content_extraction_status": "not_processed",
+      "blocks": []
+    },
+    {
+      "page_number": 129,
+      "page_type": "body",
+      "page_type_basis": "sequence_inference_from_checked_boundaries",
+      "width": 388.346,
+      "height": 583.937,
+      "content_extraction_status": "not_processed",
+      "blocks": []
+    },
+    {
+      "page_number": 130,
+      "page_type": "body",
+      "page_type_basis": "sequence_inference_from_checked_boundaries",
+      "width": 388.346,
+      "height": 583.937,
+      "content_extraction_status": "not_processed",
+      "blocks": []
+    },
+    {
+      "page_number": 131,
+      "page_type": "body",
+      "page_type_basis": "sequence_inference_from_checked_boundaries",
+      "width": 388.346,
+      "height": 583.937,
+      "content_extraction_status": "not_processed",
+      "blocks": []
+    },
+    {
+      "page_number": 132,
+      "page_type": "body",
+      "page_type_basis": "sequence_inference_from_checked_boundaries",
+      "width": 388.346,
+      "height": 583.937,
+      "content_extraction_status": "not_processed",
+      "blocks": []
+    },
+    {
+      "page_number": 133,
+      "page_type": "body",
+      "page_type_basis": "sequence_inference_from_checked_boundaries",
+      "width": 388.346,
+      "height": 583.937,
+      "content_extraction_status": "not_processed",
+      "blocks": []
+    },
+    {
+      "page_number": 134,
+      "page_type": "body",
+      "page_type_basis": "sequence_inference_from_checked_boundaries",
+      "width": 388.346,
+      "height": 583.937,
+      "content_extraction_status": "not_processed",
+      "blocks": []
+    },
+    {
+      "page_number": 135,
+      "page_type": "body",
+      "page_type_basis": "sequence_inference_from_checked_boundaries",
+      "width": 388.346,
+      "height": 583.937,
+      "content_extraction_status": "not_processed",
+      "blocks": []
+    },
+    {
+      "page_number": 136,
+      "page_type": "body",
+      "page_type_basis": "sequence_inference_from_checked_boundaries",
+      "width": 388.346,
+      "height": 583.937,
+      "content_extraction_status": "not_processed",
+      "blocks": []
+    },
+    {
+      "page_number": 137,
+      "page_type": "body",
+      "page_type_basis": "sequence_inference_from_checked_boundaries",
+      "width": 388.346,
+      "height": 583.937,
+      "content_extraction_status": "not_processed",
+      "blocks": []
+    },
+    {
+      "page_number": 138,
+      "page_type": "body",
+      "page_type_basis": "sequence_inference_from_checked_boundaries",
+      "width": 388.346,
+      "height": 583.937,
+      "content_extraction_status": "not_processed",
+      "blocks": []
+    },
+    {
+      "page_number": 139,
+      "page_type": "body",
+      "page_type_basis": "sequence_inference_from_checked_boundaries",
+      "width": 388.346,
+      "height": 583.937,
+      "content_extraction_status": "not_processed",
+      "blocks": []
+    },
+    {
+      "page_number": 140,
+      "page_type": "body",
+      "page_type_basis": "sequence_inference_from_checked_boundaries",
+      "width": 388.346,
+      "height": 583.937,
+      "content_extraction_status": "not_processed",
+      "blocks": []
+    },
+    {
+      "page_number": 141,
+      "page_type": "body",
+      "page_type_basis": "sequence_inference_from_checked_boundaries",
+      "width": 388.346,
+      "height": 583.937,
+      "content_extraction_status": "not_processed",
+      "blocks": []
+    },
+    {
+      "page_number": 142,
+      "page_type": "body",
+      "page_type_basis": "sequence_inference_from_checked_boundaries",
+      "width": 388.346,
+      "height": 583.937,
+      "content_extraction_status": "not_processed",
+      "blocks": []
+    },
+    {
+      "page_number": 143,
+      "page_type": "body",
+      "page_type_basis": "sequence_inference_from_checked_boundaries",
+      "width": 388.346,
+      "height": 583.937,
+      "content_extraction_status": "not_processed",
+      "blocks": []
+    },
+    {
+      "page_number": 144,
+      "page_type": "body",
+      "page_type_basis": "sequence_inference_from_checked_boundaries",
+      "width": 388.346,
+      "height": 583.937,
+      "content_extraction_status": "not_processed",
+      "blocks": []
+    },
+    {
+      "page_number": 145,
+      "page_type": "body",
+      "page_type_basis": "sequence_inference_from_checked_boundaries",
+      "width": 388.346,
+      "height": 583.937,
+      "content_extraction_status": "not_processed",
+      "blocks": []
+    },
+    {
+      "page_number": 146,
+      "page_type": "body",
+      "page_type_basis": "sequence_inference_from_checked_boundaries",
+      "width": 388.346,
+      "height": 583.937,
+      "content_extraction_status": "not_processed",
+      "blocks": []
+    },
+    {
+      "page_number": 147,
+      "page_type": "body",
+      "page_type_basis": "sequence_inference_from_checked_boundaries",
+      "width": 388.346,
+      "height": 583.937,
+      "content_extraction_status": "not_processed",
+      "blocks": []
+    },
+    {
+      "page_number": 148,
+      "page_type": "body",
+      "page_type_basis": "sequence_inference_from_checked_boundaries",
+      "width": 388.346,
+      "height": 583.937,
+      "content_extraction_status": "not_processed",
+      "blocks": []
+    },
+    {
+      "page_number": 149,
+      "page_type": "body",
+      "page_type_basis": "sequence_inference_from_checked_boundaries",
+      "width": 388.346,
+      "height": 583.937,
+      "content_extraction_status": "not_processed",
+      "blocks": []
+    },
+    {
+      "page_number": 150,
+      "page_type": "body",
+      "page_type_basis": "sequence_inference_from_checked_boundaries",
+      "width": 388.346,
+      "height": 583.937,
+      "content_extraction_status": "not_processed",
+      "blocks": []
+    },
+    {
+      "page_number": 151,
+      "page_type": "body",
+      "page_type_basis": "sequence_inference_from_checked_boundaries",
+      "width": 388.346,
+      "height": 583.937,
+      "content_extraction_status": "not_processed",
+      "blocks": []
+    },
+    {
+      "page_number": 152,
+      "page_type": "body",
+      "page_type_basis": "sequence_inference_from_checked_boundaries",
+      "width": 388.346,
+      "height": 583.937,
+      "content_extraction_status": "not_processed",
+      "blocks": []
+    },
+    {
+      "page_number": 153,
+      "page_type": "body",
+      "page_type_basis": "sequence_inference_from_checked_boundaries",
+      "width": 388.346,
+      "height": 583.937,
+      "content_extraction_status": "not_processed",
+      "blocks": []
+    },
+    {
+      "page_number": 154,
+      "page_type": "body",
+      "page_type_basis": "sequence_inference_from_checked_boundaries",
+      "width": 388.346,
+      "height": 583.937,
+      "content_extraction_status": "not_processed",
+      "blocks": []
+    },
+    {
+      "page_number": 155,
+      "page_type": "body",
+      "page_type_basis": "sequence_inference_from_checked_boundaries",
+      "width": 388.346,
+      "height": 583.937,
+      "content_extraction_status": "not_processed",
+      "blocks": []
+    },
+    {
+      "page_number": 156,
+      "page_type": "body",
+      "page_type_basis": "sequence_inference_from_checked_boundaries",
+      "width": 388.346,
+      "height": 583.937,
+      "content_extraction_status": "not_processed",
+      "blocks": []
+    },
+    {
+      "page_number": 157,
+      "page_type": "body",
+      "page_type_basis": "sequence_inference_from_checked_boundaries",
+      "width": 388.346,
+      "height": 583.937,
+      "content_extraction_status": "not_processed",
+      "blocks": []
+    },
+    {
+      "page_number": 158,
+      "page_type": "body",
+      "page_type_basis": "sequence_inference_from_checked_boundaries",
+      "width": 388.346,
+      "height": 583.937,
+      "content_extraction_status": "not_processed",
+      "blocks": []
+    },
+    {
+      "page_number": 159,
+      "page_type": "body",
+      "page_type_basis": "sequence_inference_from_checked_boundaries",
+      "width": 388.346,
+      "height": 583.937,
+      "content_extraction_status": "not_processed",
+      "blocks": []
+    },
+    {
+      "page_number": 160,
+      "page_type": "body",
+      "page_type_basis": "sequence_inference_from_checked_boundaries",
+      "width": 388.346,
+      "height": 583.937,
+      "content_extraction_status": "not_processed",
+      "blocks": []
+    },
+    {
+      "page_number": 161,
+      "page_type": "body",
+      "page_type_basis": "sequence_inference_from_checked_boundaries",
+      "width": 388.346,
+      "height": 583.937,
+      "content_extraction_status": "not_processed",
+      "blocks": []
+    },
+    {
+      "page_number": 162,
+      "page_type": "body",
+      "page_type_basis": "sequence_inference_from_checked_boundaries",
+      "width": 388.346,
+      "height": 583.937,
+      "content_extraction_status": "not_processed",
+      "blocks": []
+    },
+    {
+      "page_number": 163,
+      "page_type": "body",
+      "page_type_basis": "sequence_inference_from_checked_boundaries",
+      "width": 388.346,
+      "height": 583.937,
+      "content_extraction_status": "not_processed",
+      "blocks": []
+    },
+    {
+      "page_number": 164,
+      "page_type": "body",
+      "page_type_basis": "sequence_inference_from_checked_boundaries",
+      "width": 388.346,
+      "height": 583.937,
+      "content_extraction_status": "not_processed",
+      "blocks": []
+    },
+    {
+      "page_number": 165,
+      "page_type": "body",
+      "page_type_basis": "sequence_inference_from_checked_boundaries",
+      "width": 388.346,
+      "height": 583.937,
+      "content_extraction_status": "not_processed",
+      "blocks": []
+    },
+    {
+      "page_number": 166,
+      "page_type": "body",
+      "page_type_basis": "sequence_inference_from_checked_boundaries",
+      "width": 388.346,
+      "height": 583.937,
+      "content_extraction_status": "not_processed",
+      "blocks": []
+    },
+    {
+      "page_number": 167,
+      "page_type": "body",
+      "page_type_basis": "sequence_inference_from_checked_boundaries",
+      "width": 388.346,
+      "height": 583.937,
+      "content_extraction_status": "not_processed",
+      "blocks": []
+    },
+    {
+      "page_number": 168,
+      "page_type": "body",
+      "page_type_basis": "sequence_inference_from_checked_boundaries",
+      "width": 388.346,
+      "height": 583.937,
+      "content_extraction_status": "not_processed",
+      "blocks": []
+    },
+    {
+      "page_number": 169,
+      "page_type": "body",
+      "page_type_basis": "sequence_inference_from_checked_boundaries",
+      "width": 388.346,
+      "height": 583.937,
+      "content_extraction_status": "not_processed",
+      "blocks": []
+    },
+    {
+      "page_number": 170,
+      "page_type": "body",
+      "page_type_basis": "sequence_inference_from_checked_boundaries",
+      "width": 388.346,
+      "height": 583.937,
+      "content_extraction_status": "not_processed",
+      "blocks": []
+    },
+    {
+      "page_number": 171,
+      "page_type": "body",
+      "page_type_basis": "sequence_inference_from_checked_boundaries",
+      "width": 388.346,
+      "height": 583.937,
+      "content_extraction_status": "not_processed",
+      "blocks": []
+    },
+    {
+      "page_number": 172,
+      "page_type": "body",
+      "page_type_basis": "sequence_inference_from_checked_boundaries",
+      "width": 388.346,
+      "height": 583.937,
+      "content_extraction_status": "not_processed",
+      "blocks": []
+    },
+    {
+      "page_number": 173,
+      "page_type": "body",
+      "page_type_basis": "sequence_inference_from_checked_boundaries",
+      "width": 388.346,
+      "height": 583.937,
+      "content_extraction_status": "not_processed",
+      "blocks": []
+    },
+    {
+      "page_number": 174,
+      "page_type": "body",
+      "page_type_basis": "sequence_inference_from_checked_boundaries",
+      "width": 388.346,
+      "height": 583.937,
+      "content_extraction_status": "not_processed",
+      "blocks": []
+    },
+    {
+      "page_number": 175,
+      "page_type": "body",
+      "page_type_basis": "sequence_inference_from_checked_boundaries",
+      "width": 388.346,
+      "height": 583.937,
+      "content_extraction_status": "not_processed",
+      "blocks": []
+    },
+    {
+      "page_number": 176,
+      "page_type": "body",
+      "page_type_basis": "sequence_inference_from_checked_boundaries",
+      "width": 388.346,
+      "height": 583.937,
+      "content_extraction_status": "not_processed",
+      "blocks": []
+    },
+    {
+      "page_number": 177,
+      "page_type": "body",
+      "page_type_basis": "sequence_inference_from_checked_boundaries",
+      "width": 388.346,
+      "height": 583.937,
+      "content_extraction_status": "not_processed",
+      "blocks": []
+    },
+    {
+      "page_number": 178,
+      "page_type": "body",
+      "page_type_basis": "sequence_inference_from_checked_boundaries",
+      "width": 388.346,
+      "height": 583.937,
+      "content_extraction_status": "not_processed",
+      "blocks": []
+    },
+    {
+      "page_number": 179,
+      "page_type": "body",
+      "page_type_basis": "sequence_inference_from_checked_boundaries",
+      "width": 388.346,
+      "height": 583.937,
+      "content_extraction_status": "not_processed",
+      "blocks": []
+    },
+    {
+      "page_number": 180,
+      "page_type": "body",
+      "page_type_basis": "sequence_inference_from_checked_boundaries",
+      "width": 388.346,
+      "height": 583.937,
+      "content_extraction_status": "not_processed",
+      "blocks": []
+    },
+    {
+      "page_number": 181,
+      "page_type": "body",
+      "page_type_basis": "sequence_inference_from_checked_boundaries",
+      "width": 388.346,
+      "height": 583.937,
+      "content_extraction_status": "not_processed",
+      "blocks": []
+    },
+    {
+      "page_number": 182,
+      "page_type": "body",
+      "page_type_basis": "sequence_inference_from_checked_boundaries",
+      "width": 388.346,
+      "height": 583.937,
+      "content_extraction_status": "not_processed",
+      "blocks": []
+    },
+    {
+      "page_number": 183,
+      "page_type": "body",
+      "page_type_basis": "sequence_inference_from_checked_boundaries",
+      "width": 388.346,
+      "height": 583.937,
+      "content_extraction_status": "not_processed",
+      "blocks": []
+    },
+    {
+      "page_number": 184,
+      "page_type": "body",
+      "page_type_basis": "sequence_inference_from_checked_boundaries",
+      "width": 388.346,
+      "height": 583.937,
+      "content_extraction_status": "not_processed",
+      "blocks": []
+    },
+    {
+      "page_number": 185,
+      "page_type": "body",
+      "page_type_basis": "sequence_inference_from_checked_boundaries",
+      "width": 388.346,
+      "height": 583.937,
+      "content_extraction_status": "not_processed",
+      "blocks": []
+    },
+    {
+      "page_number": 186,
+      "page_type": "body",
+      "page_type_basis": "sequence_inference_from_checked_boundaries",
+      "width": 388.346,
+      "height": 583.937,
+      "content_extraction_status": "not_processed",
+      "blocks": []
+    },
+    {
+      "page_number": 187,
+      "page_type": "body",
+      "page_type_basis": "sequence_inference_from_checked_boundaries",
+      "width": 388.346,
+      "height": 583.937,
+      "content_extraction_status": "not_processed",
+      "blocks": []
+    },
+    {
+      "page_number": 188,
+      "page_type": "body",
+      "page_type_basis": "sequence_inference_from_checked_boundaries",
+      "width": 388.346,
+      "height": 583.937,
+      "content_extraction_status": "not_processed",
+      "blocks": []
+    },
+    {
+      "page_number": 189,
+      "page_type": "body",
+      "page_type_basis": "sequence_inference_from_checked_boundaries",
+      "width": 388.346,
+      "height": 583.937,
+      "content_extraction_status": "not_processed",
+      "blocks": []
+    },
+    {
+      "page_number": 190,
+      "page_type": "body",
+      "page_type_basis": "sequence_inference_from_checked_boundaries",
+      "width": 388.346,
+      "height": 583.937,
+      "content_extraction_status": "not_processed",
+      "blocks": []
+    },
+    {
+      "page_number": 191,
+      "page_type": "body",
+      "page_type_basis": "sequence_inference_from_checked_boundaries",
+      "width": 388.346,
+      "height": 583.937,
+      "content_extraction_status": "not_processed",
+      "blocks": []
+    },
+    {
+      "page_number": 192,
+      "page_type": "body",
+      "page_type_basis": "sequence_inference_from_checked_boundaries",
+      "width": 388.346,
+      "height": 583.937,
+      "content_extraction_status": "not_processed",
+      "blocks": []
+    },
+    {
+      "page_number": 193,
+      "page_type": "body",
+      "page_type_basis": "sequence_inference_from_checked_boundaries",
+      "width": 388.346,
+      "height": 583.937,
+      "content_extraction_status": "not_processed",
+      "blocks": []
+    },
+    {
+      "page_number": 194,
+      "page_type": "body",
+      "page_type_basis": "sequence_inference_from_checked_boundaries",
+      "width": 388.346,
+      "height": 583.937,
+      "content_extraction_status": "not_processed",
+      "blocks": []
+    },
+    {
+      "page_number": 195,
+      "page_type": "body",
+      "page_type_basis": "sequence_inference_from_checked_boundaries",
+      "width": 388.346,
+      "height": 583.937,
+      "content_extraction_status": "not_processed",
+      "blocks": []
+    },
+    {
+      "page_number": 196,
+      "page_type": "body",
+      "page_type_basis": "sequence_inference_from_checked_boundaries",
+      "width": 388.346,
+      "height": 583.937,
+      "content_extraction_status": "not_processed",
+      "blocks": []
+    },
+    {
+      "page_number": 197,
+      "page_type": "body",
+      "page_type_basis": "sequence_inference_from_checked_boundaries",
+      "width": 388.346,
+      "height": 583.937,
+      "content_extraction_status": "not_processed",
+      "blocks": []
+    },
+    {
+      "page_number": 198,
+      "page_type": "body",
+      "page_type_basis": "sequence_inference_from_checked_boundaries",
+      "width": 388.346,
+      "height": 583.937,
+      "content_extraction_status": "not_processed",
+      "blocks": []
+    },
+    {
+      "page_number": 199,
+      "page_type": "body",
+      "page_type_basis": "sequence_inference_from_checked_boundaries",
+      "width": 388.346,
+      "height": 583.937,
+      "content_extraction_status": "not_processed",
+      "blocks": []
+    },
+    {
+      "page_number": 200,
+      "page_type": "body",
+      "page_type_basis": "sequence_inference_from_checked_boundaries",
+      "width": 388.346,
+      "height": 583.937,
+      "content_extraction_status": "not_processed",
+      "blocks": []
+    },
+    {
+      "page_number": 201,
+      "page_type": "body",
+      "page_type_basis": "sequence_inference_from_checked_boundaries",
+      "width": 388.346,
+      "height": 583.937,
+      "content_extraction_status": "not_processed",
+      "blocks": []
+    },
+    {
+      "page_number": 202,
+      "page_type": "body",
+      "page_type_basis": "sequence_inference_from_checked_boundaries",
+      "width": 388.346,
+      "height": 583.937,
+      "content_extraction_status": "not_processed",
+      "blocks": []
+    },
+    {
+      "page_number": 203,
+      "page_type": "body",
+      "page_type_basis": "sequence_inference_from_checked_boundaries",
+      "width": 388.346,
+      "height": 583.937,
+      "content_extraction_status": "not_processed",
+      "blocks": []
+    },
+    {
+      "page_number": 204,
+      "page_type": "body",
+      "page_type_basis": "sequence_inference_from_checked_boundaries",
+      "width": 388.346,
+      "height": 583.937,
+      "content_extraction_status": "not_processed",
+      "blocks": []
+    },
+    {
+      "page_number": 205,
+      "page_type": "body",
+      "page_type_basis": "sequence_inference_from_checked_boundaries",
+      "width": 388.346,
+      "height": 583.937,
+      "content_extraction_status": "not_processed",
+      "blocks": []
+    },
+    {
+      "page_number": 206,
+      "page_type": "body",
+      "page_type_basis": "sequence_inference_from_checked_boundaries",
+      "width": 388.346,
+      "height": 583.937,
+      "content_extraction_status": "not_processed",
+      "blocks": []
+    },
+    {
+      "page_number": 207,
+      "page_type": "body",
+      "page_type_basis": "sequence_inference_from_checked_boundaries",
+      "width": 388.346,
+      "height": 583.937,
+      "content_extraction_status": "not_processed",
+      "blocks": []
+    },
+    {
+      "page_number": 208,
+      "page_type": "body",
+      "page_type_basis": "sequence_inference_from_checked_boundaries",
+      "width": 388.346,
+      "height": 583.937,
+      "content_extraction_status": "not_processed",
+      "blocks": []
+    },
+    {
+      "page_number": 209,
+      "page_type": "body",
+      "page_type_basis": "sequence_inference_from_checked_boundaries",
+      "width": 388.346,
+      "height": 583.937,
+      "content_extraction_status": "not_processed",
+      "blocks": []
+    },
+    {
+      "page_number": 210,
+      "page_type": "body",
+      "page_type_basis": "sequence_inference_from_checked_boundaries",
+      "width": 388.346,
+      "height": 583.937,
+      "content_extraction_status": "not_processed",
+      "blocks": []
+    },
+    {
+      "page_number": 211,
+      "page_type": "body",
+      "page_type_basis": "sequence_inference_from_checked_boundaries",
+      "width": 388.346,
+      "height": 583.937,
+      "content_extraction_status": "not_processed",
+      "blocks": []
+    },
+    {
+      "page_number": 212,
+      "page_type": "body",
+      "page_type_basis": "sequence_inference_from_checked_boundaries",
+      "width": 388.346,
+      "height": 583.937,
+      "content_extraction_status": "not_processed",
+      "blocks": []
+    },
+    {
+      "page_number": 213,
+      "page_type": "body",
+      "page_type_basis": "sequence_inference_from_checked_boundaries",
+      "width": 388.346,
+      "height": 583.937,
+      "content_extraction_status": "not_processed",
+      "blocks": []
+    },
+    {
+      "page_number": 214,
+      "page_type": "body",
+      "page_type_basis": "sequence_inference_from_checked_boundaries",
+      "width": 388.346,
+      "height": 583.937,
+      "content_extraction_status": "not_processed",
+      "blocks": []
+    },
+    {
+      "page_number": 215,
+      "page_type": "body",
+      "page_type_basis": "sequence_inference_from_checked_boundaries",
+      "width": 388.346,
+      "height": 583.937,
+      "content_extraction_status": "not_processed",
+      "blocks": []
+    },
+    {
+      "page_number": 216,
+      "page_type": "body",
+      "page_type_basis": "sequence_inference_from_checked_boundaries",
+      "width": 388.346,
+      "height": 583.937,
+      "content_extraction_status": "not_processed",
+      "blocks": []
+    },
+    {
+      "page_number": 217,
+      "page_type": "body",
+      "page_type_basis": "sequence_inference_from_checked_boundaries",
+      "width": 388.346,
+      "height": 583.937,
+      "content_extraction_status": "not_processed",
+      "blocks": []
+    },
+    {
+      "page_number": 218,
+      "page_type": "body",
+      "page_type_basis": "sequence_inference_from_checked_boundaries",
+      "width": 388.346,
+      "height": 583.937,
+      "content_extraction_status": "not_processed",
+      "blocks": []
+    },
+    {
+      "page_number": 219,
+      "page_type": "body",
+      "page_type_basis": "sequence_inference_from_checked_boundaries",
+      "width": 388.346,
+      "height": 583.937,
+      "content_extraction_status": "not_processed",
+      "blocks": []
+    },
+    {
+      "page_number": 220,
+      "page_type": "body",
+      "page_type_basis": "sequence_inference_from_checked_boundaries",
+      "width": 388.346,
+      "height": 583.937,
+      "content_extraction_status": "not_processed",
+      "blocks": []
+    },
+    {
+      "page_number": 221,
+      "page_type": "body",
+      "page_type_basis": "sequence_inference_from_checked_boundaries",
+      "width": 388.346,
+      "height": 583.937,
+      "content_extraction_status": "not_processed",
+      "blocks": []
+    },
+    {
+      "page_number": 222,
+      "page_type": "body",
+      "page_type_basis": "sequence_inference_from_checked_boundaries",
+      "width": 388.346,
+      "height": 583.937,
+      "content_extraction_status": "not_processed",
+      "blocks": []
+    },
+    {
+      "page_number": 223,
+      "page_type": "body",
+      "page_type_basis": "sequence_inference_from_checked_boundaries",
+      "width": 388.346,
+      "height": 583.937,
+      "content_extraction_status": "not_processed",
+      "blocks": []
+    },
+    {
+      "page_number": 224,
+      "page_type": "body",
+      "page_type_basis": "sequence_inference_from_checked_boundaries",
+      "width": 388.346,
+      "height": 583.937,
+      "content_extraction_status": "not_processed",
+      "blocks": []
+    },
+    {
+      "page_number": 225,
+      "page_type": "body",
+      "page_type_basis": "sequence_inference_from_checked_boundaries",
+      "width": 388.346,
+      "height": 583.937,
+      "content_extraction_status": "not_processed",
+      "blocks": []
+    },
+    {
+      "page_number": 226,
+      "page_type": "body",
+      "page_type_basis": "sequence_inference_from_checked_boundaries",
+      "width": 388.346,
+      "height": 583.937,
+      "content_extraction_status": "not_processed",
+      "blocks": []
+    },
+    {
+      "page_number": 227,
+      "page_type": "body",
+      "page_type_basis": "sequence_inference_from_checked_boundaries",
+      "width": 388.346,
+      "height": 583.937,
+      "content_extraction_status": "not_processed",
+      "blocks": []
+    },
+    {
+      "page_number": 228,
+      "page_type": "body",
+      "page_type_basis": "sequence_inference_from_checked_boundaries",
+      "width": 388.346,
+      "height": 583.937,
+      "content_extraction_status": "not_processed",
+      "blocks": []
+    },
+    {
+      "page_number": 229,
+      "page_type": "body",
+      "page_type_basis": "sequence_inference_from_checked_boundaries",
+      "width": 388.346,
+      "height": 583.937,
+      "content_extraction_status": "not_processed",
+      "blocks": []
+    },
+    {
+      "page_number": 230,
+      "page_type": "body",
+      "page_type_basis": "sequence_inference_from_checked_boundaries",
+      "width": 388.346,
+      "height": 583.937,
+      "content_extraction_status": "not_processed",
+      "blocks": []
+    },
+    {
+      "page_number": 231,
+      "page_type": "body",
+      "page_type_basis": "sequence_inference_from_checked_boundaries",
+      "width": 388.346,
+      "height": 583.937,
+      "content_extraction_status": "not_processed",
+      "blocks": []
+    },
+    {
+      "page_number": 232,
+      "page_type": "body",
+      "page_type_basis": "sequence_inference_from_checked_boundaries",
+      "width": 388.346,
+      "height": 583.937,
+      "content_extraction_status": "not_processed",
+      "blocks": []
+    },
+    {
+      "page_number": 233,
+      "page_type": "body",
+      "page_type_basis": "sequence_inference_from_checked_boundaries",
+      "width": 388.346,
+      "height": 583.937,
+      "content_extraction_status": "not_processed",
+      "blocks": []
+    },
+    {
+      "page_number": 234,
+      "page_type": "body",
+      "page_type_basis": "sequence_inference_from_checked_boundaries",
+      "width": 388.346,
+      "height": 583.937,
+      "content_extraction_status": "not_processed",
+      "blocks": []
+    },
+    {
+      "page_number": 235,
+      "page_type": "body",
+      "page_type_basis": "sequence_inference_from_checked_boundaries",
+      "width": 391.181,
+      "height": 569.763,
+      "content_extraction_status": "not_processed",
+      "blocks": []
+    },
+    {
+      "page_number": 236,
+      "page_type": "body",
+      "page_type_basis": "sequence_inference_from_checked_boundaries",
+      "width": 388.346,
+      "height": 583.937,
+      "content_extraction_status": "not_processed",
+      "blocks": []
+    },
+    {
+      "page_number": 237,
+      "page_type": "body",
+      "page_type_basis": "sequence_inference_from_checked_boundaries",
+      "width": 388.346,
+      "height": 583.937,
+      "content_extraction_status": "not_processed",
+      "blocks": []
+    },
+    {
+      "page_number": 238,
+      "page_type": "body",
+      "page_type_basis": "sequence_inference_from_checked_boundaries",
+      "width": 388.346,
+      "height": 583.937,
+      "content_extraction_status": "not_processed",
+      "blocks": []
+    },
+    {
+      "page_number": 239,
+      "page_type": "body",
+      "page_type_basis": "sequence_inference_from_checked_boundaries",
+      "width": 388.346,
+      "height": 583.937,
+      "content_extraction_status": "not_processed",
+      "blocks": []
+    },
+    {
+      "page_number": 240,
+      "page_type": "body",
+      "page_type_basis": "sequence_inference_from_checked_boundaries",
+      "width": 388.346,
+      "height": 583.937,
+      "content_extraction_status": "not_processed",
+      "blocks": []
+    },
+    {
+      "page_number": 241,
+      "page_type": "body",
+      "page_type_basis": "sequence_inference_from_checked_boundaries",
+      "width": 388.346,
+      "height": 583.937,
+      "content_extraction_status": "not_processed",
+      "blocks": []
+    },
+    {
+      "page_number": 242,
+      "page_type": "body",
+      "page_type_basis": "sequence_inference_from_checked_boundaries",
+      "width": 388.346,
+      "height": 583.937,
+      "content_extraction_status": "not_processed",
+      "blocks": []
+    },
+    {
+      "page_number": 243,
+      "page_type": "body",
+      "page_type_basis": "sequence_inference_from_checked_boundaries",
+      "width": 388.346,
+      "height": 583.937,
+      "content_extraction_status": "not_processed",
+      "blocks": []
+    },
+    {
+      "page_number": 244,
+      "page_type": "body",
+      "page_type_basis": "sequence_inference_from_checked_boundaries",
+      "width": 388.346,
+      "height": 583.937,
+      "content_extraction_status": "not_processed",
+      "blocks": []
+    },
+    {
+      "page_number": 245,
+      "page_type": "body",
+      "page_type_basis": "sequence_inference_from_checked_boundaries",
+      "width": 388.346,
+      "height": 583.937,
+      "content_extraction_status": "not_processed",
+      "blocks": []
+    },
+    {
+      "page_number": 246,
+      "page_type": "body",
+      "page_type_basis": "sequence_inference_from_checked_boundaries",
+      "width": 388.346,
+      "height": 583.937,
+      "content_extraction_status": "not_processed",
+      "blocks": []
+    },
+    {
+      "page_number": 247,
+      "page_type": "body",
+      "page_type_basis": "sequence_inference_from_checked_boundaries",
+      "width": 388.346,
+      "height": 583.937,
+      "content_extraction_status": "not_processed",
+      "blocks": []
+    },
+    {
+      "page_number": 248,
+      "page_type": "body",
+      "page_type_basis": "sequence_inference_from_checked_boundaries",
+      "width": 388.346,
+      "height": 583.937,
+      "content_extraction_status": "not_processed",
+      "blocks": []
+    },
+    {
+      "page_number": 249,
+      "page_type": "body",
+      "page_type_basis": "sequence_inference_from_checked_boundaries",
+      "width": 388.346,
+      "height": 583.937,
+      "content_extraction_status": "not_processed",
+      "blocks": []
+    },
+    {
+      "page_number": 250,
+      "page_type": "body",
+      "page_type_basis": "sequence_inference_from_checked_boundaries",
+      "width": 388.346,
+      "height": 583.937,
+      "content_extraction_status": "not_processed",
+      "blocks": []
+    },
+    {
+      "page_number": 251,
+      "page_type": "body",
+      "page_type_basis": "sequence_inference_from_checked_boundaries",
+      "width": 388.346,
+      "height": 583.937,
+      "content_extraction_status": "not_processed",
+      "blocks": []
+    },
+    {
+      "page_number": 252,
+      "page_type": "body",
+      "page_type_basis": "sequence_inference_from_checked_boundaries",
+      "width": 388.346,
+      "height": 583.937,
+      "content_extraction_status": "not_processed",
+      "blocks": []
+    },
+    {
+      "page_number": 253,
+      "page_type": "body",
+      "page_type_basis": "sequence_inference_from_checked_boundaries",
+      "width": 388.346,
+      "height": 583.937,
+      "content_extraction_status": "not_processed",
+      "blocks": []
+    },
+    {
+      "page_number": 254,
+      "page_type": "body",
+      "page_type_basis": "sequence_inference_from_checked_boundaries",
+      "width": 388.346,
+      "height": 583.937,
+      "content_extraction_status": "not_processed",
+      "blocks": []
+    },
+    {
+      "page_number": 255,
+      "page_type": "body",
+      "page_type_basis": "sequence_inference_from_checked_boundaries",
+      "width": 388.346,
+      "height": 583.937,
+      "content_extraction_status": "not_processed",
+      "blocks": []
+    },
+    {
+      "page_number": 256,
+      "page_type": "body",
+      "page_type_basis": "sequence_inference_from_checked_boundaries",
+      "width": 388.346,
+      "height": 583.937,
+      "content_extraction_status": "not_processed",
+      "blocks": []
+    },
+    {
+      "page_number": 257,
+      "page_type": "body",
+      "page_type_basis": "sequence_inference_from_checked_boundaries",
+      "width": 388.346,
+      "height": 583.937,
+      "content_extraction_status": "not_processed",
+      "blocks": []
+    },
+    {
+      "page_number": 258,
+      "page_type": "body",
+      "page_type_basis": "sequence_inference_from_checked_boundaries",
+      "width": 388.346,
+      "height": 583.937,
+      "content_extraction_status": "not_processed",
+      "blocks": []
+    },
+    {
+      "page_number": 259,
+      "page_type": "body",
+      "page_type_basis": "sequence_inference_from_checked_boundaries",
+      "width": 388.346,
+      "height": 583.937,
+      "content_extraction_status": "not_processed",
+      "blocks": []
+    },
+    {
+      "page_number": 260,
+      "page_type": "body",
+      "page_type_basis": "sequence_inference_from_checked_boundaries",
+      "width": 388.346,
+      "height": 583.937,
+      "content_extraction_status": "not_processed",
+      "blocks": []
+    },
+    {
+      "page_number": 261,
+      "page_type": "body",
+      "page_type_basis": "sequence_inference_from_checked_boundaries",
+      "width": 388.346,
+      "height": 583.937,
+      "content_extraction_status": "not_processed",
+      "blocks": []
+    },
+    {
+      "page_number": 262,
+      "page_type": "body",
+      "page_type_basis": "sequence_inference_from_checked_boundaries",
+      "width": 388.346,
+      "height": 583.937,
+      "content_extraction_status": "not_processed",
+      "blocks": []
+    },
+    {
+      "page_number": 263,
+      "page_type": "body",
+      "page_type_basis": "sequence_inference_from_checked_boundaries",
+      "width": 388.346,
+      "height": 583.937,
+      "content_extraction_status": "not_processed",
+      "blocks": []
+    },
+    {
+      "page_number": 264,
+      "page_type": "body",
+      "page_type_basis": "sequence_inference_from_checked_boundaries",
+      "width": 388.346,
+      "height": 583.937,
+      "content_extraction_status": "not_processed",
+      "blocks": []
+    },
+    {
+      "page_number": 265,
+      "page_type": "body",
+      "page_type_basis": "sequence_inference_from_checked_boundaries",
+      "width": 388.346,
+      "height": 583.937,
+      "content_extraction_status": "not_processed",
+      "blocks": []
+    },
+    {
+      "page_number": 266,
+      "page_type": "body",
+      "page_type_basis": "sequence_inference_from_checked_boundaries",
+      "width": 388.346,
+      "height": 583.937,
+      "content_extraction_status": "not_processed",
+      "blocks": []
+    },
+    {
+      "page_number": 267,
+      "page_type": "body",
+      "page_type_basis": "sequence_inference_from_checked_boundaries",
+      "width": 388.346,
+      "height": 583.937,
+      "content_extraction_status": "not_processed",
+      "blocks": []
+    },
+    {
+      "page_number": 268,
+      "page_type": "body",
+      "page_type_basis": "sequence_inference_from_checked_boundaries",
+      "width": 388.346,
+      "height": 583.937,
+      "content_extraction_status": "not_processed",
+      "blocks": []
+    },
+    {
+      "page_number": 269,
+      "page_type": "body",
+      "page_type_basis": "sequence_inference_from_checked_boundaries",
+      "width": 388.346,
+      "height": 583.937,
+      "content_extraction_status": "not_processed",
+      "blocks": []
+    },
+    {
+      "page_number": 270,
+      "page_type": "body",
+      "page_type_basis": "sequence_inference_from_checked_boundaries",
+      "width": 388.346,
+      "height": 583.937,
+      "content_extraction_status": "not_processed",
+      "blocks": []
+    },
+    {
+      "page_number": 271,
+      "page_type": "body",
+      "page_type_basis": "sequence_inference_from_checked_boundaries",
+      "width": 388.346,
+      "height": 583.937,
+      "content_extraction_status": "not_processed",
+      "blocks": []
+    },
+    {
+      "page_number": 272,
+      "page_type": "body",
+      "page_type_basis": "sequence_inference_from_checked_boundaries",
+      "width": 388.346,
+      "height": 583.937,
+      "content_extraction_status": "not_processed",
+      "blocks": []
+    },
+    {
+      "page_number": 273,
+      "page_type": "body",
+      "page_type_basis": "sequence_inference_from_checked_boundaries",
+      "width": 388.346,
+      "height": 583.937,
+      "content_extraction_status": "not_processed",
+      "blocks": []
+    },
+    {
+      "page_number": 274,
+      "page_type": "body",
+      "page_type_basis": "sequence_inference_from_checked_boundaries",
+      "width": 388.346,
+      "height": 583.937,
+      "content_extraction_status": "not_processed",
+      "blocks": []
+    },
+    {
+      "page_number": 275,
+      "page_type": "wording_rules",
+      "page_type_basis": "visually_checked",
+      "width": 388.346,
+      "height": 583.937,
+      "content_extraction_status": "not_processed",
+      "blocks": []
+    },
+    {
+      "page_number": 276,
+      "page_type": "normative_references",
+      "page_type_basis": "visually_checked",
+      "width": 388.346,
+      "height": 583.937,
+      "content_extraction_status": "not_processed",
+      "blocks": []
+    },
+    {
+      "page_number": 277,
+      "page_type": "explanation_cover",
+      "page_type_basis": "visually_checked",
+      "width": 382.677,
+      "height": 572.598,
+      "content_extraction_status": "partially_transcribed",
+      "blocks": [
+        {
+          "block_id": "p277_exp_cover",
+          "block_type": "title",
+          "bbox": {
+            "x_min": 83,
+            "y_min": 110,
+            "x_max": 309,
+            "y_max": 228
+          },
+          "bbox_status": "manual_approximate",
+          "reading_order": 0,
+          "ocr": {
+            "text": "混凝土结构设计规范 条文说明"
+          },
+          "extraction_method": "manual_visual_inspection"
+        }
+      ]
+    },
+    {
+      "page_number": 278,
+      "page_type": "revision_notes",
+      "page_type_basis": "visually_checked",
+      "width": 388.346,
+      "height": 583.937,
+      "content_extraction_status": "partially_transcribed",
+      "blocks": [
+        {
+          "block_id": "p278_exp_revision",
+          "block_type": "title",
+          "bbox": {
+            "x_min": 138,
+            "y_min": 42,
+            "x_max": 267,
+            "y_max": 71
+          },
+          "bbox_status": "manual_approximate",
+          "reading_order": 0,
+          "ocr": {
+            "text": "修订说明"
+          },
+          "extraction_method": "manual_visual_inspection"
+        }
+      ]
+    },
+    {
+      "page_number": 279,
+      "page_type": "explanation_toc",
+      "page_type_basis": "visually_checked",
+      "width": 388.346,
+      "height": 583.937,
+      "content_extraction_status": "partially_transcribed",
+      "blocks": [
+        {
+          "block_id": "p279_exp_toc",
+          "block_type": "title",
+          "bbox": {
+            "x_min": 158,
+            "y_min": 58,
+            "x_max": 234,
+            "y_max": 79
+          },
+          "bbox_status": "manual_approximate",
+          "reading_order": 0,
+          "ocr": {
+            "text": "目次"
+          },
+          "extraction_method": "manual_visual_inspection"
+        }
+      ]
+    },
+    {
+      "page_number": 280,
+      "page_type": "explanation_toc",
+      "page_type_basis": "visually_checked",
+      "width": 388.346,
+      "height": 583.937,
+      "content_extraction_status": "not_processed",
+      "blocks": []
+    },
+    {
+      "page_number": 281,
+      "page_type": "explanation_toc",
+      "page_type_basis": "visually_checked",
+      "width": 388.346,
+      "height": 583.937,
+      "content_extraction_status": "not_processed",
+      "blocks": []
+    },
+    {
+      "page_number": 282,
+      "page_type": "explanation_body",
+      "page_type_basis": "visually_checked",
+      "width": 388.346,
+      "height": 583.937,
+      "content_extraction_status": "partially_transcribed",
+      "blocks": [
+        {
+          "block_id": "p282_exp_ch1",
+          "block_type": "title",
+          "bbox": {
+            "x_min": 137,
+            "y_min": 65,
+            "x_max": 260,
+            "y_max": 88
+          },
+          "bbox_status": "manual_approximate",
+          "reading_order": 0,
+          "ocr": {
+            "text": "1 总则"
+          },
+          "extraction_method": "manual_visual_inspection"
+        },
+        {
+          "block_id": "p282_exp_c101",
+          "block_type": "body",
+          "bbox": {
+            "x_min": 40,
+            "y_min": 100,
+            "x_max": 315,
+            "y_max": 238
+          },
+          "bbox_status": "manual_approximate",
+          "reading_order": 1,
+          "ocr": {
+            "text": "1.0.1 本次修订根据多年来的工程经验和研究成果，并总结了上一版规范的应用情况和存在问题，贯彻国家“四节一环保”的技术政策，对部分内容进行了补充和调整。"
+          },
+          "extraction_method": "manual_visual_inspection"
+        }
+      ]
+    },
+    {
+      "page_number": 283,
+      "page_type": "explanation_body",
+      "page_type_basis": "sequence_inference_from_checked_boundaries",
+      "width": 388.346,
+      "height": 583.937,
+      "content_extraction_status": "not_processed",
+      "blocks": []
+    },
+    {
+      "page_number": 284,
+      "page_type": "explanation_body",
+      "page_type_basis": "sequence_inference_from_checked_boundaries",
+      "width": 388.346,
+      "height": 583.937,
+      "content_extraction_status": "not_processed",
+      "blocks": []
+    },
+    {
+      "page_number": 285,
+      "page_type": "explanation_body",
+      "page_type_basis": "sequence_inference_from_checked_boundaries",
+      "width": 388.346,
+      "height": 583.937,
+      "content_extraction_status": "not_processed",
+      "blocks": []
+    },
+    {
+      "page_number": 286,
+      "page_type": "explanation_body",
+      "page_type_basis": "sequence_inference_from_checked_boundaries",
+      "width": 388.346,
+      "height": 583.937,
+      "content_extraction_status": "not_processed",
+      "blocks": []
+    },
+    {
+      "page_number": 287,
+      "page_type": "explanation_body",
+      "page_type_basis": "sequence_inference_from_checked_boundaries",
+      "width": 388.346,
+      "height": 583.937,
+      "content_extraction_status": "not_processed",
+      "blocks": []
+    },
+    {
+      "page_number": 288,
+      "page_type": "explanation_body",
+      "page_type_basis": "sequence_inference_from_checked_boundaries",
+      "width": 388.346,
+      "height": 583.937,
+      "content_extraction_status": "not_processed",
+      "blocks": []
+    },
+    {
+      "page_number": 289,
+      "page_type": "explanation_body",
+      "page_type_basis": "sequence_inference_from_checked_boundaries",
+      "width": 388.346,
+      "height": 583.937,
+      "content_extraction_status": "not_processed",
+      "blocks": []
+    },
+    {
+      "page_number": 290,
+      "page_type": "explanation_body",
+      "page_type_basis": "sequence_inference_from_checked_boundaries",
+      "width": 388.346,
+      "height": 583.937,
+      "content_extraction_status": "not_processed",
+      "blocks": []
+    },
+    {
+      "page_number": 291,
+      "page_type": "explanation_body",
+      "page_type_basis": "sequence_inference_from_checked_boundaries",
+      "width": 388.346,
+      "height": 583.937,
+      "content_extraction_status": "not_processed",
+      "blocks": []
+    },
+    {
+      "page_number": 292,
+      "page_type": "explanation_body",
+      "page_type_basis": "sequence_inference_from_checked_boundaries",
+      "width": 388.346,
+      "height": 583.937,
+      "content_extraction_status": "not_processed",
+      "blocks": []
+    },
+    {
+      "page_number": 293,
+      "page_type": "explanation_body",
+      "page_type_basis": "sequence_inference_from_checked_boundaries",
+      "width": 388.346,
+      "height": 583.937,
+      "content_extraction_status": "not_processed",
+      "blocks": []
+    },
+    {
+      "page_number": 294,
+      "page_type": "explanation_body",
+      "page_type_basis": "sequence_inference_from_checked_boundaries",
+      "width": 388.346,
+      "height": 583.937,
+      "content_extraction_status": "not_processed",
+      "blocks": []
+    },
+    {
+      "page_number": 295,
+      "page_type": "explanation_body",
+      "page_type_basis": "sequence_inference_from_checked_boundaries",
+      "width": 388.346,
+      "height": 583.937,
+      "content_extraction_status": "not_processed",
+      "blocks": []
+    },
+    {
+      "page_number": 296,
+      "page_type": "explanation_body",
+      "page_type_basis": "sequence_inference_from_checked_boundaries",
+      "width": 388.346,
+      "height": 583.937,
+      "content_extraction_status": "not_processed",
+      "blocks": []
+    },
+    {
+      "page_number": 297,
+      "page_type": "explanation_body",
+      "page_type_basis": "sequence_inference_from_checked_boundaries",
+      "width": 388.346,
+      "height": 583.937,
+      "content_extraction_status": "not_processed",
+      "blocks": []
+    },
+    {
+      "page_number": 298,
+      "page_type": "explanation_body",
+      "page_type_basis": "sequence_inference_from_checked_boundaries",
+      "width": 388.346,
+      "height": 583.937,
+      "content_extraction_status": "not_processed",
+      "blocks": []
+    },
+    {
+      "page_number": 299,
+      "page_type": "explanation_body",
+      "page_type_basis": "sequence_inference_from_checked_boundaries",
+      "width": 388.346,
+      "height": 583.937,
+      "content_extraction_status": "not_processed",
+      "blocks": []
+    },
+    {
+      "page_number": 300,
+      "page_type": "explanation_body",
+      "page_type_basis": "sequence_inference_from_checked_boundaries",
+      "width": 388.346,
+      "height": 583.937,
+      "content_extraction_status": "not_processed",
+      "blocks": []
+    },
+    {
+      "page_number": 301,
+      "page_type": "explanation_body",
+      "page_type_basis": "visually_checked",
+      "width": 388.346,
+      "height": 583.937,
+      "content_extraction_status": "partially_transcribed",
+      "blocks": [
+        {
+          "block_id": "p301_exp_c415",
+          "block_type": "body",
+          "bbox": {
+            "x_min": 44,
+            "y_min": 306,
+            "x_max": 320,
+            "y_max": 351
+          },
+          "bbox_status": "manual_approximate",
+          "reading_order": 0,
+          "ocr": {
+            "text": "4.1.5 混凝土的弹性模量、剪切变形模量及泊松比同原规范。混凝土的弹性模量E_c以其强度等级值按下列公式计算："
+          },
+          "extraction_method": "manual_visual_inspection"
+        },
+        {
+          "block_id": "p301_exp_unnumbered_formula",
+          "block_type": "formula",
+          "bbox": {
+            "x_min": 112,
+            "y_min": 356,
+            "x_max": 311,
+            "y_max": 382
+          },
+          "bbox_status": "manual_approximate",
+          "reading_order": 1,
+          "ocr": {
+            "text": "E_c = 10^5 / (2.2 + 34.7/f_cu,k) (N/mm²)，原文没有单独印刷公式编号。",
+            "formula_group": {
+              "equations": [
+                {
+                  "formula_id": "f-explanation-4.1.5-unnumbered-1",
+                  "equation_number": null,
+                  "text": "E_c = 10^5 / (2.2 + 34.7/f_cu,k)",
+                  "latex": "E_c=\\frac{10^5}{2.2+\\frac{34.7}{f_{cu,k}}}",
+                  "recognition_status": "visually_verified"
+                }
+              ],
+              "symbol_explanations": null
+            }
+          },
+          "extraction_method": "manual_visual_inspection",
+          "formula_group_id": "fg-exp-4.1.5"
+        }
+      ]
+    },
+    {
+      "page_number": 302,
+      "page_type": "explanation_body",
+      "page_type_basis": "sequence_inference_from_checked_boundaries",
+      "width": 388.346,
+      "height": 583.937,
+      "content_extraction_status": "not_processed",
+      "blocks": []
+    },
+    {
+      "page_number": 303,
+      "page_type": "explanation_body",
+      "page_type_basis": "sequence_inference_from_checked_boundaries",
+      "width": 388.346,
+      "height": 583.937,
+      "content_extraction_status": "not_processed",
+      "blocks": []
+    },
+    {
+      "page_number": 304,
+      "page_type": "explanation_body",
+      "page_type_basis": "sequence_inference_from_checked_boundaries",
+      "width": 388.346,
+      "height": 583.937,
+      "content_extraction_status": "not_processed",
+      "blocks": []
+    },
+    {
+      "page_number": 305,
+      "page_type": "explanation_body",
+      "page_type_basis": "sequence_inference_from_checked_boundaries",
+      "width": 388.346,
+      "height": 583.937,
+      "content_extraction_status": "not_processed",
+      "blocks": []
+    },
+    {
+      "page_number": 306,
+      "page_type": "explanation_body",
+      "page_type_basis": "sequence_inference_from_checked_boundaries",
+      "width": 388.346,
+      "height": 583.937,
+      "content_extraction_status": "not_processed",
+      "blocks": []
+    },
+    {
+      "page_number": 307,
+      "page_type": "explanation_body",
+      "page_type_basis": "sequence_inference_from_checked_boundaries",
+      "width": 388.346,
+      "height": 583.937,
+      "content_extraction_status": "not_processed",
+      "blocks": []
+    },
+    {
+      "page_number": 308,
+      "page_type": "explanation_body",
+      "page_type_basis": "sequence_inference_from_checked_boundaries",
+      "width": 388.346,
+      "height": 583.937,
+      "content_extraction_status": "not_processed",
+      "blocks": []
+    },
+    {
+      "page_number": 309,
+      "page_type": "explanation_body",
+      "page_type_basis": "sequence_inference_from_checked_boundaries",
+      "width": 388.346,
+      "height": 583.937,
+      "content_extraction_status": "not_processed",
+      "blocks": []
+    },
+    {
+      "page_number": 310,
+      "page_type": "explanation_body",
+      "page_type_basis": "sequence_inference_from_checked_boundaries",
+      "width": 388.346,
+      "height": 583.937,
+      "content_extraction_status": "not_processed",
+      "blocks": []
+    },
+    {
+      "page_number": 311,
+      "page_type": "explanation_body",
+      "page_type_basis": "sequence_inference_from_checked_boundaries",
+      "width": 388.346,
+      "height": 583.937,
+      "content_extraction_status": "not_processed",
+      "blocks": []
+    },
+    {
+      "page_number": 312,
+      "page_type": "explanation_body",
+      "page_type_basis": "sequence_inference_from_checked_boundaries",
+      "width": 388.346,
+      "height": 583.937,
+      "content_extraction_status": "not_processed",
+      "blocks": []
+    },
+    {
+      "page_number": 313,
+      "page_type": "explanation_body",
+      "page_type_basis": "sequence_inference_from_checked_boundaries",
+      "width": 388.346,
+      "height": 583.937,
+      "content_extraction_status": "not_processed",
+      "blocks": []
+    },
+    {
+      "page_number": 314,
+      "page_type": "explanation_body",
+      "page_type_basis": "sequence_inference_from_checked_boundaries",
+      "width": 388.346,
+      "height": 583.937,
+      "content_extraction_status": "not_processed",
+      "blocks": []
+    },
+    {
+      "page_number": 315,
+      "page_type": "explanation_body",
+      "page_type_basis": "sequence_inference_from_checked_boundaries",
+      "width": 388.346,
+      "height": 583.937,
+      "content_extraction_status": "not_processed",
+      "blocks": []
+    },
+    {
+      "page_number": 316,
+      "page_type": "explanation_body",
+      "page_type_basis": "sequence_inference_from_checked_boundaries",
+      "width": 388.346,
+      "height": 583.937,
+      "content_extraction_status": "not_processed",
+      "blocks": []
+    },
+    {
+      "page_number": 317,
+      "page_type": "explanation_body",
+      "page_type_basis": "sequence_inference_from_checked_boundaries",
+      "width": 388.346,
+      "height": 583.937,
+      "content_extraction_status": "not_processed",
+      "blocks": []
+    },
+    {
+      "page_number": 318,
+      "page_type": "explanation_body",
+      "page_type_basis": "sequence_inference_from_checked_boundaries",
+      "width": 388.346,
+      "height": 583.937,
+      "content_extraction_status": "not_processed",
+      "blocks": []
+    },
+    {
+      "page_number": 319,
+      "page_type": "explanation_body",
+      "page_type_basis": "sequence_inference_from_checked_boundaries",
+      "width": 388.346,
+      "height": 583.937,
+      "content_extraction_status": "not_processed",
+      "blocks": []
+    },
+    {
+      "page_number": 320,
+      "page_type": "explanation_body",
+      "page_type_basis": "sequence_inference_from_checked_boundaries",
+      "width": 388.346,
+      "height": 583.937,
+      "content_extraction_status": "not_processed",
+      "blocks": []
+    },
+    {
+      "page_number": 321,
+      "page_type": "explanation_body",
+      "page_type_basis": "sequence_inference_from_checked_boundaries",
+      "width": 388.346,
+      "height": 583.937,
+      "content_extraction_status": "not_processed",
+      "blocks": []
+    },
+    {
+      "page_number": 322,
+      "page_type": "explanation_body",
+      "page_type_basis": "sequence_inference_from_checked_boundaries",
+      "width": 388.346,
+      "height": 583.937,
+      "content_extraction_status": "not_processed",
+      "blocks": []
+    },
+    {
+      "page_number": 323,
+      "page_type": "explanation_body",
+      "page_type_basis": "sequence_inference_from_checked_boundaries",
+      "width": 388.346,
+      "height": 583.937,
+      "content_extraction_status": "not_processed",
+      "blocks": []
+    },
+    {
+      "page_number": 324,
+      "page_type": "explanation_body",
+      "page_type_basis": "sequence_inference_from_checked_boundaries",
+      "width": 388.346,
+      "height": 583.937,
+      "content_extraction_status": "not_processed",
+      "blocks": []
+    },
+    {
+      "page_number": 325,
+      "page_type": "explanation_body",
+      "page_type_basis": "sequence_inference_from_checked_boundaries",
+      "width": 388.346,
+      "height": 583.937,
+      "content_extraction_status": "not_processed",
+      "blocks": []
+    },
+    {
+      "page_number": 326,
+      "page_type": "explanation_body",
+      "page_type_basis": "sequence_inference_from_checked_boundaries",
+      "width": 388.346,
+      "height": 583.937,
+      "content_extraction_status": "not_processed",
+      "blocks": []
+    },
+    {
+      "page_number": 327,
+      "page_type": "explanation_body",
+      "page_type_basis": "sequence_inference_from_checked_boundaries",
+      "width": 388.346,
+      "height": 583.937,
+      "content_extraction_status": "not_processed",
+      "blocks": []
+    },
+    {
+      "page_number": 328,
+      "page_type": "explanation_body",
+      "page_type_basis": "sequence_inference_from_checked_boundaries",
+      "width": 388.346,
+      "height": 583.937,
+      "content_extraction_status": "not_processed",
+      "blocks": []
+    },
+    {
+      "page_number": 329,
+      "page_type": "explanation_body",
+      "page_type_basis": "sequence_inference_from_checked_boundaries",
+      "width": 388.346,
+      "height": 583.937,
+      "content_extraction_status": "not_processed",
+      "blocks": []
+    },
+    {
+      "page_number": 330,
+      "page_type": "explanation_body",
+      "page_type_basis": "sequence_inference_from_checked_boundaries",
+      "width": 388.346,
+      "height": 583.937,
+      "content_extraction_status": "not_processed",
+      "blocks": []
+    },
+    {
+      "page_number": 331,
+      "page_type": "explanation_body",
+      "page_type_basis": "sequence_inference_from_checked_boundaries",
+      "width": 388.346,
+      "height": 583.937,
+      "content_extraction_status": "not_processed",
+      "blocks": []
+    },
+    {
+      "page_number": 332,
+      "page_type": "explanation_body",
+      "page_type_basis": "sequence_inference_from_checked_boundaries",
+      "width": 388.346,
+      "height": 583.937,
+      "content_extraction_status": "not_processed",
+      "blocks": []
+    },
+    {
+      "page_number": 333,
+      "page_type": "explanation_body",
+      "page_type_basis": "sequence_inference_from_checked_boundaries",
+      "width": 388.346,
+      "height": 583.937,
+      "content_extraction_status": "not_processed",
+      "blocks": []
+    },
+    {
+      "page_number": 334,
+      "page_type": "explanation_body",
+      "page_type_basis": "sequence_inference_from_checked_boundaries",
+      "width": 388.346,
+      "height": 583.937,
+      "content_extraction_status": "not_processed",
+      "blocks": []
+    },
+    {
+      "page_number": 335,
+      "page_type": "explanation_body",
+      "page_type_basis": "sequence_inference_from_checked_boundaries",
+      "width": 388.346,
+      "height": 583.937,
+      "content_extraction_status": "not_processed",
+      "blocks": []
+    },
+    {
+      "page_number": 336,
+      "page_type": "explanation_body",
+      "page_type_basis": "sequence_inference_from_checked_boundaries",
+      "width": 388.346,
+      "height": 583.937,
+      "content_extraction_status": "not_processed",
+      "blocks": []
+    },
+    {
+      "page_number": 337,
+      "page_type": "explanation_body",
+      "page_type_basis": "sequence_inference_from_checked_boundaries",
+      "width": 388.346,
+      "height": 583.937,
+      "content_extraction_status": "not_processed",
+      "blocks": []
+    },
+    {
+      "page_number": 338,
+      "page_type": "explanation_body",
+      "page_type_basis": "sequence_inference_from_checked_boundaries",
+      "width": 388.346,
+      "height": 583.937,
+      "content_extraction_status": "not_processed",
+      "blocks": []
+    },
+    {
+      "page_number": 339,
+      "page_type": "explanation_body",
+      "page_type_basis": "sequence_inference_from_checked_boundaries",
+      "width": 388.346,
+      "height": 583.937,
+      "content_extraction_status": "not_processed",
+      "blocks": []
+    },
+    {
+      "page_number": 340,
+      "page_type": "explanation_body",
+      "page_type_basis": "sequence_inference_from_checked_boundaries",
+      "width": 388.346,
+      "height": 583.937,
+      "content_extraction_status": "not_processed",
+      "blocks": []
+    },
+    {
+      "page_number": 341,
+      "page_type": "explanation_body",
+      "page_type_basis": "sequence_inference_from_checked_boundaries",
+      "width": 388.346,
+      "height": 583.937,
+      "content_extraction_status": "not_processed",
+      "blocks": []
+    },
+    {
+      "page_number": 342,
+      "page_type": "explanation_body",
+      "page_type_basis": "sequence_inference_from_checked_boundaries",
+      "width": 388.346,
+      "height": 583.937,
+      "content_extraction_status": "not_processed",
+      "blocks": []
+    },
+    {
+      "page_number": 343,
+      "page_type": "explanation_body",
+      "page_type_basis": "sequence_inference_from_checked_boundaries",
+      "width": 388.346,
+      "height": 583.937,
+      "content_extraction_status": "not_processed",
+      "blocks": []
+    },
+    {
+      "page_number": 344,
+      "page_type": "explanation_body",
+      "page_type_basis": "sequence_inference_from_checked_boundaries",
+      "width": 388.346,
+      "height": 583.937,
+      "content_extraction_status": "not_processed",
+      "blocks": []
+    },
+    {
+      "page_number": 345,
+      "page_type": "explanation_body",
+      "page_type_basis": "sequence_inference_from_checked_boundaries",
+      "width": 388.346,
+      "height": 583.937,
+      "content_extraction_status": "not_processed",
+      "blocks": []
+    },
+    {
+      "page_number": 346,
+      "page_type": "explanation_body",
+      "page_type_basis": "sequence_inference_from_checked_boundaries",
+      "width": 388.346,
+      "height": 583.937,
+      "content_extraction_status": "not_processed",
+      "blocks": []
+    },
+    {
+      "page_number": 347,
+      "page_type": "explanation_body",
+      "page_type_basis": "sequence_inference_from_checked_boundaries",
+      "width": 388.346,
+      "height": 583.937,
+      "content_extraction_status": "not_processed",
+      "blocks": []
+    },
+    {
+      "page_number": 348,
+      "page_type": "explanation_body",
+      "page_type_basis": "sequence_inference_from_checked_boundaries",
+      "width": 388.346,
+      "height": 583.937,
+      "content_extraction_status": "not_processed",
+      "blocks": []
+    },
+    {
+      "page_number": 349,
+      "page_type": "explanation_body",
+      "page_type_basis": "sequence_inference_from_checked_boundaries",
+      "width": 388.346,
+      "height": 583.937,
+      "content_extraction_status": "not_processed",
+      "blocks": []
+    },
+    {
+      "page_number": 350,
+      "page_type": "explanation_body",
+      "page_type_basis": "sequence_inference_from_checked_boundaries",
+      "width": 388.346,
+      "height": 583.937,
+      "content_extraction_status": "not_processed",
+      "blocks": []
+    },
+    {
+      "page_number": 351,
+      "page_type": "explanation_body",
+      "page_type_basis": "sequence_inference_from_checked_boundaries",
+      "width": 388.346,
+      "height": 583.937,
+      "content_extraction_status": "not_processed",
+      "blocks": []
+    },
+    {
+      "page_number": 352,
+      "page_type": "explanation_body",
+      "page_type_basis": "sequence_inference_from_checked_boundaries",
+      "width": 388.346,
+      "height": 583.937,
+      "content_extraction_status": "not_processed",
+      "blocks": []
+    },
+    {
+      "page_number": 353,
+      "page_type": "explanation_body",
+      "page_type_basis": "sequence_inference_from_checked_boundaries",
+      "width": 388.346,
+      "height": 583.937,
+      "content_extraction_status": "not_processed",
+      "blocks": []
+    },
+    {
+      "page_number": 354,
+      "page_type": "explanation_body",
+      "page_type_basis": "sequence_inference_from_checked_boundaries",
+      "width": 388.346,
+      "height": 583.937,
+      "content_extraction_status": "not_processed",
+      "blocks": []
+    },
+    {
+      "page_number": 355,
+      "page_type": "explanation_body",
+      "page_type_basis": "sequence_inference_from_checked_boundaries",
+      "width": 388.346,
+      "height": 583.937,
+      "content_extraction_status": "not_processed",
+      "blocks": []
+    },
+    {
+      "page_number": 356,
+      "page_type": "explanation_body",
+      "page_type_basis": "sequence_inference_from_checked_boundaries",
+      "width": 388.346,
+      "height": 583.937,
+      "content_extraction_status": "not_processed",
+      "blocks": []
+    },
+    {
+      "page_number": 357,
+      "page_type": "explanation_body",
+      "page_type_basis": "sequence_inference_from_checked_boundaries",
+      "width": 388.346,
+      "height": 583.937,
+      "content_extraction_status": "not_processed",
+      "blocks": []
+    },
+    {
+      "page_number": 358,
+      "page_type": "explanation_body",
+      "page_type_basis": "sequence_inference_from_checked_boundaries",
+      "width": 388.346,
+      "height": 583.937,
+      "content_extraction_status": "not_processed",
+      "blocks": []
+    },
+    {
+      "page_number": 359,
+      "page_type": "explanation_body",
+      "page_type_basis": "sequence_inference_from_checked_boundaries",
+      "width": 388.346,
+      "height": 583.937,
+      "content_extraction_status": "not_processed",
+      "blocks": []
+    },
+    {
+      "page_number": 360,
+      "page_type": "explanation_body",
+      "page_type_basis": "sequence_inference_from_checked_boundaries",
+      "width": 388.346,
+      "height": 583.937,
+      "content_extraction_status": "not_processed",
+      "blocks": []
+    },
+    {
+      "page_number": 361,
+      "page_type": "explanation_body",
+      "page_type_basis": "sequence_inference_from_checked_boundaries",
+      "width": 388.346,
+      "height": 583.937,
+      "content_extraction_status": "not_processed",
+      "blocks": []
+    },
+    {
+      "page_number": 362,
+      "page_type": "explanation_body",
+      "page_type_basis": "sequence_inference_from_checked_boundaries",
+      "width": 388.346,
+      "height": 583.937,
+      "content_extraction_status": "not_processed",
+      "blocks": []
+    },
+    {
+      "page_number": 363,
+      "page_type": "explanation_body",
+      "page_type_basis": "sequence_inference_from_checked_boundaries",
+      "width": 388.346,
+      "height": 583.937,
+      "content_extraction_status": "not_processed",
+      "blocks": []
+    },
+    {
+      "page_number": 364,
+      "page_type": "explanation_body",
+      "page_type_basis": "sequence_inference_from_checked_boundaries",
+      "width": 388.346,
+      "height": 583.937,
+      "content_extraction_status": "not_processed",
+      "blocks": []
+    },
+    {
+      "page_number": 365,
+      "page_type": "explanation_body",
+      "page_type_basis": "sequence_inference_from_checked_boundaries",
+      "width": 388.346,
+      "height": 583.937,
+      "content_extraction_status": "not_processed",
+      "blocks": []
+    },
+    {
+      "page_number": 366,
+      "page_type": "explanation_body",
+      "page_type_basis": "sequence_inference_from_checked_boundaries",
+      "width": 388.346,
+      "height": 583.937,
+      "content_extraction_status": "not_processed",
+      "blocks": []
+    },
+    {
+      "page_number": 367,
+      "page_type": "explanation_body",
+      "page_type_basis": "sequence_inference_from_checked_boundaries",
+      "width": 388.346,
+      "height": 583.937,
+      "content_extraction_status": "not_processed",
+      "blocks": []
+    },
+    {
+      "page_number": 368,
+      "page_type": "explanation_body",
+      "page_type_basis": "sequence_inference_from_checked_boundaries",
+      "width": 388.346,
+      "height": 583.937,
+      "content_extraction_status": "not_processed",
+      "blocks": []
+    },
+    {
+      "page_number": 369,
+      "page_type": "explanation_body",
+      "page_type_basis": "sequence_inference_from_checked_boundaries",
+      "width": 388.346,
+      "height": 583.937,
+      "content_extraction_status": "not_processed",
+      "blocks": []
+    },
+    {
+      "page_number": 370,
+      "page_type": "explanation_body",
+      "page_type_basis": "sequence_inference_from_checked_boundaries",
+      "width": 388.346,
+      "height": 583.937,
+      "content_extraction_status": "not_processed",
+      "blocks": []
+    },
+    {
+      "page_number": 371,
+      "page_type": "explanation_body",
+      "page_type_basis": "sequence_inference_from_checked_boundaries",
+      "width": 388.346,
+      "height": 583.937,
+      "content_extraction_status": "not_processed",
+      "blocks": []
+    },
+    {
+      "page_number": 372,
+      "page_type": "explanation_body",
+      "page_type_basis": "sequence_inference_from_checked_boundaries",
+      "width": 388.346,
+      "height": 583.937,
+      "content_extraction_status": "not_processed",
+      "blocks": []
+    },
+    {
+      "page_number": 373,
+      "page_type": "explanation_body",
+      "page_type_basis": "sequence_inference_from_checked_boundaries",
+      "width": 388.346,
+      "height": 583.937,
+      "content_extraction_status": "not_processed",
+      "blocks": []
+    },
+    {
+      "page_number": 374,
+      "page_type": "explanation_body",
+      "page_type_basis": "sequence_inference_from_checked_boundaries",
+      "width": 388.346,
+      "height": 583.937,
+      "content_extraction_status": "not_processed",
+      "blocks": []
+    },
+    {
+      "page_number": 375,
+      "page_type": "explanation_body",
+      "page_type_basis": "sequence_inference_from_checked_boundaries",
+      "width": 388.346,
+      "height": 583.937,
+      "content_extraction_status": "not_processed",
+      "blocks": []
+    },
+    {
+      "page_number": 376,
+      "page_type": "explanation_body",
+      "page_type_basis": "sequence_inference_from_checked_boundaries",
+      "width": 388.346,
+      "height": 583.937,
+      "content_extraction_status": "not_processed",
+      "blocks": []
+    },
+    {
+      "page_number": 377,
+      "page_type": "explanation_body",
+      "page_type_basis": "sequence_inference_from_checked_boundaries",
+      "width": 388.346,
+      "height": 583.937,
+      "content_extraction_status": "not_processed",
+      "blocks": []
+    },
+    {
+      "page_number": 378,
+      "page_type": "explanation_body",
+      "page_type_basis": "sequence_inference_from_checked_boundaries",
+      "width": 388.346,
+      "height": 583.937,
+      "content_extraction_status": "not_processed",
+      "blocks": []
+    },
+    {
+      "page_number": 379,
+      "page_type": "explanation_body",
+      "page_type_basis": "sequence_inference_from_checked_boundaries",
+      "width": 388.346,
+      "height": 583.937,
+      "content_extraction_status": "not_processed",
+      "blocks": []
+    },
+    {
+      "page_number": 380,
+      "page_type": "explanation_body",
+      "page_type_basis": "sequence_inference_from_checked_boundaries",
+      "width": 388.346,
+      "height": 583.937,
+      "content_extraction_status": "not_processed",
+      "blocks": []
+    },
+    {
+      "page_number": 381,
+      "page_type": "explanation_body",
+      "page_type_basis": "sequence_inference_from_checked_boundaries",
+      "width": 388.346,
+      "height": 583.937,
+      "content_extraction_status": "not_processed",
+      "blocks": []
+    },
+    {
+      "page_number": 382,
+      "page_type": "explanation_body",
+      "page_type_basis": "sequence_inference_from_checked_boundaries",
+      "width": 388.346,
+      "height": 583.937,
+      "content_extraction_status": "not_processed",
+      "blocks": []
+    },
+    {
+      "page_number": 383,
+      "page_type": "explanation_body",
+      "page_type_basis": "sequence_inference_from_checked_boundaries",
+      "width": 388.346,
+      "height": 583.937,
+      "content_extraction_status": "not_processed",
+      "blocks": []
+    },
+    {
+      "page_number": 384,
+      "page_type": "explanation_body",
+      "page_type_basis": "sequence_inference_from_checked_boundaries",
+      "width": 388.346,
+      "height": 583.937,
+      "content_extraction_status": "not_processed",
+      "blocks": []
+    },
+    {
+      "page_number": 385,
+      "page_type": "explanation_body",
+      "page_type_basis": "sequence_inference_from_checked_boundaries",
+      "width": 388.346,
+      "height": 583.937,
+      "content_extraction_status": "not_processed",
+      "blocks": []
+    },
+    {
+      "page_number": 386,
+      "page_type": "explanation_body",
+      "page_type_basis": "sequence_inference_from_checked_boundaries",
+      "width": 388.346,
+      "height": 583.937,
+      "content_extraction_status": "not_processed",
+      "blocks": []
+    },
+    {
+      "page_number": 387,
+      "page_type": "explanation_body",
+      "page_type_basis": "sequence_inference_from_checked_boundaries",
+      "width": 388.346,
+      "height": 583.937,
+      "content_extraction_status": "not_processed",
+      "blocks": []
+    },
+    {
+      "page_number": 388,
+      "page_type": "explanation_body",
+      "page_type_basis": "sequence_inference_from_checked_boundaries",
+      "width": 388.346,
+      "height": 583.937,
+      "content_extraction_status": "not_processed",
+      "blocks": []
+    },
+    {
+      "page_number": 389,
+      "page_type": "explanation_body",
+      "page_type_basis": "sequence_inference_from_checked_boundaries",
+      "width": 388.346,
+      "height": 583.937,
+      "content_extraction_status": "not_processed",
+      "blocks": []
+    },
+    {
+      "page_number": 390,
+      "page_type": "explanation_body",
+      "page_type_basis": "sequence_inference_from_checked_boundaries",
+      "width": 388.346,
+      "height": 583.937,
+      "content_extraction_status": "not_processed",
+      "blocks": []
+    },
+    {
+      "page_number": 391,
+      "page_type": "explanation_body",
+      "page_type_basis": "sequence_inference_from_checked_boundaries",
+      "width": 388.346,
+      "height": 583.937,
+      "content_extraction_status": "not_processed",
+      "blocks": []
+    },
+    {
+      "page_number": 392,
+      "page_type": "explanation_body",
+      "page_type_basis": "sequence_inference_from_checked_boundaries",
+      "width": 388.346,
+      "height": 583.937,
+      "content_extraction_status": "not_processed",
+      "blocks": []
+    },
+    {
+      "page_number": 393,
+      "page_type": "explanation_body",
+      "page_type_basis": "sequence_inference_from_checked_boundaries",
+      "width": 388.346,
+      "height": 583.937,
+      "content_extraction_status": "not_processed",
+      "blocks": []
+    },
+    {
+      "page_number": 394,
+      "page_type": "explanation_body",
+      "page_type_basis": "sequence_inference_from_checked_boundaries",
+      "width": 388.346,
+      "height": 583.937,
+      "content_extraction_status": "not_processed",
+      "blocks": []
+    },
+    {
+      "page_number": 395,
+      "page_type": "explanation_body",
+      "page_type_basis": "sequence_inference_from_checked_boundaries",
+      "width": 388.346,
+      "height": 583.937,
+      "content_extraction_status": "not_processed",
+      "blocks": []
+    },
+    {
+      "page_number": 396,
+      "page_type": "explanation_body",
+      "page_type_basis": "sequence_inference_from_checked_boundaries",
+      "width": 388.346,
+      "height": 583.937,
+      "content_extraction_status": "not_processed",
+      "blocks": []
+    },
+    {
+      "page_number": 397,
+      "page_type": "explanation_body",
+      "page_type_basis": "sequence_inference_from_checked_boundaries",
+      "width": 388.346,
+      "height": 583.937,
+      "content_extraction_status": "not_processed",
+      "blocks": []
+    },
+    {
+      "page_number": 398,
+      "page_type": "explanation_body",
+      "page_type_basis": "sequence_inference_from_checked_boundaries",
+      "width": 388.346,
+      "height": 583.937,
+      "content_extraction_status": "not_processed",
+      "blocks": []
+    },
+    {
+      "page_number": 399,
+      "page_type": "explanation_body",
+      "page_type_basis": "sequence_inference_from_checked_boundaries",
+      "width": 388.346,
+      "height": 583.937,
+      "content_extraction_status": "not_processed",
+      "blocks": []
+    },
+    {
+      "page_number": 400,
+      "page_type": "explanation_body",
+      "page_type_basis": "sequence_inference_from_checked_boundaries",
+      "width": 388.346,
+      "height": 583.937,
+      "content_extraction_status": "not_processed",
+      "blocks": []
+    },
+    {
+      "page_number": 401,
+      "page_type": "explanation_body",
+      "page_type_basis": "sequence_inference_from_checked_boundaries",
+      "width": 388.346,
+      "height": 583.937,
+      "content_extraction_status": "not_processed",
+      "blocks": []
+    },
+    {
+      "page_number": 402,
+      "page_type": "explanation_body",
+      "page_type_basis": "sequence_inference_from_checked_boundaries",
+      "width": 388.346,
+      "height": 583.937,
+      "content_extraction_status": "not_processed",
+      "blocks": []
+    },
+    {
+      "page_number": 403,
+      "page_type": "explanation_body",
+      "page_type_basis": "sequence_inference_from_checked_boundaries",
+      "width": 388.346,
+      "height": 583.937,
+      "content_extraction_status": "not_processed",
+      "blocks": []
+    },
+    {
+      "page_number": 404,
+      "page_type": "explanation_body",
+      "page_type_basis": "sequence_inference_from_checked_boundaries",
+      "width": 388.346,
+      "height": 583.937,
+      "content_extraction_status": "not_processed",
+      "blocks": []
+    },
+    {
+      "page_number": 405,
+      "page_type": "explanation_body",
+      "page_type_basis": "sequence_inference_from_checked_boundaries",
+      "width": 388.346,
+      "height": 583.937,
+      "content_extraction_status": "not_processed",
+      "blocks": []
+    },
+    {
+      "page_number": 406,
+      "page_type": "explanation_body",
+      "page_type_basis": "sequence_inference_from_checked_boundaries",
+      "width": 388.346,
+      "height": 583.937,
+      "content_extraction_status": "not_processed",
+      "blocks": []
+    },
+    {
+      "page_number": 407,
+      "page_type": "explanation_body",
+      "page_type_basis": "sequence_inference_from_checked_boundaries",
+      "width": 388.346,
+      "height": 583.937,
+      "content_extraction_status": "not_processed",
+      "blocks": []
+    },
+    {
+      "page_number": 408,
+      "page_type": "explanation_body",
+      "page_type_basis": "sequence_inference_from_checked_boundaries",
+      "width": 388.346,
+      "height": 583.937,
+      "content_extraction_status": "not_processed",
+      "blocks": []
+    },
+    {
+      "page_number": 409,
+      "page_type": "explanation_body",
+      "page_type_basis": "sequence_inference_from_checked_boundaries",
+      "width": 388.346,
+      "height": 583.937,
+      "content_extraction_status": "not_processed",
+      "blocks": []
+    },
+    {
+      "page_number": 410,
+      "page_type": "explanation_body",
+      "page_type_basis": "sequence_inference_from_checked_boundaries",
+      "width": 388.346,
+      "height": 583.937,
+      "content_extraction_status": "not_processed",
+      "blocks": []
+    },
+    {
+      "page_number": 411,
+      "page_type": "explanation_body",
+      "page_type_basis": "sequence_inference_from_checked_boundaries",
+      "width": 388.346,
+      "height": 583.937,
+      "content_extraction_status": "not_processed",
+      "blocks": []
+    },
+    {
+      "page_number": 412,
+      "page_type": "explanation_body",
+      "page_type_basis": "sequence_inference_from_checked_boundaries",
+      "width": 388.346,
+      "height": 583.937,
+      "content_extraction_status": "not_processed",
+      "blocks": []
+    },
+    {
+      "page_number": 413,
+      "page_type": "explanation_body",
+      "page_type_basis": "sequence_inference_from_checked_boundaries",
+      "width": 388.346,
+      "height": 583.937,
+      "content_extraction_status": "not_processed",
+      "blocks": []
+    },
+    {
+      "page_number": 414,
+      "page_type": "explanation_body",
+      "page_type_basis": "sequence_inference_from_checked_boundaries",
+      "width": 388.346,
+      "height": 583.937,
+      "content_extraction_status": "not_processed",
+      "blocks": []
+    },
+    {
+      "page_number": 415,
+      "page_type": "explanation_body",
+      "page_type_basis": "sequence_inference_from_checked_boundaries",
+      "width": 388.346,
+      "height": 583.937,
+      "content_extraction_status": "not_processed",
+      "blocks": []
+    },
+    {
+      "page_number": 416,
+      "page_type": "explanation_body",
+      "page_type_basis": "sequence_inference_from_checked_boundaries",
+      "width": 388.346,
+      "height": 583.937,
+      "content_extraction_status": "not_processed",
+      "blocks": []
+    },
+    {
+      "page_number": 417,
+      "page_type": "explanation_body",
+      "page_type_basis": "sequence_inference_from_checked_boundaries",
+      "width": 388.346,
+      "height": 583.937,
+      "content_extraction_status": "not_processed",
+      "blocks": []
+    },
+    {
+      "page_number": 418,
+      "page_type": "explanation_body",
+      "page_type_basis": "sequence_inference_from_checked_boundaries",
+      "width": 388.346,
+      "height": 583.937,
+      "content_extraction_status": "not_processed",
+      "blocks": []
+    },
+    {
+      "page_number": 419,
+      "page_type": "explanation_body",
+      "page_type_basis": "sequence_inference_from_checked_boundaries",
+      "width": 388.346,
+      "height": 583.937,
+      "content_extraction_status": "not_processed",
+      "blocks": []
+    },
+    {
+      "page_number": 420,
+      "page_type": "explanation_body",
+      "page_type_basis": "sequence_inference_from_checked_boundaries",
+      "width": 388.346,
+      "height": 583.937,
+      "content_extraction_status": "not_processed",
+      "blocks": []
+    },
+    {
+      "page_number": 421,
+      "page_type": "explanation_body",
+      "page_type_basis": "sequence_inference_from_checked_boundaries",
+      "width": 388.346,
+      "height": 583.937,
+      "content_extraction_status": "not_processed",
+      "blocks": []
+    },
+    {
+      "page_number": 422,
+      "page_type": "explanation_body",
+      "page_type_basis": "sequence_inference_from_checked_boundaries",
+      "width": 388.346,
+      "height": 583.937,
+      "content_extraction_status": "not_processed",
+      "blocks": []
+    },
+    {
+      "page_number": 423,
+      "page_type": "explanation_body",
+      "page_type_basis": "sequence_inference_from_checked_boundaries",
+      "width": 388.346,
+      "height": 583.937,
+      "content_extraction_status": "not_processed",
+      "blocks": []
+    },
+    {
+      "page_number": 424,
+      "page_type": "explanation_body",
+      "page_type_basis": "sequence_inference_from_checked_boundaries",
+      "width": 388.346,
+      "height": 583.937,
+      "content_extraction_status": "not_processed",
+      "blocks": []
+    },
+    {
+      "page_number": 425,
+      "page_type": "explanation_body",
+      "page_type_basis": "sequence_inference_from_checked_boundaries",
+      "width": 388.346,
+      "height": 583.937,
+      "content_extraction_status": "not_processed",
+      "blocks": []
+    },
+    {
+      "page_number": 426,
+      "page_type": "explanation_body",
+      "page_type_basis": "sequence_inference_from_checked_boundaries",
+      "width": 388.346,
+      "height": 583.937,
+      "content_extraction_status": "not_processed",
+      "blocks": []
+    },
+    {
+      "page_number": 427,
+      "page_type": "explanation_body",
+      "page_type_basis": "sequence_inference_from_checked_boundaries",
+      "width": 388.346,
+      "height": 583.937,
+      "content_extraction_status": "not_processed",
+      "blocks": []
+    },
+    {
+      "page_number": 428,
+      "page_type": "explanation_body",
+      "page_type_basis": "sequence_inference_from_checked_boundaries",
+      "width": 388.346,
+      "height": 583.937,
+      "content_extraction_status": "not_processed",
+      "blocks": []
+    },
+    {
+      "page_number": 429,
+      "page_type": "explanation_body",
+      "page_type_basis": "sequence_inference_from_checked_boundaries",
+      "width": 388.346,
+      "height": 583.937,
+      "content_extraction_status": "not_processed",
+      "blocks": []
+    },
+    {
+      "page_number": 430,
+      "page_type": "explanation_body",
+      "page_type_basis": "sequence_inference_from_checked_boundaries",
+      "width": 388.346,
+      "height": 583.937,
+      "content_extraction_status": "not_processed",
+      "blocks": []
+    },
+    {
+      "page_number": 431,
+      "page_type": "explanation_body",
+      "page_type_basis": "sequence_inference_from_checked_boundaries",
+      "width": 388.346,
+      "height": 583.937,
+      "content_extraction_status": "not_processed",
+      "blocks": []
+    },
+    {
+      "page_number": 432,
+      "page_type": "explanation_body",
+      "page_type_basis": "sequence_inference_from_checked_boundaries",
+      "width": 388.346,
+      "height": 583.937,
+      "content_extraction_status": "not_processed",
+      "blocks": []
+    },
+    {
+      "page_number": 433,
+      "page_type": "explanation_body",
+      "page_type_basis": "sequence_inference_from_checked_boundaries",
+      "width": 388.346,
+      "height": 583.937,
+      "content_extraction_status": "not_processed",
+      "blocks": []
+    },
+    {
+      "page_number": 434,
+      "page_type": "explanation_body",
+      "page_type_basis": "sequence_inference_from_checked_boundaries",
+      "width": 388.346,
+      "height": 583.937,
+      "content_extraction_status": "not_processed",
+      "blocks": []
+    },
+    {
+      "page_number": 435,
+      "page_type": "explanation_body",
+      "page_type_basis": "sequence_inference_from_checked_boundaries",
+      "width": 388.346,
+      "height": 583.937,
+      "content_extraction_status": "not_processed",
+      "blocks": []
+    },
+    {
+      "page_number": 436,
+      "page_type": "explanation_body",
+      "page_type_basis": "sequence_inference_from_checked_boundaries",
+      "width": 388.346,
+      "height": 583.937,
+      "content_extraction_status": "not_processed",
+      "blocks": []
+    },
+    {
+      "page_number": 437,
+      "page_type": "explanation_body",
+      "page_type_basis": "sequence_inference_from_checked_boundaries",
+      "width": 388.346,
+      "height": 583.937,
+      "content_extraction_status": "not_processed",
+      "blocks": []
+    },
+    {
+      "page_number": 438,
+      "page_type": "explanation_body",
+      "page_type_basis": "sequence_inference_from_checked_boundaries",
+      "width": 388.346,
+      "height": 583.937,
+      "content_extraction_status": "not_processed",
+      "blocks": []
+    },
+    {
+      "page_number": 439,
+      "page_type": "explanation_body",
+      "page_type_basis": "sequence_inference_from_checked_boundaries",
+      "width": 388.346,
+      "height": 583.937,
+      "content_extraction_status": "not_processed",
+      "blocks": []
+    },
+    {
+      "page_number": 440,
+      "page_type": "explanation_body",
+      "page_type_basis": "sequence_inference_from_checked_boundaries",
+      "width": 388.346,
+      "height": 583.937,
+      "content_extraction_status": "not_processed",
+      "blocks": []
+    },
+    {
+      "page_number": 441,
+      "page_type": "explanation_body",
+      "page_type_basis": "visually_checked",
+      "width": 388.346,
+      "height": 583.937,
+      "content_extraction_status": "not_processed",
+      "blocks": []
+    }
+  ],
+  "sections": [
+    {
+      "section_id": "N-1",
+      "number": "1",
+      "title": "总则",
+      "section_type": "chapter",
+      "content_group": "normative",
+      "parent_section_id": null,
+      "structure_path": [
+        "1"
+      ]
+    },
+    {
+      "section_id": "N-3",
+      "number": "3",
+      "title": "基本设计规定",
+      "section_type": "chapter",
+      "content_group": "normative",
+      "parent_section_id": null,
+      "structure_path": [
+        "3"
+      ]
+    },
+    {
+      "section_id": "N-3.3",
+      "number": "3.3",
+      "title": "承载能力极限状态计算",
+      "section_type": "section",
+      "content_group": "normative",
+      "parent_section_id": "N-3",
+      "structure_path": [
+        "3",
+        "3.3"
+      ]
+    },
+    {
+      "section_id": "N-3.5",
+      "number": "3.5",
+      "title": "耐久性设计",
+      "section_type": "section",
+      "content_group": "normative",
+      "parent_section_id": "N-3",
+      "structure_path": [
+        "3",
+        "3.5"
+      ]
+    },
+    {
+      "section_id": "N-4",
+      "number": "4",
+      "title": "材料",
+      "section_type": "chapter",
+      "content_group": "normative",
+      "parent_section_id": null,
+      "structure_path": [
+        "4"
+      ]
+    },
+    {
+      "section_id": "N-4.2",
+      "number": "4.2",
+      "title": "钢筋",
+      "section_type": "section",
+      "content_group": "normative",
+      "parent_section_id": "N-4",
+      "structure_path": [
+        "4",
+        "4.2"
+      ]
+    },
+    {
+      "section_id": "N-6",
+      "number": "6",
+      "title": "承载能力极限状态计算",
+      "section_type": "chapter",
+      "content_group": "normative",
+      "parent_section_id": null,
+      "structure_path": [
+        "6"
+      ]
+    },
+    {
+      "section_id": "N-6.2",
+      "number": "6.2",
+      "title": "正截面承载力计算",
+      "section_type": "section",
+      "content_group": "normative",
+      "parent_section_id": "N-6",
+      "structure_path": [
+        "6",
+        "6.2"
+      ]
+    },
+    {
+      "section_id": "N-9",
+      "number": "9",
+      "title": "结构构件的基本规定",
+      "section_type": "chapter",
+      "content_group": "normative",
+      "parent_section_id": null,
+      "structure_path": [
+        "9"
+      ]
+    },
+    {
+      "section_id": "N-9.1",
+      "number": "9.1",
+      "title": "板",
+      "section_type": "section",
+      "content_group": "normative",
+      "parent_section_id": "N-9",
+      "structure_path": [
+        "9",
+        "9.1"
+      ]
+    },
+    {
+      "section_id": "E-1",
+      "number": "1",
+      "title": "总则",
+      "section_type": "chapter",
+      "content_group": "explanation",
+      "parent_section_id": null,
+      "structure_path": [
+        "1"
+      ]
+    },
+    {
+      "section_id": "E-4",
+      "number": "4",
+      "title": "材料",
+      "section_type": "chapter",
+      "content_group": "explanation",
+      "parent_section_id": null,
+      "structure_path": [
+        "4"
+      ]
+    },
+    {
+      "section_id": "E-4.1",
+      "number": "4.1",
+      "title": "混凝土",
+      "section_type": "section",
+      "content_group": "explanation",
+      "parent_section_id": "E-4",
+      "structure_path": [
+        "4",
+        "4.1"
+      ]
+    }
+  ],
+  "tables": [
+    {
+      "table_id": "table-9.1.2",
+      "table_number": "表9.1.2",
+      "title": "现浇钢筋混凝土板的最小厚度（mm）",
+      "page_start": 126,
+      "page_end": 127,
+      "source_block_ids": [
+        "p126_t912_p1",
+        "p127_t912_p2"
+      ],
+      "fragments": [
+        {
+          "page_number": 126,
+          "block_id": "p126_t912_p1",
+          "label": "表9.1.2",
+          "fragment_index": 0
+        },
+        {
+          "page_number": 127,
+          "block_id": "p127_t912_p2",
+          "label": "续表9.1.2",
+          "fragment_index": 1
+        }
+      ],
+      "columns": [
+        {
+          "key": "slab_type",
+          "header_path": [
+            "板的类别"
+          ],
+          "role": "row_header",
+          "derived": false
+        },
+        {
+          "key": "subtype",
+          "header_path": [
+            "板的类别"
+          ],
+          "role": "row_header",
+          "derived": true,
+          "description": "由表格中的合并单元格及子分类展开，原表未单列此字段"
+        },
+        {
+          "key": "min_thickness_mm",
+          "header_path": [
+            "最小厚度"
+          ],
+          "role": "value",
+          "derived": false
+        }
+      ],
+      "data": [
+        {
+          "slab_type": "单向板",
+          "subtype": "屋面板",
+          "min_thickness_mm": "60",
+          "source_page": 126
+        },
+        {
+          "slab_type": "单向板",
+          "subtype": "民用建筑楼板",
+          "min_thickness_mm": "60",
+          "source_page": 126
+        },
+        {
+          "slab_type": "单向板",
+          "subtype": "工业建筑楼板",
+          "min_thickness_mm": "70",
+          "source_page": 126
+        },
+        {
+          "slab_type": "单向板",
+          "subtype": "行车道下的楼板",
+          "min_thickness_mm": "80",
+          "source_page": 126
+        },
+        {
+          "slab_type": "双向板",
+          "subtype": null,
+          "min_thickness_mm": "80",
+          "source_page": 127
+        },
+        {
+          "slab_type": "密肋楼盖",
+          "subtype": "面板",
+          "min_thickness_mm": "50",
+          "source_page": 127
+        },
+        {
+          "slab_type": "密肋楼盖",
+          "subtype": "肋高",
+          "min_thickness_mm": "250",
+          "source_page": 127
+        },
+        {
+          "slab_type": "悬臂板（根部）",
+          "subtype": "悬臂长度不大于500mm",
+          "min_thickness_mm": "60",
+          "source_page": 127
+        },
+        {
+          "slab_type": "悬臂板（根部）",
+          "subtype": "悬臂长度1200mm",
+          "min_thickness_mm": "100",
+          "source_page": 127
+        },
+        {
+          "slab_type": "无梁楼板",
+          "subtype": null,
+          "min_thickness_mm": "150",
+          "source_page": 127
+        },
+        {
+          "slab_type": "现浇空心楼盖",
+          "subtype": null,
+          "min_thickness_mm": "200",
+          "source_page": 127
+        }
+      ],
+      "notes": null,
+      "extraction_status": "manually_verified_normalized_with_one_ambiguous_cell",
+      "original_grid_available": false,
+      "normalization_warning": "原表具有纵向合并单元格；subtype为规范化后的补充字段，原印刷表头仅为“板的类别 / 最小厚度”。“悬臂长度1200mm”一项的关系符号无法可靠辨认，按可见文字记录，需进一步校对。"
+    },
+    {
+      "table_id": "table-3.5.2",
+      "table_number": "表3.5.2",
+      "title": "混凝土结构的环境类别",
+      "page_start": 28,
+      "page_end": 29,
+      "source_block_ids": [
+        "p028_t352_part1",
+        "p029_t352_part2"
+      ],
+      "fragments": [
+        {
+          "page_number": 28,
+          "block_id": "p028_t352_part1",
+          "fragment_index": 0
+        },
+        {
+          "page_number": 29,
+          "block_id": "p029_t352_part2",
+          "fragment_index": 1
+        }
+      ],
+      "columns": [],
+      "data": null,
+      "notes": null,
+      "extraction_status": "structure_only_not_ocr_transcribed"
+    },
+    {
+      "table_id": "table-4.2.2-2",
+      "table_number": "表4.2.2-2",
+      "title": "预应力筋强度标准值",
+      "page_start": 37,
+      "page_end": 38,
+      "source_block_ids": [
+        "p037_t422_part1",
+        "p038_t422_part2"
+      ],
+      "fragments": [
+        {
+          "page_number": 37,
+          "block_id": "p037_t422_part1",
+          "fragment_index": 0
+        },
+        {
+          "page_number": 38,
+          "block_id": "p038_t422_part2",
+          "fragment_index": 1
+        }
+      ],
+      "columns": [],
+      "data": null,
+      "notes": null,
+      "extraction_status": "structure_only_not_ocr_transcribed"
+    }
+  ],
+  "clauses": {
+    "normative": [
+      {
+        "clause_id": "norm-1.0.1",
+        "clause_number": "1.0.1",
+        "section_id": "N-1",
+        "clause_content": {
+          "plain_text": "1.0.1 为了在混凝土结构设计中贯彻执行国家的技术经济政策，做到安全、适用、经济，保证质量，制定本规范。",
+          "content_units": [
+            {
+              "order": 0,
+              "content_type": "body",
+              "source_block_ids": [
+                "p016_c101"
+              ],
+              "text": "1.0.1 为了在混凝土结构设计中贯彻执行国家的技术经济政策，做到安全、适用、经济，保证质量，制定本规范。"
+            }
+          ],
+          "transcription_status": "manually_verified_complete"
+        },
+        "page_start": 16,
+        "page_end": 16,
+        "source_block_ids": [
+          "p016_c101"
+        ],
+        "is_explanation": false,
+        "is_mandatory": null,
+        "mandatory_evidence": null
+      },
+      {
+        "clause_id": "norm-3.3.2",
+        "clause_number": "3.3.2",
+        "section_id": "N-3.3",
+        "clause_content": {
+          "plain_text": "3.3.2 对持久设计状况、短暂设计状况和地震设计状况，当用内力的形式表达时，结构构件应采用下列承载能力极限状态设计表达式：\n(3.3.2-1) γ₀S≤R；(3.3.2-2) R=R(f_c,f_s,a_k,…) /γ_Rd；符号说明续页。",
+          "content_units": [
+            {
+              "order": 0,
+              "content_type": "body",
+              "source_block_ids": [
+                "p024_c332"
+              ],
+              "text": "3.3.2 对持久设计状况、短暂设计状况和地震设计状况，当用内力的形式表达时，结构构件应采用下列承载能力极限状态设计表达式："
+            },
+            {
+              "order": 1,
+              "content_type": "formula",
+              "source_block_ids": [
+                "p024_f332"
+              ],
+              "formula_group_id": "fg-3.3.2",
+              "formula_numbers": [
+                "(3.3.2-1)",
+                "(3.3.2-2)"
+              ]
+            }
+          ],
+          "transcription_status": "manually_verified_partial"
+        },
+        "page_start": 24,
+        "page_end": 25,
+        "source_block_ids": [
+          "p024_c332",
+          "p024_f332"
+        ],
+        "is_explanation": false,
+        "is_mandatory": null,
+        "mandatory_evidence": null
+      },
+      {
+        "clause_id": "norm-6.2.1",
+        "clause_number": "6.2.1",
+        "section_id": "N-6.2",
+        "clause_content": {
+          "plain_text": "6.2.1 中的（6.2.1-1）至（6.2.1-7）公式在 PDF 第50页出现；本示例未转录全部条文及跨页符号说明。",
+          "content_units": [
+            {
+              "order": 0,
+              "content_type": "formula",
+              "source_block_ids": [
+                "p050_fg621"
+              ],
+              "formula_group_id": "fg-6.2.1-a",
+              "formula_numbers": [
+                "(6.2.1-1)",
+                "(6.2.1-2)",
+                "(6.2.1-3)",
+                "(6.2.1-4)",
+                "(6.2.1-5)"
+              ]
+            },
+            {
+              "order": 1,
+              "content_type": "formula",
+              "source_block_ids": [
+                "p050_fg621b"
+              ],
+              "formula_group_id": "fg-6.2.1-b",
+              "formula_numbers": [
+                "(6.2.1-6)",
+                "(6.2.1-7)"
+              ]
+            }
+          ],
+          "transcription_status": "manually_verified_partial"
+        },
+        "page_start": 49,
+        "page_end": 51,
+        "source_block_ids": [
+          "p050_fg621",
+          "p050_fg621b"
+        ],
+        "is_explanation": false,
+        "is_mandatory": null,
+        "mandatory_evidence": null
+      },
+      {
+        "clause_id": "norm-9.1.2",
+        "clause_number": "9.1.2",
+        "section_id": "N-9.1",
+        "clause_content": {
+          "plain_text": "9.1.2 现浇混凝土板的尺寸宜符合下列规定：\n1 板的跨厚比：钢筋混凝土单向板不大于30，双向板不大于40；无梁支承的有柱帽板不大于35，无梁支承的无柱帽板不大于30。预应力板可适当增加；当板的荷载、跨度较大时宜适当减小。\n2 现浇钢筋混凝土板的厚度不应小于表9.1.2规定的数值。\n表9.1.2 现浇钢筋混凝土板的最小厚度（mm）（表格内容详见 tables.table-9.1.2）",
+          "content_units": [
+            {
+              "order": 0,
+              "content_type": "body",
+              "source_block_ids": [
+                "p126_c912"
+              ],
+              "text": "9.1.2 现浇混凝土板的尺寸宜符合下列规定：\n1 板的跨厚比：钢筋混凝土单向板不大于30，双向板不大于40；无梁支承的有柱帽板不大于35，无梁支承的无柱帽板不大于30。预应力板可适当增加；当板的荷载、跨度较大时宜适当减小。\n2 现浇钢筋混凝土板的厚度不应小于表9.1.2规定的数值。"
+            },
+            {
+              "order": 1,
+              "content_type": "table",
+              "source_block_ids": [
+                "p126_t912_p1",
+                "p127_t912_p2"
+              ],
+              "table_id": "table-9.1.2"
+            }
+          ],
+          "transcription_status": "manually_verified_partial",
+          "review_warning": "表9.1.2有一个悬臂板条件的比较关系符未可靠辨认，需结合清晰原件复核。"
+        },
+        "page_start": 126,
+        "page_end": 127,
+        "source_block_ids": [
+          "p126_c912",
+          "p126_t912_p1",
+          "p127_t912_p2"
+        ],
+        "is_explanation": false,
+        "is_mandatory": null,
+        "mandatory_evidence": null
+      },
+      {
+        "clause_id": "norm-9.1.3",
+        "clause_number": "9.1.3",
+        "section_id": "N-9.1",
+        "clause_content": {
+          "plain_text": "9.1.3 板中受力钢筋的间距，当板厚不大于150mm时不宜大于200mm；当板厚大于150mm时不宜大于板厚的1.5倍，且不宜大于250mm。",
+          "content_units": [
+            {
+              "order": 0,
+              "content_type": "body",
+              "source_block_ids": [
+                "p127_c913"
+              ],
+              "text": "9.1.3 板中受力钢筋的间距，当板厚不大于150mm时不宜大于200mm；当板厚大于150mm时不宜大于板厚的1.5倍，且不宜大于250mm。"
+            }
+          ],
+          "transcription_status": "manually_verified_complete"
+        },
+        "page_start": 127,
+        "page_end": 127,
+        "source_block_ids": [
+          "p127_c913"
+        ],
+        "is_explanation": false,
+        "is_mandatory": null,
+        "mandatory_evidence": null
+      }
+    ],
+    "explanations": [
+      {
+        "clause_id": "exp-1.0.1",
+        "clause_number": "1.0.1",
+        "section_id": "E-1",
+        "clause_content": {
+          "plain_text": "1.0.1 本次修订根据多年来的工程经验和研究成果，并总结了上一版规范的应用情况和存在问题，贯彻国家“四节一环保”的技术政策，对部分内容进行了补充和调整。",
+          "content_units": [
+            {
+              "order": 0,
+              "content_type": "body",
+              "source_block_ids": [
+                "p282_exp_c101"
+              ],
+              "text": "1.0.1 本次修订根据多年来的工程经验和研究成果，并总结了上一版规范的应用情况和存在问题，贯彻国家“四节一环保”的技术政策，对部分内容进行了补充和调整。"
+            }
+          ],
+          "transcription_status": "manually_verified_partial"
+        },
+        "page_start": 282,
+        "page_end": 282,
+        "source_block_ids": [
+          "p282_exp_c101"
+        ],
+        "is_explanation": true,
+        "explains_clause_id": "norm-1.0.1"
+      },
+      {
+        "clause_id": "exp-4.1.5",
+        "clause_number": "4.1.5",
+        "section_id": "E-4.1",
+        "clause_content": {
+          "plain_text": "4.1.5 混凝土的弹性模量、剪切变形模量及泊松比同原规范。混凝土的弹性模量E_c以其强度等级值按下列公式计算：\nE_c=10^5/(2.2+34.7/f_cu,k)（无印刷公式编号）",
+          "content_units": [
+            {
+              "order": 0,
+              "content_type": "body",
+              "source_block_ids": [
+                "p301_exp_c415"
+              ],
+              "text": "4.1.5 混凝土的弹性模量、剪切变形模量及泊松比同原规范。混凝土的弹性模量E_c以其强度等级值按下列公式计算："
+            },
+            {
+              "order": 1,
+              "content_type": "formula",
+              "source_block_ids": [
+                "p301_exp_unnumbered_formula"
+              ],
+              "formula_group_id": "fg-exp-4.1.5",
+              "formula_numbers": [
+                null
+              ]
+            }
+          ],
+          "transcription_status": "manually_verified_partial"
+        },
+        "page_start": 301,
+        "page_end": 301,
+        "source_block_ids": [
+          "p301_exp_c415",
+          "p301_exp_unnumbered_formula"
+        ],
+        "is_explanation": true,
+        "explains_clause_id": "norm-4.1.5",
+        "linked_clause_resolution_status": "target_not_in_partial_sample"
+      }
+    ]
+  },
+  "processing": {
+    "parser_id": "manual-visual-structure-review",
+    "parser_version": "review-1",
+    "partial": true,
+    "is_complete_document_ocr": false,
+    "pdf_has_text_layer": false,
+    "visually_reviewed_pages": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      9,
+      12,
+      16,
+      24,
+      26,
+      28,
+      29,
+      37,
+      38,
+      50,
+      126,
+      127,
+      275,
+      276,
+      277,
+      278,
+      279,
+      280,
+      281,
+      282,
+      301,
+      441
+    ],
+    "pages_with_transcribed_blocks": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      16,
+      24,
+      28,
+      29,
+      37,
+      38,
+      50,
+      126,
+      127,
+      277,
+      278,
+      279,
+      282,
+      301
+    ],
+    "extraction_policy": "Only individually visually verified selected blocks; pages with empty blocks are NOT empty PDF pages, they have not been OCR processed.",
+    "warnings": [
+      "All 441 pages are image-only in PyMuPDF text extraction.",
+      "Only representative selected pages and blocks have been transcribed, not the full standard.",
+      "Most page_type values are inferred from visually checked section boundaries, not individually classified.",
+      "Page-level table fragments are grouped into logical cross-page tables.",
+      "Formula equation_number may be null when the printed formula has no number, e.g. PDF page 301.",
+      "bbox values for sampled blocks are manual approximations, not OCR-detected precise coordinates.",
+      "Normative mandatory status left unknown until checked against applicable announcements."
+    ]
+  }
+}

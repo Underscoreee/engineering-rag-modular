@@ -1,0 +1,17 @@
+{
+  "schema_version": "1.0",
+  "answer": "根据虚构示例条文，应考虑预留演示检修空间。",
+  "citations": [
+    {
+      "citation_id": "citation-001",
+      "evidence_chunk_id": "chunk-physical-001",
+      "document_id": "doc-demo-2026-ed1",
+      "clause_id": "clause-norm-4.2.1",
+      "page_start": 2,
+      "page_end": 3,
+      "quoted_text": "示例构件宜留出演示检修空间。"
+    }
+  ],
+  "grounding_status": "grounded",
+  "model": {"provider": "fictional-provider", "model_id": "demo-model", "model_version": "0"}
+}

@@ -1,0 +1,1245 @@
+{
+  "schema_version": "2.3",
+  "document_id": "doc-demo-2026-ed1",
+  "bbox_coordinate_system": {
+    "unit": "pdf_points",
+    "origin": "top_left"
+  },
+  "source_file": {
+    "file_id": "file-demo-pdf",
+    "uri": "artifact://demo/source.pdf",
+    "mime_type": "application/pdf",
+    "size_bytes": 4096
+  },
+  "standard": {
+    "standard_name": "虚构工程示例规范",
+    "standard_code": "DEMO 100-2026",
+    "edition": "2026演示版",
+    "language": "zh-CN"
+  },
+  "page_count": 16,
+  "pages": [
+    {
+      "page_number": 1,
+      "page_type": "outer_cover",
+      "width": 595.0,
+      "height": 842.0,
+      "blocks": [
+        {
+          "block_id": "p01_b00",
+          "block_type": "title",
+          "bbox": {
+            "x_min": 110,
+            "y_min": 250,
+            "x_max": 495,
+            "y_max": 320
+          },
+          "reading_order": 0,
+          "ocr": {
+            "text": "虚构工程示例规范"
+          }
+        },
+        {
+          "block_id": "p01_b01",
+          "block_type": "body",
+          "bbox": {
+            "x_min": 140,
+            "y_min": 340,
+            "x_max": 465,
+            "y_max": 385
+          },
+          "reading_order": 1,
+          "ocr": {
+            "text": "DEMO 100-2026 · 仅用于数据契约演示"
+          }
+        }
+      ]
+    },
+    {
+      "page_number": 2,
+      "page_type": "inner_cover",
+      "width": 595.0,
+      "height": 842.0,
+      "blocks": [
+        {
+          "block_id": "p02_b00",
+          "block_type": "title",
+          "bbox": {
+            "x_min": 60,
+            "y_min": 85,
+            "x_max": 535,
+            "y_max": 150
+          },
+          "reading_order": 0,
+          "ocr": {
+            "text": "虚构工程示例规范（内封面）"
+          }
+        },
+        {
+          "block_id": "p02_b01",
+          "block_type": "body",
+          "bbox": {
+            "x_min": 60,
+            "y_min": 173,
+            "x_max": 535,
+            "y_max": 238
+          },
+          "reading_order": 1,
+          "ocr": {
+            "text": "演示发布单位：示例标准研究组；演示版次：2026 演示版"
+          }
+        }
+      ]
+    },
+    {
+      "page_number": 3,
+      "page_type": "publication_notice",
+      "width": 595.0,
+      "height": 842.0,
+      "blocks": [
+        {
+          "block_id": "p03_b00",
+          "block_type": "title",
+          "bbox": {
+            "x_min": 60,
+            "y_min": 85,
+            "x_max": 535,
+            "y_max": 150
+          },
+          "reading_order": 0,
+          "ocr": {
+            "text": "关于发布《虚构工程示例规范》的演示公告"
+          }
+        },
+        {
+          "block_id": "p03_b01",
+          "block_type": "body",
+          "bbox": {
+            "x_min": 60,
+            "y_min": 173,
+            "x_max": 535,
+            "y_max": 238
+          },
+          "reading_order": 1,
+          "ocr": {
+            "text": "本公告仅为合成示例，不具有任何实际标准发布效力。"
+          }
+        }
+      ]
+    },
+    {
+      "page_number": 4,
+      "page_type": "preface",
+      "width": 595.0,
+      "height": 842.0,
+      "blocks": [
+        {
+          "block_id": "p04_b00",
+          "block_type": "title",
+          "bbox": {
+            "x_min": 60,
+            "y_min": 85,
+            "x_max": 535,
+            "y_max": 150
+          },
+          "reading_order": 0,
+          "ocr": {
+            "text": "前言"
+          }
+        },
+        {
+          "block_id": "p04_b01",
+          "block_type": "body",
+          "bbox": {
+            "x_min": 60,
+            "y_min": 173,
+            "x_max": 535,
+            "y_max": 238
+          },
+          "reading_order": 1,
+          "ocr": {
+            "text": "本文件为展示工程规范文档结构化数据格式而编写，不适用于真实工程。"
+          }
+        }
+      ]
+    },
+    {
+      "page_number": 5,
+      "page_type": "toc_zh",
+      "width": 595.0,
+      "height": 842.0,
+      "blocks": [
+        {
+          "block_id": "p05_b00",
+          "block_type": "title",
+          "bbox": {
+            "x_min": 60,
+            "y_min": 85,
+            "x_max": 535,
+            "y_max": 150
+          },
+          "reading_order": 0,
+          "ocr": {
+            "text": "目次"
+          }
+        },
+        {
+          "block_id": "p05_b01",
+          "block_type": "body",
+          "bbox": {
+            "x_min": 60,
+            "y_min": 173,
+            "x_max": 535,
+            "y_max": 238
+          },
+          "reading_order": 1,
+          "ocr": {
+            "text": "4 示例构造 …… 1\n4.2 构件设计 …… 1\n本规范用词说明 …… 4"
+          }
+        }
+      ]
+    },
+    {
+      "page_number": 6,
+      "page_type": "toc_en",
+      "width": 595.0,
+      "height": 842.0,
+      "blocks": [
+        {
+          "block_id": "p06_b00",
+          "block_type": "title",
+          "bbox": {
+            "x_min": 60,
+            "y_min": 85,
+            "x_max": 535,
+            "y_max": 150
+          },
+          "reading_order": 0,
+          "ocr": {
+            "text": "Contents"
+          }
+        },
+        {
+          "block_id": "p06_b01",
+          "block_type": "body",
+          "bbox": {
+            "x_min": 60,
+            "y_min": 173,
+            "x_max": 535,
+            "y_max": 238
+          },
+          "reading_order": 1,
+          "ocr": {
+            "text": "4 Demonstration Structures …… 1\n4.2 Component Design …… 1"
+          }
+        }
+      ]
+    },
+    {
+      "page_number": 7,
+      "page_type": "body",
+      "width": 595.0,
+      "height": 842.0,
+      "blocks": [
+        {
+          "block_id": "p07_b00",
+          "block_type": "title",
+          "bbox": {
+            "x_min": 60,
+            "y_min": 85,
+            "x_max": 535,
+            "y_max": 150
+          },
+          "reading_order": 0,
+          "ocr": {
+            "text": "4 示例构造"
+          }
+        },
+        {
+          "block_id": "p07_b01",
+          "block_type": "title",
+          "bbox": {
+            "x_min": 60,
+            "y_min": 173,
+            "x_max": 535,
+            "y_max": 238
+          },
+          "reading_order": 1,
+          "ocr": {
+            "text": "4.2 构件设计"
+          }
+        },
+        {
+          "block_id": "p07_b02",
+          "block_type": "body",
+          "bbox": {
+            "x_min": 60,
+            "y_min": 295,
+            "x_max": 535,
+            "y_max": 378
+          },
+          "reading_order": 2,
+          "ocr": {
+            "text": "4.2.1 示例构件宜留出演示检修空间。本条的检修空间指标见表4.2.1。"
+          }
+        }
+      ]
+    },
+    {
+      "page_number": 8,
+      "page_type": "body",
+      "width": 595.0,
+      "height": 842.0,
+      "blocks": [
+        {
+          "block_id": "p08_b00",
+          "block_type": "table",
+          "bbox": {
+            "x_min": 70,
+            "y_min": 85,
+            "x_max": 525,
+            "y_max": 345
+          },
+          "reading_order": 0,
+          "ocr": {
+            "text": "表4.2.1 示例构件检修空间（所有数值均为演示用）\n| 示例构件类别 | 最小检修空间（mm） |\n| --- | --- |\n| A 类 | 600 |\n| B 类 | 800 |\n1. 表中数值仅为结构化数据格式演示，不适用于工程设计。\n2. 最小检修空间为人工编写的示例值。",
+            "table": {
+              "table_number": "表4.2.1",
+              "title": "示例构件检修空间（所有数值均为演示用）",
+              "notes": [
+                {
+                  "number": 1,
+                  "content": "表中数值仅为结构化数据格式演示，不适用于工程设计。"
+                },
+                {
+                  "number": 2,
+                  "content": "最小检修空间为人工编写的示例值。"
+                }
+              ],
+              "markdown": "表4.2.1 示例构件检修空间（所有数值均为演示用）\n| 示例构件类别 | 最小检修空间（mm） |\n| --- | --- |\n| A 类 | 600 |\n| B 类 | 800 |\n1. 表中数值仅为结构化数据格式演示，不适用于工程设计。\n2. 最小检修空间为人工编写的示例值。",
+              "columns": [
+                {
+                  "key": "component_category",
+                  "header_path": [
+                    "示例构件类别"
+                  ],
+                  "role": "row_header"
+                },
+                {
+                  "key": "min_access_space_mm",
+                  "header_path": [
+                    "最小检修空间（mm）"
+                  ],
+                  "role": "value"
+                }
+              ],
+              "data": [
+                {
+                  "component_category": "A 类",
+                  "min_access_space_mm": "600"
+                },
+                {
+                  "component_category": "B 类",
+                  "min_access_space_mm": "800"
+                }
+              ]
+            }
+          },
+          "asset": {
+            "artifact_id": "asset-demo-table-421",
+            "artifact_type": "table_image",
+            "uri": "artifact://demo/table-421.png",
+            "media_type": "image/png",
+            "schema_version": "2.0",
+            "artifact_version": "1"
+          }
+        },
+        {
+          "block_id": "p08_b01",
+          "block_type": "body",
+          "bbox": {
+            "x_min": 65,
+            "y_min": 370,
+            "x_max": 530,
+            "y_max": 420
+          },
+          "reading_order": 1,
+          "ocr": {
+            "text": "在本演示条文中，平均应力和应变分别按式（4.2.1-1）和式（4.2.1-2）计算。"
+          }
+        },
+        {
+          "block_id": "p08_b02",
+          "block_type": "formula",
+          "bbox": {
+            "x_min": 60,
+            "y_min": 445,
+            "x_max": 535,
+            "y_max": 720
+          },
+          "reading_order": 2,
+          "ocr": {
+            "text": "σ = F / A  (4.2.1-1)\nε = ΔL / L₀ = (L - L₀) / L₀  (4.2.1-2)\n式中：\nσ——平均应力；\nF——作用力；\nA——截面面积；\nε——应变；\nL₀——原始长度；\nΔL——长度变化量；\nL——变化后的长度；",
+            "formula_group": {
+              "equations": [
+                {
+                  "equation_number": "(4.2.1-1)",
+                  "text": "σ = F / A",
+                  "latex": "\\sigma = \\frac{F}{A}"
+                },
+                {
+                  "equation_number": "(4.2.1-2)",
+                  "text": "ε = ΔL / L₀ = (L - L₀) / L₀",
+                  "latex": "\\begin{aligned}\\varepsilon &= \\frac{\\Delta L}{L_0} \\\\ &= \\frac{L-L_0}{L_0}\\end{aligned}"
+                }
+              ],
+              "symbol_explanations": {
+                "items": [
+                  {
+                    "symbol": "σ",
+                    "latex": "\\sigma",
+                    "description": "平均应力"
+                  },
+                  {
+                    "symbol": "F",
+                    "latex": "F",
+                    "description": "作用力"
+                  },
+                  {
+                    "symbol": "A",
+                    "latex": "A",
+                    "description": "截面面积"
+                  },
+                  {
+                    "symbol": "ε",
+                    "latex": "\\varepsilon",
+                    "description": "应变"
+                  },
+                  {
+                    "symbol": "L₀",
+                    "latex": "L_0",
+                    "description": "原始长度"
+                  },
+                  {
+                    "symbol": "ΔL",
+                    "latex": "\\Delta L",
+                    "description": "长度变化量"
+                  },
+                  {
+                    "symbol": "L",
+                    "latex": "L",
+                    "description": "变化后的长度"
+                  }
+                ]
+              }
+            }
+          }
+        }
+      ]
+    },
+    {
+      "page_number": 9,
+      "page_type": "body",
+      "width": 595.0,
+      "height": 842.0,
+      "blocks": [
+        {
+          "block_id": "p09_b00",
+          "block_type": "body",
+          "bbox": {
+            "x_min": 60,
+            "y_min": 85,
+            "x_max": 535,
+            "y_max": 150
+          },
+          "reading_order": 0,
+          "ocr": {
+            "text": "4.2.2 示例连接节点应便于检查；构造示意见图4.2.2。"
+          }
+        },
+        {
+          "block_id": "p09_b01",
+          "block_type": "image",
+          "bbox": {
+            "x_min": 120,
+            "y_min": 215,
+            "x_max": 490,
+            "y_max": 460
+          },
+          "reading_order": 1,
+          "ocr": {
+            "text": "图4.2.2 示例连接节点示意图"
+          },
+          "asset": {
+            "artifact_id": "asset-demo-figure-422",
+            "artifact_type": "figure_image",
+            "uri": "artifact://demo/figure-422.png",
+            "media_type": "image/png",
+            "schema_version": "2.0",
+            "artifact_version": "1"
+          }
+        },
+        {
+          "block_id": "p09_b02",
+          "block_type": "body",
+          "bbox": {
+            "x_min": 60,
+            "y_min": 500,
+            "x_max": 535,
+            "y_max": 565
+          },
+          "reading_order": 2,
+          "ocr": {
+            "text": "4.2.3 示例构件的施工记录宜按统一格式保存。"
+          }
+        }
+      ]
+    },
+    {
+      "page_number": 10,
+      "page_type": "wording_rules",
+      "width": 595.0,
+      "height": 842.0,
+      "blocks": [
+        {
+          "block_id": "p10_b00",
+          "block_type": "title",
+          "bbox": {
+            "x_min": 60,
+            "y_min": 85,
+            "x_max": 535,
+            "y_max": 150
+          },
+          "reading_order": 0,
+          "ocr": {
+            "text": "本规范用词说明"
+          }
+        },
+        {
+          "block_id": "p10_b01",
+          "block_type": "body",
+          "bbox": {
+            "x_min": 60,
+            "y_min": 173,
+            "x_max": 535,
+            "y_max": 238
+          },
+          "reading_order": 1,
+          "ocr": {
+            "text": "本段仅示意解释“应”“宜”等字词的表述形式，不代表强制性条文判定。"
+          }
+        }
+      ]
+    },
+    {
+      "page_number": 11,
+      "page_type": "normative_references",
+      "width": 595.0,
+      "height": 842.0,
+      "blocks": [
+        {
+          "block_id": "p11_b00",
+          "block_type": "title",
+          "bbox": {
+            "x_min": 60,
+            "y_min": 85,
+            "x_max": 535,
+            "y_max": 150
+          },
+          "reading_order": 0,
+          "ocr": {
+            "text": "引用标准名录"
+          }
+        },
+        {
+          "block_id": "p11_b01",
+          "block_type": "body",
+          "bbox": {
+            "x_min": 60,
+            "y_min": 173,
+            "x_max": 535,
+            "y_max": 238
+          },
+          "reading_order": 1,
+          "ocr": {
+            "text": "《虚构演示材料测试方法》 DEMO 200-2026（虚构）"
+          }
+        }
+      ]
+    },
+    {
+      "page_number": 12,
+      "page_type": "explanation_cover",
+      "width": 595.0,
+      "height": 842.0,
+      "blocks": [
+        {
+          "block_id": "p12_b00",
+          "block_type": "title",
+          "bbox": {
+            "x_min": 60,
+            "y_min": 85,
+            "x_max": 535,
+            "y_max": 150
+          },
+          "reading_order": 0,
+          "ocr": {
+            "text": "虚构工程示例规范 — 条文说明"
+          }
+        },
+        {
+          "block_id": "p12_b01",
+          "block_type": "body",
+          "bbox": {
+            "x_min": 60,
+            "y_min": 173,
+            "x_max": 535,
+            "y_max": 238
+          },
+          "reading_order": 1,
+          "ocr": {
+            "text": "以下解释仅用于演示“正文条文 ↔ 条文说明”的关联。"
+          }
+        }
+      ]
+    },
+    {
+      "page_number": 13,
+      "page_type": "revision_notes",
+      "width": 595.0,
+      "height": 842.0,
+      "blocks": [
+        {
+          "block_id": "p13_b00",
+          "block_type": "title",
+          "bbox": {
+            "x_min": 60,
+            "y_min": 85,
+            "x_max": 535,
+            "y_max": 150
+          },
+          "reading_order": 0,
+          "ocr": {
+            "text": "修订说明"
+          }
+        },
+        {
+          "block_id": "p13_b01",
+          "block_type": "body",
+          "bbox": {
+            "x_min": 60,
+            "y_min": 173,
+            "x_max": 535,
+            "y_max": 238
+          },
+          "reading_order": 1,
+          "ocr": {
+            "text": "本演示版首次构造，不涉及真实规范修订。"
+          }
+        }
+      ]
+    },
+    {
+      "page_number": 14,
+      "page_type": "explanation_toc",
+      "width": 595.0,
+      "height": 842.0,
+      "blocks": [
+        {
+          "block_id": "p14_b00",
+          "block_type": "title",
+          "bbox": {
+            "x_min": 60,
+            "y_min": 85,
+            "x_max": 535,
+            "y_max": 150
+          },
+          "reading_order": 0,
+          "ocr": {
+            "text": "条文说明目次"
+          }
+        },
+        {
+          "block_id": "p14_b01",
+          "block_type": "body",
+          "bbox": {
+            "x_min": 60,
+            "y_min": 173,
+            "x_max": 535,
+            "y_max": 238
+          },
+          "reading_order": 1,
+          "ocr": {
+            "text": "4 示例构造 …… 1\n4.2 构件设计 …… 1"
+          }
+        }
+      ]
+    },
+    {
+      "page_number": 15,
+      "page_type": "explanation_body",
+      "width": 595.0,
+      "height": 842.0,
+      "blocks": [
+        {
+          "block_id": "p15_b00",
+          "block_type": "title",
+          "bbox": {
+            "x_min": 60,
+            "y_min": 85,
+            "x_max": 535,
+            "y_max": 150
+          },
+          "reading_order": 0,
+          "ocr": {
+            "text": "4 示例构造"
+          }
+        },
+        {
+          "block_id": "p15_b01",
+          "block_type": "title",
+          "bbox": {
+            "x_min": 60,
+            "y_min": 173,
+            "x_max": 535,
+            "y_max": 238
+          },
+          "reading_order": 1,
+          "ocr": {
+            "text": "4.2 构件设计"
+          }
+        },
+        {
+          "block_id": "p15_b02",
+          "block_type": "body",
+          "bbox": {
+            "x_min": 60,
+            "y_min": 280,
+            "x_max": 535,
+            "y_max": 370
+          },
+          "reading_order": 2,
+          "ocr": {
+            "text": "4.2.1 本条采用检修空间示例，是为了演示条文中混合文字、表格和公式的结构化存储。"
+          }
+        }
+      ]
+    },
+    {
+      "page_number": 16,
+      "page_type": "explanation_body",
+      "width": 595.0,
+      "height": 842.0,
+      "blocks": [
+        {
+          "block_id": "p16_b00",
+          "block_type": "body",
+          "bbox": {
+            "x_min": 60,
+            "y_min": 85,
+            "x_max": 535,
+            "y_max": 150
+          },
+          "reading_order": 0,
+          "ocr": {
+            "text": "4.2.2 本条通过示例连接节点说明图示资料、表格与带编号公式的关联方式。"
+          }
+        },
+        {
+          "block_id": "p16_b01",
+          "block_type": "table",
+          "bbox": {
+            "x_min": 80,
+            "y_min": 215,
+            "x_max": 520,
+            "y_max": 405
+          },
+          "reading_order": 1,
+          "ocr": {
+            "text": "说明用参数对照表（虚构示例）\n| 设计场景 | 参数类型 | 计算参数 / 一般工况 | 计算参数 / 特殊工况 |\n| --- | --- | --- | --- |\n| 常规情况 | 系数 k | k = 1.0 | k = 1.1 |\n| 复杂情况 | 系数 k | k = 1.2 | k = 1.3 |",
+            "table": {
+              "table_number": null,
+              "title": "说明用参数对照表（虚构示例）",
+              "notes": null,
+              "markdown": "说明用参数对照表（虚构示例）\n| 设计场景 | 参数类型 | 计算参数 / 一般工况 | 计算参数 / 特殊工况 |\n| --- | --- | --- | --- |\n| 常规情况 | 系数 k | k = 1.0 | k = 1.1 |\n| 复杂情况 | 系数 k | k = 1.2 | k = 1.3 |",
+              "columns": [
+                {
+                  "key": "scenario",
+                  "header_path": [
+                    "设计场景"
+                  ],
+                  "role": "row_header"
+                },
+                {
+                  "key": "parameter",
+                  "header_path": [
+                    "参数类型"
+                  ],
+                  "role": "row_header"
+                },
+                {
+                  "key": "normal",
+                  "header_path": [
+                    "计算参数",
+                    "一般工况"
+                  ],
+                  "role": "value"
+                },
+                {
+                  "key": "special",
+                  "header_path": [
+                    "计算参数",
+                    "特殊工况"
+                  ],
+                  "role": "value"
+                }
+              ],
+              "data": [
+                {
+                  "scenario": "常规情况",
+                  "parameter": "系数 k",
+                  "normal": "k = 1.0",
+                  "special": "k = 1.1"
+                },
+                {
+                  "scenario": "复杂情况",
+                  "parameter": "系数 k",
+                  "normal": "k = 1.2",
+                  "special": "k = 1.3"
+                }
+              ]
+            }
+          },
+          "asset": {
+            "artifact_id": "asset-demo-exp-table",
+            "artifact_type": "table_image",
+            "uri": "artifact://demo/exp-table.png",
+            "media_type": "image/png",
+            "schema_version": "2.0",
+            "artifact_version": "1"
+          }
+        },
+        {
+          "block_id": "p16_b02",
+          "block_type": "formula",
+          "bbox": {
+            "x_min": 85,
+            "y_min": 440,
+            "x_max": 520,
+            "y_max": 545
+          },
+          "reading_order": 2,
+          "ocr": {
+            "text": "k = P₁ / P₀  (4.2.2-1)",
+            "formula_group": {
+              "equations": [
+                {
+                  "equation_number": "(4.2.2-1)",
+                  "text": "k = P₁ / P₀",
+                  "latex": "k = \\frac{P_1}{P_0}"
+                }
+              ],
+              "symbol_explanations": null
+            }
+          }
+        }
+      ]
+    }
+  ],
+  "sections": [
+    {
+      "section_id": "norm-sec-4",
+      "number": "4",
+      "title": "示例构造",
+      "section_type": "chapter",
+      "content_group": "normative",
+      "parent_section_id": null,
+      "structure_path": [
+        "4"
+      ]
+    },
+    {
+      "section_id": "norm-sec-4.2",
+      "number": "4.2",
+      "title": "构件设计",
+      "section_type": "section",
+      "content_group": "normative",
+      "parent_section_id": "norm-sec-4",
+      "structure_path": [
+        "4",
+        "4.2"
+      ]
+    },
+    {
+      "section_id": "exp-sec-4",
+      "number": "4",
+      "title": "示例构造",
+      "section_type": "chapter",
+      "content_group": "explanation",
+      "parent_section_id": null,
+      "structure_path": [
+        "条文说明",
+        "4"
+      ]
+    },
+    {
+      "section_id": "exp-sec-4.2",
+      "number": "4.2",
+      "title": "构件设计",
+      "section_type": "section",
+      "content_group": "explanation",
+      "parent_section_id": "exp-sec-4",
+      "structure_path": [
+        "条文说明",
+        "4",
+        "4.2"
+      ]
+    }
+  ],
+  "clauses": {
+    "normative": [
+      {
+        "clause_id": "norm-4.2.1",
+        "clause_number": "4.2.1",
+        "section_id": "norm-sec-4.2",
+        "clause_content": {
+          "plain_text": "4.2.1 示例构件宜留出演示检修空间。本条的检修空间指标见表4.2.1。\n表4.2.1 示例构件检修空间（所有数值均为演示用）\n| 示例构件类别 | 最小检修空间（mm） |\n| --- | --- |\n| A 类 | 600 |\n| B 类 | 800 |\n1. 表中数值仅为结构化数据格式演示，不适用于工程设计。\n2. 最小检修空间为人工编写的示例值。\n在本演示条文中，平均应力和应变分别按式（4.2.1-1）和式（4.2.1-2）计算。\nσ = F / A  (4.2.1-1)\nε = ΔL / L₀ = (L - L₀) / L₀  (4.2.1-2)\n式中：\nσ——平均应力；\nF——作用力；\nA——截面面积；\nε——应变；\nL₀——原始长度；\nΔL——长度变化量；\nL——变化后的长度；",
+          "content_units": [
+            {
+              "order": 0,
+              "content_type": "body",
+              "source_block_ids": [
+                "p07_b02"
+              ],
+              "text": "4.2.1 示例构件宜留出演示检修空间。本条的检修空间指标见表4.2.1。"
+            },
+            {
+              "order": 1,
+              "content_type": "table",
+              "source_block_ids": [
+                "p08_b00"
+              ],
+              "text": "示例构件检修空间（所有数值均为演示用）",
+              "table": {
+                "table_number": "表4.2.1",
+                "title": "示例构件检修空间（所有数值均为演示用）",
+                "notes": [
+                  {
+                    "number": 1,
+                    "content": "表中数值仅为结构化数据格式演示，不适用于工程设计。"
+                  },
+                  {
+                    "number": 2,
+                    "content": "最小检修空间为人工编写的示例值。"
+                  }
+                ],
+                "markdown": "表4.2.1 示例构件检修空间（所有数值均为演示用）\n| 示例构件类别 | 最小检修空间（mm） |\n| --- | --- |\n| A 类 | 600 |\n| B 类 | 800 |\n1. 表中数值仅为结构化数据格式演示，不适用于工程设计。\n2. 最小检修空间为人工编写的示例值。",
+                "columns": [
+                  {
+                    "key": "component_category",
+                    "header_path": [
+                      "示例构件类别"
+                    ],
+                    "role": "row_header"
+                  },
+                  {
+                    "key": "min_access_space_mm",
+                    "header_path": [
+                      "最小检修空间（mm）"
+                    ],
+                    "role": "value"
+                  }
+                ],
+                "data": [
+                  {
+                    "component_category": "A 类",
+                    "min_access_space_mm": "600"
+                  },
+                  {
+                    "component_category": "B 类",
+                    "min_access_space_mm": "800"
+                  }
+                ]
+              },
+              "asset_id": "asset-demo-table-421"
+            },
+            {
+              "order": 2,
+              "content_type": "body",
+              "source_block_ids": [
+                "p08_b01"
+              ],
+              "text": "在本演示条文中，平均应力和应变分别按式（4.2.1-1）和式（4.2.1-2）计算。"
+            },
+            {
+              "order": 3,
+              "content_type": "formula",
+              "source_block_ids": [
+                "p08_b02"
+              ],
+              "text": "σ = F / A  (4.2.1-1)\nε = ΔL / L₀ = (L - L₀) / L₀  (4.2.1-2)\n式中：\nσ——平均应力；\nF——作用力；\nA——截面面积；\nε——应变；\nL₀——原始长度；\nΔL——长度变化量；\nL——变化后的长度；",
+              "formula_group": {
+                "equations": [
+                  {
+                    "equation_number": "(4.2.1-1)",
+                    "text": "σ = F / A",
+                    "latex": "\\sigma = \\frac{F}{A}"
+                  },
+                  {
+                    "equation_number": "(4.2.1-2)",
+                    "text": "ε = ΔL / L₀ = (L - L₀) / L₀",
+                    "latex": "\\begin{aligned}\\varepsilon &= \\frac{\\Delta L}{L_0} \\\\ &= \\frac{L-L_0}{L_0}\\end{aligned}"
+                  }
+                ],
+                "symbol_explanations": {
+                  "items": [
+                    {
+                      "symbol": "σ",
+                      "latex": "\\sigma",
+                      "description": "平均应力"
+                    },
+                    {
+                      "symbol": "F",
+                      "latex": "F",
+                      "description": "作用力"
+                    },
+                    {
+                      "symbol": "A",
+                      "latex": "A",
+                      "description": "截面面积"
+                    },
+                    {
+                      "symbol": "ε",
+                      "latex": "\\varepsilon",
+                      "description": "应变"
+                    },
+                    {
+                      "symbol": "L₀",
+                      "latex": "L_0",
+                      "description": "原始长度"
+                    },
+                    {
+                      "symbol": "ΔL",
+                      "latex": "\\Delta L",
+                      "description": "长度变化量"
+                    },
+                    {
+                      "symbol": "L",
+                      "latex": "L",
+                      "description": "变化后的长度"
+                    }
+                  ]
+                }
+              }
+            }
+          ]
+        },
+        "page_start": 7,
+        "page_end": 8,
+        "source_block_ids": [
+          "p07_b02",
+          "p08_b00",
+          "p08_b01",
+          "p08_b02"
+        ],
+        "is_mandatory": null
+      },
+      {
+        "clause_id": "norm-4.2.2",
+        "clause_number": "4.2.2",
+        "section_id": "norm-sec-4.2",
+        "clause_content": {
+          "plain_text": "4.2.2 示例连接节点应便于检查；构造示意见图4.2.2。\n图4.2.2 示例连接节点示意图",
+          "content_units": [
+            {
+              "order": 0,
+              "content_type": "body",
+              "source_block_ids": [
+                "p09_b00"
+              ],
+              "text": "4.2.2 示例连接节点应便于检查；构造示意见图4.2.2。"
+            },
+            {
+              "order": 1,
+              "content_type": "image",
+              "source_block_ids": [
+                "p09_b01"
+              ],
+              "text": "图4.2.2 示例连接节点示意图",
+              "asset_id": "asset-demo-figure-422"
+            }
+          ]
+        },
+        "page_start": 9,
+        "page_end": 9,
+        "source_block_ids": [
+          "p09_b00",
+          "p09_b01"
+        ],
+        "is_mandatory": null
+      },
+      {
+        "clause_id": "norm-4.2.3",
+        "clause_number": "4.2.3",
+        "section_id": "norm-sec-4.2",
+        "clause_content": {
+          "plain_text": "4.2.3 示例构件的施工记录宜按统一格式保存。",
+          "content_units": [
+            {
+              "order": 0,
+              "content_type": "body",
+              "source_block_ids": [
+                "p09_b02"
+              ],
+              "text": "4.2.3 示例构件的施工记录宜按统一格式保存。"
+            }
+          ]
+        },
+        "page_start": 9,
+        "page_end": 9,
+        "source_block_ids": [
+          "p09_b02"
+        ],
+        "is_mandatory": null
+      }
+    ],
+    "explanations": [
+      {
+        "clause_id": "exp-4.2.1",
+        "clause_number": "4.2.1",
+        "section_id": "exp-sec-4.2",
+        "clause_content": {
+          "plain_text": "4.2.1 本条采用检修空间示例，是为了演示条文中混合文字、表格和公式的结构化存储。",
+          "content_units": [
+            {
+              "order": 0,
+              "content_type": "body",
+              "source_block_ids": [
+                "p15_b02"
+              ],
+              "text": "4.2.1 本条采用检修空间示例，是为了演示条文中混合文字、表格和公式的结构化存储。"
+            }
+          ]
+        },
+        "page_start": 15,
+        "page_end": 15,
+        "source_block_ids": [
+          "p15_b02"
+        ],
+        "explains_clause_id": "norm-4.2.1"
+      },
+      {
+        "clause_id": "exp-4.2.2",
+        "clause_number": "4.2.2",
+        "section_id": "exp-sec-4.2",
+        "clause_content": {
+          "plain_text": "4.2.2 本条通过示例连接节点说明图示资料、表格与带编号公式的关联方式。\n说明用参数对照表（虚构示例）\n| 设计场景 | 参数类型 | 计算参数 / 一般工况 | 计算参数 / 特殊工况 |\n| --- | --- | --- | --- |\n| 常规情况 | 系数 k | k = 1.0 | k = 1.1 |\n| 复杂情况 | 系数 k | k = 1.2 | k = 1.3 |\nk = P₁ / P₀  (4.2.2-1)",
+          "content_units": [
+            {
+              "order": 0,
+              "content_type": "body",
+              "source_block_ids": [
+                "p16_b00"
+              ],
+              "text": "4.2.2 本条通过示例连接节点说明图示资料、表格与带编号公式的关联方式。"
+            },
+            {
+              "order": 1,
+              "content_type": "table",
+              "source_block_ids": [
+                "p16_b01"
+              ],
+              "text": "说明用参数对照表（虚构示例）",
+              "table": {
+                "table_number": null,
+                "title": "说明用参数对照表（虚构示例）",
+                "notes": null,
+                "markdown": "说明用参数对照表（虚构示例）\n| 设计场景 | 参数类型 | 计算参数 / 一般工况 | 计算参数 / 特殊工况 |\n| --- | --- | --- | --- |\n| 常规情况 | 系数 k | k = 1.0 | k = 1.1 |\n| 复杂情况 | 系数 k | k = 1.2 | k = 1.3 |",
+                "columns": [
+                  {
+                    "key": "scenario",
+                    "header_path": [
+                      "设计场景"
+                    ],
+                    "role": "row_header"
+                  },
+                  {
+                    "key": "parameter",
+                    "header_path": [
+                      "参数类型"
+                    ],
+                    "role": "row_header"
+                  },
+                  {
+                    "key": "normal",
+                    "header_path": [
+                      "计算参数",
+                      "一般工况"
+                    ],
+                    "role": "value"
+                  },
+                  {
+                    "key": "special",
+                    "header_path": [
+                      "计算参数",
+                      "特殊工况"
+                    ],
+                    "role": "value"
+                  }
+                ],
+                "data": [
+                  {
+                    "scenario": "常规情况",
+                    "parameter": "系数 k",
+                    "normal": "k = 1.0",
+                    "special": "k = 1.1"
+                  },
+                  {
+                    "scenario": "复杂情况",
+                    "parameter": "系数 k",
+                    "normal": "k = 1.2",
+                    "special": "k = 1.3"
+                  }
+                ]
+              },
+              "asset_id": "asset-demo-exp-table"
+            },
+            {
+              "order": 2,
+              "content_type": "formula",
+              "source_block_ids": [
+                "p16_b02"
+              ],
+              "text": "k = P₁ / P₀  (4.2.2-1)",
+              "formula_group": {
+                "equations": [
+                  {
+                    "equation_number": "(4.2.2-1)",
+                    "text": "k = P₁ / P₀",
+                    "latex": "k = \\frac{P_1}{P_0}"
+                  }
+                ],
+                "symbol_explanations": null
+              }
+            }
+          ]
+        },
+        "page_start": 16,
+        "page_end": 16,
+        "source_block_ids": [
+          "p16_b00",
+          "p16_b01",
+          "p16_b02"
+        ],
+        "explains_clause_id": "norm-4.2.2"
+      }
+    ]
+  },
+  "processing": {
+    "parser_id": "interface-example",
+    "parser_version": "0",
+    "partial": false,
+    "warnings": [],
+    "note": "所有规范文本、表格、公式和资源 URI 均为人工构造的示例，不具有工程规范效力。V2.3 统一 bbox 坐标约定，表格以 columns/data 表达横纵表头及展开后的记录，表注以编号和内容列表表示，公式去除 line_index 和 symbol_explanations.intro。"
+  }
+}

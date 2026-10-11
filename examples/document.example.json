@@ -1,0 +1,50 @@
+{
+  "schema_version": "2.4",
+  "document_id": "doc-synthetic-v24",
+  "bbox_coordinate_system": {"unit": "pdf_points", "origin": "top_left"},
+  "source_file": {"file_id": "file-synthetic-v24", "uri": "artifact://synthetic/source.pdf", "mime_type": "application/pdf"},
+  "standard": {"standard_name": "虚构结构化演示规范", "standard_code": "DEMO-24", "edition": "演示版"},
+  "page_count": 4,
+  "pages": [
+    {"page_number": 1, "page_type": "body", "width": 600, "height": 800, "content_extraction_status": "complete", "blocks": [
+      {"block_id": "body-1", "block_type": "body", "bbox": {"x_min": 40, "y_min": 40, "x_max": 550, "y_max": 100}, "reading_order": 0, "ocr": {"text": "4.2.1 以下全部内容为虚构演示。"}},
+      {"block_id": "table-a-1", "block_type": "table", "bbox": {"x_min": 40, "y_min": 130, "x_max": 550, "y_max": 650}, "reading_order": 1, "ocr": {"text": "表4.2.1 虚构表格首段"}, "table_id": "table-a", "fragment_index": 0, "fragment_status": "verified"}
+    ]},
+    {"page_number": 2, "page_type": "body", "width": 600, "height": 800, "content_extraction_status": "complete", "blocks": [
+      {"block_id": "table-a-2", "block_type": "table", "bbox": {"x_min": 40, "y_min": 30, "x_max": 550, "y_max": 220}, "reading_order": 0, "ocr": {"text": "续表4.2.1 虚构表格次段"}, "table_id": "table-a", "fragment_index": 1, "fragment_status": "verified"},
+      {"block_id": "formula-intro", "block_type": "body", "bbox": {"x_min": 40, "y_min": 240, "x_max": 550, "y_max": 280}, "reading_order": 1, "ocr": {"text": "下列公式仅演示数据结构。"}},
+      {"block_id": "formula-1", "block_type": "formula", "bbox": {"x_min": 70, "y_min": 300, "x_max": 520, "y_max": 600}, "reading_order": 2, "formula_group_id": "fg-norm-421", "ocr": {"text": "q=F/A；r=ΔL/L₀；式中：q为虚构量。", "formula_group": {"equations": [
+        {"formula_id": "f-norm-421-1", "equation_number": "(4.2.1-1)", "equation_number_status": "printed", "latex": "q=\\frac{F}{A}", "text": "q=F/A", "recognition_status": "verified"},
+        {"formula_id": "f-norm-421-2", "equation_number": "(4.2.1-2)", "equation_number_status": "printed", "latex": "\\begin{aligned}r&=\\frac{\\Delta L}{L_0}\\\\&=\\frac{L-L_0}{L_0}\\end{aligned}", "text": "r=ΔL/L₀", "recognition_status": "verified"}
+      ], "symbol_explanations": {"items": [{"symbol": "q", "latex": "q", "description": "虚构量"}]}}}}
+    ]},
+    {"page_number": 3, "page_type": "body", "width": 600, "height": 800, "content_extraction_status": "complete", "blocks": [
+      {"block_id": "body-2", "block_type": "body", "bbox": {"x_min": 40, "y_min": 40, "x_max": 550, "y_max": 100}, "reading_order": 0, "ocr": {"text": "4.2.2 虚构附图及单页表。"}},
+      {"block_id": "table-b-1", "block_type": "table", "bbox": {"x_min": 40, "y_min": 120, "x_max": 550, "y_max": 340}, "reading_order": 1, "ocr": {"text": "虚构单页表"}, "table_id": "table-b", "fragment_index": 0, "fragment_status": "verified"},
+      {"block_id": "image-1", "block_type": "image", "bbox": {"x_min": 80, "y_min": 370, "x_max": 500, "y_max": 680}, "reading_order": 2, "ocr": {"text": "虚构附图"}, "asset": {"artifact_id": "synthetic-figure", "artifact_type": "image", "uri": "artifact://synthetic/figure.png", "media_type": "image/png", "artifact_version": "1"}}
+    ]},
+    {"page_number": 4, "page_type": "explanation_body", "width": 600, "height": 800, "content_extraction_status": "complete", "blocks": [
+      {"block_id": "explain-body", "block_type": "body", "bbox": {"x_min": 40, "y_min": 40, "x_max": 550, "y_max": 110}, "reading_order": 0, "ocr": {"text": "4.2.1 本说明同样为虚构文本。"}},
+      {"block_id": "explain-formula", "block_type": "formula", "bbox": {"x_min": 80, "y_min": 140, "x_max": 500, "y_max": 250}, "reading_order": 1, "formula_group_id": "fg-exp-421", "ocr": {"text": "z=a+b，原文确认无印刷编号。", "formula_group": {"equations": [{"formula_id": "f-exp-421-1", "equation_number": null, "equation_number_status": "confirmed_absent", "latex": "z=a+b", "text": "z=a+b", "recognition_status": "verified"}], "symbol_explanations": null}}}
+    ]}
+  ],
+  "sections": [
+    {"section_id": "n-4", "number": "4", "title": "虚构章", "section_type": "chapter", "content_group": "normative", "parent_section_id": null, "structure_path": ["4"]},
+    {"section_id": "n-4.2", "number": "4.2", "title": "虚构节", "section_type": "section", "content_group": "normative", "parent_section_id": "n-4", "structure_path": ["4", "4.2"]},
+    {"section_id": "e-4", "number": "4", "title": "虚构说明章", "section_type": "chapter", "content_group": "explanation", "parent_section_id": null, "structure_path": ["说明", "4"]}
+  ],
+  "tables": [
+    {"table_id": "table-a", "table_number": "表4.2.1", "title": "虚构跨页表", "page_start": 1, "page_end": 2, "source_block_ids": ["table-a-1", "table-a-2"], "fragments": [{"page_number": 1, "block_id": "table-a-1", "fragment_index": 0}, {"page_number": 2, "block_id": "table-a-2", "fragment_index": 1}], "columns": [{"key": "kind", "header_path": ["构件", "类别"], "role": "row_header"}, {"key": "condition", "header_path": ["构件", "演示条件"], "role": "row_header", "derived": true, "description": "合并单元格展开"}, {"key": "value", "header_path": ["演示指标", "值"], "role": "value"}], "data": [{"kind": "甲类", "condition": "常规", "value": "演示值甲", "source_page": 1, "source_block_id": "table-a-1"}, {"kind": "乙类", "condition": null, "value": "≥演示值乙", "source_page": 2, "source_block_id": "table-a-2"}], "notes": [{"number": 1, "content": "所有内容均为虚构演示。"}, {"number": 2, "content": "比较符号仅用于展示字符串保真。"}], "extraction_status": "verified", "normalization_warning": "展开后的记录不能复原合并单元格版面。"},
+    {"table_id": "table-b", "table_number": null, "title": "虚构单页表", "page_start": 3, "page_end": 3, "source_block_ids": ["table-b-1"], "fragments": [{"page_number": 3, "block_id": "table-b-1", "fragment_index": 0}], "columns": [{"key": "node", "header_path": ["节点"], "role": "row_header"}, {"key": "description", "header_path": ["说明"], "role": "value"}], "data": [{"node": "演示节点", "description": "仅用于测试"}], "notes": null, "extraction_status": "verified"}
+  ],
+  "clauses": {
+    "normative": [
+      {"clause_id": "n-4.2.1", "clause_number": "4.2.1", "section_id": "n-4.2", "clause_content": {"plain_text": "虚构条文；表格内容见 table-a。", "content_units": [{"order": 0, "content_type": "body", "source_block_ids": ["body-1"], "text": "虚构条文。"}, {"order": 1, "content_type": "table", "source_block_ids": ["table-a-1", "table-a-2"], "table_id": "table-a"}, {"order": 2, "content_type": "body", "source_block_ids": ["formula-intro"], "text": "下列公式仅演示数据结构。"}, {"order": 3, "content_type": "formula", "source_block_ids": ["formula-1"]}], "transcription_status": "verified"}, "page_start": 1, "page_end": 2, "source_block_ids": ["body-1", "table-a-1", "table-a-2", "formula-intro", "formula-1"], "is_mandatory": null},
+      {"clause_id": "n-4.2.2", "clause_number": "4.2.2", "section_id": "n-4.2", "clause_content": {"plain_text": "虚构附图及单页表。", "content_units": [{"order": 0, "content_type": "body", "source_block_ids": ["body-2"]}, {"order": 1, "content_type": "table", "source_block_ids": ["table-b-1"], "table_id": "table-b"}, {"order": 2, "content_type": "image", "source_block_ids": ["image-1"], "asset_id": "synthetic-figure"}]}, "page_start": 3, "page_end": 3, "source_block_ids": ["body-2", "table-b-1", "image-1"], "is_mandatory": null}
+    ],
+    "explanations": [
+      {"clause_id": "e-4.2.1", "clause_number": "4.2.1", "section_id": "e-4", "clause_content": {"plain_text": "本说明仅为虚构文本。", "content_units": [{"order": 0, "content_type": "body", "source_block_ids": ["explain-body"]}, {"order": 1, "content_type": "formula", "source_block_ids": ["explain-formula"]}]}, "page_start": 4, "page_end": 4, "source_block_ids": ["explain-body", "explain-formula"], "explains_clause_id": "n-4.2.1"}
+    ]
+  },
+  "processing": {"parser_id": "synthetic-fixture", "parser_version": "2.4", "partial": false, "is_complete_document_ocr": true, "warnings": []}
+}

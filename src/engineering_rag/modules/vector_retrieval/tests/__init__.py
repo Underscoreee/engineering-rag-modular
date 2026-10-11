@@ -1,0 +1,1 @@
+"""Vector retrieval contract tests."""
