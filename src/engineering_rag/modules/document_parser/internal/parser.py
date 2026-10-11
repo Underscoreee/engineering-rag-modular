@@ -1,6 +1,8 @@
-"""Task 1.1 concrete parser: bounded PDF IO, text layer, and replaceable OCR."""
+"""Parser with the Task 1.1 baseline and Task 1.2 private MinerU path."""
 
 from contextlib import AbstractContextManager
+from pathlib import Path
+from tempfile import TemporaryDirectory
 from time import perf_counter
 from typing import BinaryIO, cast
 from uuid import NAMESPACE_URL, uuid5
@@ -27,6 +29,8 @@ from .diagnostics import (
     ParserDiagnostics,
 )
 from .layout_baseline import RecognizedFragment, build_provisional_blocks
+from .mineru import MinerUAdapter, MinerUParseRequest, MinerUParseResult
+from .mineru.v24_adapter import adapt_to_v24
 from .ocr import PageTextRecognizer
 from .ocr_rapidocr import RapidOcrRecognizer
 from .pdf_backend import PdfDocument, PyMuPdfBackend, pixel_bbox_to_pdf
@@ -57,21 +61,30 @@ class PyMuPdfDocumentParser:
         recognizer: PageTextRecognizer | None = None,
         pdf_backend: PyMuPdfBackend | None = None,
         page_observer: PageObserver | None = None,
+        mineru_adapter: MinerUAdapter | None = None,
     ) -> None:
         self._file_store = file_store
         self._recognizer = recognizer or RapidOcrRecognizer()
         self._pdf_backend = pdf_backend or PyMuPdfBackend()
         self._page_observer = page_observer
+        self._mineru_adapter = mineru_adapter
         self.last_diagnostics: ParserDiagnostics | None = None
+        self.last_mineru_result: MinerUParseResult | None = None
 
     def parse(self, request: ParseRequest) -> Document:
         self.last_diagnostics = None
+        self.last_mineru_result = None
         if request.supplied_standard is None:
             raise ParserConfigurationError(
                 "supplied_standard is required; Task 1.1 does not infer identity from filenames"
             )
         settings = ParserSettings.from_contract(request.config)
-        self._check_backend_option(settings.ocr_backend)
+        if settings.document_engine == "baseline":
+            self._check_backend_option(settings.ocr_backend)
+        elif self._mineru_adapter is None:
+            raise ParserConfigurationError(
+                "document_engine='mineru' requires an injected local MinerU adapter"
+            )
         if (
             request.source_file.size_bytes is not None
             and request.source_file.size_bytes > settings.max_pdf_bytes
@@ -92,6 +105,14 @@ class PyMuPdfDocumentParser:
             ):
                 page_count = pdf.page_count
                 selected_pages = settings.resolve_pages(page_count)
+                if settings.document_engine == "mineru":
+                    return self._parse_with_mineru(
+                        request,
+                        pdf=pdf,
+                        page_count=page_count,
+                        selected_pages=selected_pages,
+                        settings=settings,
+                    )
                 selected = set(selected_pages)
                 document_id = _document_id(request)
                 pages: list[Page] = []
@@ -232,6 +253,45 @@ class PyMuPdfDocumentParser:
             raise
         except Exception as exc:
             raise DocumentParserError(f"document parsing failed: {exc}") from exc
+
+    def _parse_with_mineru(
+        self,
+        request: ParseRequest,
+        *,
+        pdf: PdfDocument,
+        page_count: int,
+        selected_pages: tuple[int, ...],
+        settings: ParserSettings,
+    ) -> Document:
+        adapter = self._mineru_adapter
+        standard = request.supplied_standard
+        if adapter is None or standard is None:
+            raise ParserConfigurationError("MinerU adapter and supplied_standard are required")
+
+        def execute(output_dir: Path) -> Document:
+            result = adapter.parse(
+                MinerUParseRequest(
+                    source_pdf=pdf.source_path,
+                    source_sha256=pdf.source_sha256,
+                    original_pages=list(selected_pages),
+                    output_dir=output_dir,
+                    timeout_seconds=settings.engine_timeout_seconds,
+                    tier=settings.mineru_tier,
+                    ocr_mode="ocr",
+                )
+            )
+            self.last_mineru_result = result
+            return adapt_to_v24(
+                result,
+                source_file=request.source_file,
+                standard=standard,
+                page_count=page_count,
+            ).document
+
+        if settings.engine_output_dir is not None:
+            return execute(Path(settings.engine_output_dir))
+        with TemporaryDirectory(prefix="engineering-rag-mineru-") as directory:
+            return execute(Path(directory))
 
     def _process_page(
         self,

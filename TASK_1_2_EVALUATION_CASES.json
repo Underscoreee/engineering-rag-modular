@@ -1,0 +1,383 @@
+{
+  "evaluation_id": "engineering-rag-task1.2-mineru-local-deployment-and-test-2026-10",
+  "document_reference": {
+    "document_title": "混凝土结构设计规范（2015年版）",
+    "standard_code": "GB 50010-2010",
+    "expected_page_count": 441,
+    "pdf_filename": "混凝土结构设计规范(2015年版) GB 50010-2010_纯图版.pdf",
+    "source_available_only_if_user_provides_file": true
+  },
+  "source_policy": {
+    "local_only": true,
+    "source_sha256_required_at_runtime": true,
+    "original_page_number_base": 1,
+    "do_not_process_all_441_pages_by_default": true
+  },
+  "candidate_count": 18,
+  "unique_physical_pages": [
+    1,
+    2,
+    3,
+    9,
+    12,
+    16,
+    24,
+    28,
+    29,
+    37,
+    38,
+    50,
+    126,
+    127,
+    275,
+    276,
+    277,
+    278,
+    279,
+    282,
+    301
+  ],
+  "engine": {
+    "id": "mineru",
+    "family": "MinerU",
+    "version": "to_be_recorded_on_run",
+    "status": "not_run",
+    "major_preference": "4.x",
+    "execution_mode": "local_stateless_mineru_kit"
+  },
+  "case_policy": {
+    "ground_truth_status_required": "verified_ground_truth",
+    "unverified_cases_excluded_from_accuracy_metrics": true,
+    "run_status_allowed": [
+      "not_run",
+      "blocked",
+      "succeeded",
+      "failed"
+    ],
+    "single_engine": "mineru",
+    "requires_real_model_output_for_success": true,
+    "no_engine_comparison": true
+  },
+  "cases": [
+    {
+      "case_id": "P001",
+      "kind": "page_type",
+      "physical_pages": [
+        1
+      ],
+      "review_focus": "扫描封面，检查标准号和名称",
+      "candidate_labels": {
+        "suggested_page_type": "outer_cover"
+      },
+      "ground_truth_status": "candidate_pending_human_review",
+      "ground_truth": null,
+      "modes": [
+        "single_page"
+      ],
+      "run_status": "not_run"
+    },
+    {
+      "case_id": "P002",
+      "kind": "page_type",
+      "physical_pages": [
+        2
+      ],
+      "review_focus": "内封面与发行信息",
+      "candidate_labels": {
+        "suggested_page_type": "inner_cover"
+      },
+      "ground_truth_status": "candidate_pending_human_review",
+      "ground_truth": null,
+      "modes": [
+        "single_page"
+      ],
+      "run_status": "not_run"
+    },
+    {
+      "case_id": "P003",
+      "kind": "page_type",
+      "physical_pages": [
+        3
+      ],
+      "review_focus": "公告页面",
+      "candidate_labels": {
+        "suggested_page_type": "publication_notice"
+      },
+      "ground_truth_status": "candidate_pending_human_review",
+      "ground_truth": null,
+      "modes": [
+        "single_page"
+      ],
+      "run_status": "not_run"
+    },
+    {
+      "case_id": "P009",
+      "kind": "page_type",
+      "physical_pages": [
+        9
+      ],
+      "review_focus": "中文目录",
+      "candidate_labels": {
+        "suggested_page_type": "toc_zh"
+      },
+      "ground_truth_status": "candidate_pending_human_review",
+      "ground_truth": null,
+      "modes": [
+        "single_page"
+      ],
+      "run_status": "not_run"
+    },
+    {
+      "case_id": "P012",
+      "kind": "page_type",
+      "physical_pages": [
+        12
+      ],
+      "review_focus": "英文目录",
+      "candidate_labels": {
+        "suggested_page_type": "toc_en"
+      },
+      "ground_truth_status": "candidate_pending_human_review",
+      "ground_truth": null,
+      "modes": [
+        "single_page"
+      ],
+      "run_status": "not_run"
+    },
+    {
+      "case_id": "P016",
+      "kind": "body_text",
+      "physical_pages": [
+        16
+      ],
+      "review_focus": "正文条文开头与编号",
+      "candidate_labels": {
+        "suggested_page_type": "body",
+        "suggested_clause_number": "1.0.1"
+      },
+      "ground_truth_status": "candidate_pending_human_review",
+      "ground_truth": null,
+      "modes": [
+        "single_page"
+      ],
+      "run_status": "not_run"
+    },
+    {
+      "case_id": "P024",
+      "kind": "formula_group",
+      "physical_pages": [
+        24
+      ],
+      "review_focus": "多个编号公式与符号说明",
+      "candidate_labels": {
+        "suggested_clause_number": "3.3.2",
+        "suggested_equation_numbers": [
+          "(3.3.2-1)",
+          "(3.3.2-2)"
+        ]
+      },
+      "ground_truth_status": "candidate_pending_human_review",
+      "ground_truth": null,
+      "modes": [
+        "single_page"
+      ],
+      "run_status": "not_run"
+    },
+    {
+      "case_id": "P028029",
+      "kind": "cross_page_table",
+      "physical_pages": [
+        28,
+        29
+      ],
+      "review_focus": "续表跨页、注解可能在续页",
+      "candidate_labels": {
+        "suggested_table_number": "表3.5.2"
+      },
+      "ground_truth_status": "candidate_pending_human_review",
+      "ground_truth": null,
+      "modes": [
+        "paired_contiguous",
+        "individual_pages"
+      ],
+      "run_status": "not_run"
+    },
+    {
+      "case_id": "P037038",
+      "kind": "cross_page_table",
+      "physical_pages": [
+        37,
+        38
+      ],
+      "review_focus": "多级表头与续表",
+      "candidate_labels": {
+        "suggested_table_number": "表4.2.2-2"
+      },
+      "ground_truth_status": "candidate_pending_human_review",
+      "ground_truth": null,
+      "modes": [
+        "paired_contiguous",
+        "individual_pages"
+      ],
+      "run_status": "not_run"
+    },
+    {
+      "case_id": "P050",
+      "kind": "formula_group",
+      "physical_pages": [
+        50
+      ],
+      "review_focus": "多个有编号公式及符号解释",
+      "candidate_labels": {
+        "suggested_clause_number": "6.2.1"
+      },
+      "ground_truth_status": "candidate_pending_human_review",
+      "ground_truth": null,
+      "modes": [
+        "single_page"
+      ],
+      "run_status": "not_run"
+    },
+    {
+      "case_id": "P126127",
+      "kind": "cross_page_table_and_clause",
+      "physical_pages": [
+        126,
+        127
+      ],
+      "review_focus": "跨页续表结束后新条文开始",
+      "candidate_labels": {
+        "suggested_table_number": "表9.1.2",
+        "suggested_next_clause": "9.1.3"
+      },
+      "ground_truth_status": "candidate_pending_human_review",
+      "ground_truth": null,
+      "modes": [
+        "paired_contiguous",
+        "individual_pages"
+      ],
+      "run_status": "not_run"
+    },
+    {
+      "case_id": "P275",
+      "kind": "page_type",
+      "physical_pages": [
+        275
+      ],
+      "review_focus": "规范用词说明",
+      "candidate_labels": {
+        "suggested_page_type": "wording_rules"
+      },
+      "ground_truth_status": "candidate_pending_human_review",
+      "ground_truth": null,
+      "modes": [
+        "single_page"
+      ],
+      "run_status": "not_run"
+    },
+    {
+      "case_id": "P276",
+      "kind": "page_type",
+      "physical_pages": [
+        276
+      ],
+      "review_focus": "引用标准名录",
+      "candidate_labels": {
+        "suggested_page_type": "normative_references"
+      },
+      "ground_truth_status": "candidate_pending_human_review",
+      "ground_truth": null,
+      "modes": [
+        "single_page"
+      ],
+      "run_status": "not_run"
+    },
+    {
+      "case_id": "P277",
+      "kind": "page_type",
+      "physical_pages": [
+        277
+      ],
+      "review_focus": "条文说明封面",
+      "candidate_labels": {
+        "suggested_page_type": "explanation_cover"
+      },
+      "ground_truth_status": "candidate_pending_human_review",
+      "ground_truth": null,
+      "modes": [
+        "single_page"
+      ],
+      "run_status": "not_run"
+    },
+    {
+      "case_id": "P278",
+      "kind": "page_type",
+      "physical_pages": [
+        278
+      ],
+      "review_focus": "说明修订说明",
+      "candidate_labels": {
+        "suggested_page_type": "revision_notes"
+      },
+      "ground_truth_status": "candidate_pending_human_review",
+      "ground_truth": null,
+      "modes": [
+        "single_page"
+      ],
+      "run_status": "not_run"
+    },
+    {
+      "case_id": "P279",
+      "kind": "page_type",
+      "physical_pages": [
+        279
+      ],
+      "review_focus": "条文说明目次",
+      "candidate_labels": {
+        "suggested_page_type": "explanation_toc"
+      },
+      "ground_truth_status": "candidate_pending_human_review",
+      "ground_truth": null,
+      "modes": [
+        "single_page"
+      ],
+      "run_status": "not_run"
+    },
+    {
+      "case_id": "P282",
+      "kind": "explanation_clause",
+      "physical_pages": [
+        282
+      ],
+      "review_focus": "条文说明正文和同号条文身份",
+      "candidate_labels": {
+        "suggested_page_type": "explanation_body",
+        "suggested_clause_number": "1.0.1"
+      },
+      "ground_truth_status": "candidate_pending_human_review",
+      "ground_truth": null,
+      "modes": [
+        "single_page"
+      ],
+      "run_status": "not_run"
+    },
+    {
+      "case_id": "P301",
+      "kind": "formula_unnumbered",
+      "physical_pages": [
+        301
+      ],
+      "review_focus": "展示公式无印刷编号；复核后才能确认为无号",
+      "candidate_labels": {
+        "suggested_clause_number": "4.1.5",
+        "suggested_equation_number_status": "confirmed_absent"
+      },
+      "ground_truth_status": "candidate_pending_human_review",
+      "ground_truth": null,
+      "modes": [
+        "single_page"
+      ],
+      "run_status": "not_run"
+    }
+  ]
+}

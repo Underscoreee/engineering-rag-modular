@@ -98,9 +98,20 @@ def pdf_bbox_to_pixel(bbox: BoundingBox, raster: RasterizedPage) -> tuple[float,
 class PdfDocument:
     """Small wrapper that keeps third-party PyMuPDF types private."""
 
-    def __init__(self, document: object, pymupdf_module: object) -> None:
+    def __init__(
+        self,
+        document: object,
+        pymupdf_module: object,
+        *,
+        source_path: Path,
+        source_sha256: str,
+        source_size_bytes: int,
+    ) -> None:
         self._document = document
         self._pymupdf = pymupdf_module
+        self.source_path = source_path
+        self.source_sha256 = source_sha256
+        self.source_size_bytes = source_size_bytes
         self._text_diagnostics: dict[int, tuple[str, ...]] = {}
 
     @property
@@ -241,7 +252,13 @@ class PyMuPdfBackend:
                     raise PdfInputError("password-protected PDF is not supported")
                 if document.page_count <= 0:
                     raise PdfInputError("PDF contains no pages")
-                yield PdfDocument(document, pymupdf)
+                yield PdfDocument(
+                    document,
+                    pymupdf,
+                    source_path=path,
+                    source_sha256=copied.sha256,
+                    source_size_bytes=copied.size_bytes,
+                )
             finally:
                 document.close()
 

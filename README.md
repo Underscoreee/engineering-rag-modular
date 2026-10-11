@@ -1,6 +1,6 @@
 # Engineering RAG
 
-面向工程规范、建设标准与图集 PDF 的模块化单体 RAG 项目。**Document Schema V2.4 已于 2026-10-11 正式冻结（FROZEN）**。Architecture Task 1.1 已实现 Document Parser 的安全 PDF 读取、选页渲染、文本层提取、可替换中文 OCR 和合法 partial Document 输出，正在等待维护者验收。Task 1.2～1.6 的页面分类、复杂版面、表格、公式和 Clause 算法尚未开始；Chunking、检索、LLM 与外部存储后端也未实现。
+面向工程规范、建设标准与图集 PDF 的模块化单体 RAG 项目。**Document Schema V2.4 已于 2026-10-11 正式冻结（FROZEN）**。Architecture Task 1.1 已实现安全 PDF 读取、选页渲染、文本层提取、中文 OCR 和合法 partial Document 输出。Task 1.2 增加可选的本地 MinerU 4.x 私有适配器与受限真实案例执行工具；页面分类、跨页表聚合、Clause 等领域算法仍未实现。Chunking、检索、LLM 与外部存储后端也未实现。
 
 ## 安装与检查
 
@@ -20,6 +20,8 @@ python -m pip install -e '.[dev,parser-ocr]'
 python -m pytest src/engineering_rag/modules/document_parser/tests -q
 ```
 
+Task 1.2 MinerU 运行时独立安装在项目忽略的 `.local/mineru-runtime`，主环境不依赖 MinerU。固定入口依赖见 `requirements/mineru-task1-2.txt`；真实 PDF 和生成产物位于被 Git 忽略的 `data/eval/task1_2_mineru/`。执行器必须传入 PDF、案例清单、输出目录、可执行文件和模型目录，不会默认处理全部 441 页。
+
 源代码采用一个 `src/engineering_rag` 包。`contracts` 是唯一公共 Schema/Protocol 来源；七个业务模块只提供稳定 `api.py`，未来实现放各自 `internal/`；跨模块流程由 `infrastructure/orchestrator` 组合。
 
 ## 独立模块测试
@@ -38,5 +40,5 @@ python -m pytest src/engineering_rag/modules/generation/tests -q
 
 字段说明见 [data-contracts.md](docs/data-contracts.md)，身份规则见 [id-policy.md](docs/id-policy.md)，快照与迁移见 [artifact-policy.md](docs/artifact-policy.md)，版本差异见 [schema-changelog.md](docs/schema-changelog.md)。[schema-freeze-checklist.md](docs/schema-freeze-checklist.md) 是唯一权威冻结验收表，[schema-v2.4-freeze-record.md](docs/schema-v2.4-freeze-record.md) 是正式冻结记录。V2.4 冻结后的破坏性变更必须升级 Schema 版本并提供显式迁移机制。
 
-Parser Task 1.1 的行为、OCR 后端与实测结果分别见 [实现说明](docs/document-parser-task1-1.md)、[OCR 后端](docs/document-parser-ocr-backend.md) 和 [验收报告](docs/document-parser-task1-1-report.md)。
+Parser Task 1.1 的行为、OCR 后端与实测结果分别见 [实现说明](docs/document-parser-task1-1.md)、[OCR 后端](docs/document-parser-ocr-backend.md) 和 [验收报告](docs/document-parser-task1-1-report.md)。Task 1.2 的实际环境、逐例状态和已知失败见 [MinerU 真实测试报告](docs/task-1.2-mineru-real-test-report.md)。
 

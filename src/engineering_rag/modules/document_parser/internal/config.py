@@ -1,4 +1,4 @@
-"""Validated private configuration for the Task 1.1 parser implementation."""
+"""Validated private configuration for the Document Parser implementation."""
 
 from dataclasses import dataclass
 
@@ -20,6 +20,10 @@ class ParserSettings:
     max_pdf_bytes: int = 256 * 1024 * 1024
     max_selected_pages: int = 20
     max_page_pixels: int = 40_000_000
+    document_engine: str = "baseline"
+    engine_timeout_seconds: int = 900
+    engine_output_dir: str | None = None
+    mineru_tier: str = "basic"
 
     @classmethod
     def from_contract(cls, config: ParseConfig | None) -> "ParserSettings":
@@ -35,6 +39,10 @@ class ParserSettings:
             "max_pdf_bytes",
             "max_selected_pages",
             "max_page_pixels",
+            "document_engine",
+            "engine_timeout_seconds",
+            "engine_output_dir",
+            "mineru_tier",
         }
         unknown = sorted(set(options) - allowed)
         if unknown:
@@ -51,6 +59,14 @@ class ParserSettings:
         if on_page_error not in {"raise", "continue"}:
             raise ParserConfigurationError("on_page_error must be 'raise' or 'continue'")
         force_ocr = _boolean(options.get("force_ocr", defaults.force_ocr), "force_ocr")
+        document_engine = _string(
+            options.get("document_engine", defaults.document_engine), "document_engine"
+        )
+        if document_engine not in {"baseline", "mineru"}:
+            raise ParserConfigurationError("document_engine must be 'baseline' or 'mineru'")
+        mineru_tier = _string(options.get("mineru_tier", defaults.mineru_tier), "mineru_tier")
+        if mineru_tier not in {"basic", "standard", "advanced"}:
+            raise ParserConfigurationError("mineru_tier must be basic, standard, or advanced")
         return cls(
             page_selection=page_selection,
             dpi=dpi,
@@ -71,6 +87,15 @@ class ParserSettings:
             max_page_pixels=_positive_int(
                 options.get("max_page_pixels", defaults.max_page_pixels), "max_page_pixels"
             ),
+            document_engine=document_engine,
+            engine_timeout_seconds=_positive_int(
+                options.get("engine_timeout_seconds", defaults.engine_timeout_seconds),
+                "engine_timeout_seconds",
+            ),
+            engine_output_dir=_optional_string(
+                options.get("engine_output_dir"), "engine_output_dir"
+            ),
+            mineru_tier=mineru_tier,
         )
 
     def resolve_pages(self, page_count: int) -> tuple[int, ...]:

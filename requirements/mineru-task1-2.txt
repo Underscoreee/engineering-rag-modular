@@ -1,0 +1,2 @@
+# Isolated optional runtime for Architecture Task 1.2; not installed in the main project venv.
+mineru==4.0.12
