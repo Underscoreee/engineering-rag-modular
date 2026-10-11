@@ -22,7 +22,7 @@ from .common import (
 )
 
 DOCUMENT_SCHEMA_VERSION = "2.4"
-PLAIN_TEXT_RENDERER_VERSION = "1"
+PLAIN_TEXT_RENDERER_VERSION = "2"
 
 
 class PageType(StrEnum):
@@ -278,6 +278,29 @@ class Page(ContractModel):
     def check_status(self) -> "Page":
         if self.content_extraction_status == ContentExtractionStatus.NOT_PROCESSED and self.blocks:
             raise ValueError("not_processed page cannot declare extracted blocks")
+        if self.content_extraction_status == ContentExtractionStatus.COMPLETE:
+            incomplete = {
+                RecognitionStatus.NOT_PROCESSED,
+                RecognitionStatus.NOT_TRANSCRIBED,
+            }
+            if any(block.recognition_status in incomplete for block in self.blocks):
+                raise ValueError("complete page cannot contain a nonprocessed OCR block")
+            if any(
+                block.fragment_status
+                in {
+                    TableFragmentStatus.NOT_PROCESSED,
+                    TableFragmentStatus.NOT_TRANSCRIBED,
+                }
+                for block in self.blocks
+            ):
+                raise ValueError("complete page cannot contain an unprocessed table fragment")
+            if any(
+                equation.recognition_status in incomplete
+                for block in self.blocks
+                if block.ocr is not None and block.ocr.formula_group is not None
+                for equation in block.ocr.formula_group.equations
+            ):
+                raise ValueError("complete page cannot contain a nonprocessed equation")
         return self
 
 
@@ -708,6 +731,10 @@ def validate_document_references(document: Document) -> list[ContractError]:
 def _check_sections(sections: dict[str, Section]) -> list[ContractError]:
     errors: list[ContractError] = []
     for section in sections.values():
+        if section.number is not None and section.structure_path[-1] != section.number:
+            errors.append(
+                _error(section.section_id, "section structure_path must end with its number")
+            )
         parent_id = section.parent_section_id
         if parent_id is not None:
             parent = sections.get(parent_id)
@@ -793,6 +820,7 @@ def _check_clause(
     document: Document,
 ) -> list[ContractError]:
     errors: list[ContractError] = []
+    pages = {page.page_number: page for page in document.pages}
     section = sections.get(clause.section_id)
     if section is None or section.content_group != group:
         errors.append(_error(clause.clause_id, "section_id missing or content_group mismatch"))
@@ -802,8 +830,21 @@ def _check_clause(
         location = blocks.get(block_id)
         if location is None:
             errors.append(_error(clause.clause_id, f"unknown block_id: {block_id}"))
-        elif not clause.page_start <= location[0] <= clause.page_end:
-            errors.append(_error(clause.clause_id, "source block outside clause page range"))
+        else:
+            page_number = location[0]
+            if not clause.page_start <= page_number <= clause.page_end:
+                errors.append(_error(clause.clause_id, "source block outside clause page range"))
+            expected_page_type = (
+                PageType.BODY if group == ContentGroup.NORMATIVE else PageType.EXPLANATION_BODY
+            )
+            page = pages.get(page_number)
+            if page is not None and page.page_type != expected_page_type:
+                errors.append(
+                    _error(
+                        clause.clause_id,
+                        f"{group.value} clause source page_type must be {expected_page_type.value}",
+                    )
+                )
     unit_sources: list[str] = []
     for unit in clause.clause_content.content_units:
         unit_sources.extend(
@@ -934,6 +975,31 @@ def derive_clause_plain_text(document: Document, clause: Clause) -> tuple[str, s
 
     blocks = {block.block_id: block for page in document.pages for block in page.blocks}
     tables = {table.table_id: table for table in document.tables}
+    formula_registry: dict[str, tuple[Equation, str, FormulaGroup, str]] = {}
+    for block_id, block in blocks.items():
+        group = block.ocr.formula_group if block.ocr else None
+        if group is None or block.formula_group_id is None:
+            continue
+        for equation in group.equations:
+            formula_registry[equation.formula_id] = (
+                equation,
+                block.formula_group_id,
+                group,
+                block_id,
+            )
+    formula_sequence = [
+        formula_id
+        for unit in clause.clause_content.content_units
+        if unit.content_type == ClauseContentType.FORMULA
+        for formula_id in unit.formula_ids
+    ]
+    last_group_position: dict[str, int] = {}
+    for position, formula_id in enumerate(formula_sequence):
+        registered = formula_registry.get(formula_id)
+        if registered is not None:
+            last_group_position[registered[1]] = position
+    formula_position = 0
+    rendered_symbol_groups: set[str] = set()
     pieces: list[str] = []
     dependencies: list[object] = []
     for unit in clause.clause_content.content_units:
@@ -964,27 +1030,34 @@ def derive_clause_plain_text(document: Document, clause: Clause) -> tuple[str, s
             pieces.append("\n".join(filter(None, [table.title, header, *rows, *notes])))
             dependencies.append(table.model_dump(mode="json"))
         elif unit.content_type == ClauseContentType.FORMULA:
-            equations: dict[str, Equation] = {}
             for block_id in unit.source_block_ids:
                 if block_id not in blocks:
                     return None
                 block = blocks[block_id]
                 dependencies.append(block.model_dump(mode="json"))
-                group = block.ocr.formula_group if block.ocr else None
-                equations.update(
-                    {equation.formula_id: equation for equation in group.equations if group}
-                    if group
-                    else {}
-                )
-            if any(formula_id not in equations for formula_id in unit.formula_ids):
-                return None
-            formula_text = [
-                equations[formula_id].text or equations[formula_id].latex
+            if any(
+                formula_id not in formula_registry
+                or formula_registry[formula_id][3] not in unit.source_block_ids
                 for formula_id in unit.formula_ids
-            ]
-            if any(text is None for text in formula_text):
+            ):
                 return None
-            pieces.extend(text for text in formula_text if text is not None)
+            for formula_id in unit.formula_ids:
+                equation, group_id, formula_group, _ = formula_registry[formula_id]
+                formula_text = equation.text or equation.latex
+                if formula_text is None:
+                    return None
+                pieces.append(formula_text)
+                if (
+                    last_group_position.get(group_id) == formula_position
+                    and group_id not in rendered_symbol_groups
+                    and formula_group.symbol_explanations is not None
+                ):
+                    pieces.extend(
+                        _render_symbol_explanation(item)
+                        for item in formula_group.symbol_explanations.items
+                    )
+                    rendered_symbol_groups.add(group_id)
+                formula_position += 1
         else:
             if any(block_id not in blocks for block_id in unit.source_block_ids):
                 return None
@@ -1005,3 +1078,10 @@ def derive_clause_plain_text(document: Document, clause: Clause) -> tuple[str, s
 
 def _error(field: str, message: str) -> ContractError:
     return ContractError(code="invalid_input", message=message, field=field)
+
+
+def _render_symbol_explanation(item: SymbolExplanationItem) -> str:
+    label = item.symbol
+    if item.latex is not None and item.latex != item.symbol:
+        label = f"{item.symbol}（{item.latex}）"
+    return f"式中：{label}：{item.description}"

@@ -15,9 +15,9 @@
 
 ## Manifest 静态契约
 
-`ArtifactManifest` 区分 Document schema、Artifact version、Parser version 与标准 edition。`created_at` 必须为 UTC；document JSON 和资产引用必须有 URI、media type、SHA-256 与大小。`processing_status` 为 completed/partial/failed，并与 Document.processing 一致。partial 文档的未处理页不是空白，缺少的 OCR/格网/LaTeX 不得伪造。
+`ArtifactManifest` 区分 Document schema、Artifact version、Parser version 与标准 edition。`created_at` 必须为 UTC；document JSON 和资产引用必须有 URI、media type、SHA-256 与大小。Manifest 声明 parser version 时必须与 Document.processing 一致；双方声明同一 Asset 的 SHA-256/大小时必须相等。`processing_status` 为 completed/partial/failed，并与 Document.processing 一致。partial 文档的未处理页不是空白，缺少的 OCR/格网/LaTeX 不得伪造。
 
-Pydantic 只验证声明值之间的一致性，不打开 URI、不比较实际字节、不确认资源存在。未来 I/O 实现应分别报告 not found、checksum mismatch、unsupported version 与 commit conflict。
+Pydantic 只验证声明值之间的一致性，不打开 URI、不比较实际字节、不确认资源存在。`validate_assignment=True` 不会因深层对象原地修改而自动重跑 Document/Artifact 全图校验；FileStore 的未来 `commit_artifact` 必须先通过序列化后重新构造 `DocumentArtifact` 完整验证，再计算真实字节 hash 和提交快照。未来 I/O 实现应分别报告 not found、checksum mismatch、unsupported version 与 commit conflict。
 
 ## 迁移
 

@@ -30,3 +30,12 @@ Task 0.1 尚无发布、提交标签或外部消费者证据，因此本次在�
 ## 显式迁移要求
 
 迁移器必须解析旧 ContentUnit 引用并删除重复副本，核对其与 PageBlock/LogicalTable 是否一致；为公式建立真实 `formula_ids`；重算或清空 plain_text 缓存；只有已核验来源才可填 mandatory evidence；raw_grid 不可用时写 null。`2.4-proposal` 还需逐项核对 FileRef、状态枚举和悬空说明链接。当前仓库只定义迁移接口，未实现上述算法。
+
+## 冻结评审修复
+
+- Clause 来源页增加正文 `body` / 说明 `explanation_body` 分区约束；
+- complete 页面拒绝未处理 Block/表格片段/公式，明确允许已识别但待审核的 `unverified`；
+- plain_text renderer 升至 v2，并渲染公式符号说明；
+- Manifest 与 Document 对齐 parser version，并核对双方已声明的 Asset 摘要和大小；
+- 带编号 Section 的 structure_path 末级必须与 number 一致；
+- 明确嵌套原地修改后的 Artifact 在提交前必须重新完整验证。

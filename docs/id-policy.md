@@ -19,6 +19,6 @@ OCR 文本变化不自动创建新 Clause，也不能把 OCR 文本 hash 当稳�
 
 ## 引用完整性
 
-`validate_document_references()` 校验快照内 ID 唯一、Section 无环、Clause/Section 分组、来源 Block、Table 双向片段、Formula、Asset、Evidence 及页范围。`Clause.source_block_ids` 必须等于按 ContentUnit 顺序首次出现去重的来源序列。partial 只放宽未声明内容，不放宽悬空引用。
+`validate_document_references()` 校验快照内 ID 唯一、Section 无环、Clause/Section/PageType 分组、来源 Block、Table 双向片段、Formula、Asset、Evidence 及页范围。带 `number` 的 Section 要求 `structure_path` 末级等于该编号；因此 `条文说明/4`、附录编号等前缀仍可表达，但编号不能与路径末级矛盾。`Clause.source_block_ids` 必须等于按 ContentUnit 顺序首次出现去重的来源序列。partial 只放宽未声明内容，不放宽悬空引用。
 
 `DocumentArtifact` 校验 Manifest 的 `source_document_id/schema_version/processing_status` 与 Document 一致，防止同 document 的不同 Artifact 被误当成同一来源快照。具体跨版本映射算法留给后续实现。

@@ -24,7 +24,7 @@ testpaths = ["tests", "src/engineering_rag/modules"]
 target-version = "py311"
 line-length = 100
 src = ["src", "tests"]
-extend-exclude = ["ARCHITECTURE_TASK_0_1_PROMPT.md", "references"]
+extend-exclude = ["ARCHITECTURE_TASK_0_1_PROMPT.md", "references", "test_freeze_gaps.py"]
 
 [tool.ruff.lint]
 select = ["E", "F", "I", "UP", "B", "SIM"]

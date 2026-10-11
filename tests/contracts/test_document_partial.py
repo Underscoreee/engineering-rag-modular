@@ -34,6 +34,18 @@ def test_partial_states_are_explicit() -> None:
     assert document.pages[1].blocks[1].bbox_status.value == "manual_approximate"
 
 
+def test_complete_ocr_allows_recognized_but_unverified_block() -> None:
+    data = json.loads((EXAMPLES / "document.example.json").read_text())
+    data["pages"][0]["blocks"][0]["recognition_status"] = "unverified"
+    content = data["clauses"]["normative"][0]["clause_content"]
+    content["plain_text"] = None
+    content.pop("plain_text_renderer_version")
+    content.pop("plain_text_source_digest")
+    document = Document.model_validate(data)
+    assert document.processing.is_complete_document_ocr is True
+    assert document.pages[0].blocks[0].recognition_status.value == "unverified"
+
+
 def test_partial_document_can_omit_unprocessed_page_listing() -> None:
     data = json.loads((EXAMPLES / "document.partial.example.json").read_text())
     data["pages"] = data["pages"][:2]

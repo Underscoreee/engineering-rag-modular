@@ -25,6 +25,25 @@ def test_normative_and_explanation_identity_and_order(document_data: dict[str, o
 
 
 @pytest.mark.parametrize(
+    ("page_index", "wrong_page_type", "message"),
+    [
+        (0, "explanation_body", "normative clause source page_type must be body"),
+        (3, "body", "explanation clause source page_type must be explanation_body"),
+    ],
+)
+def test_clause_group_must_match_source_page_type(
+    document_data: dict[str, object],
+    page_index: int,
+    wrong_page_type: str,
+    message: str,
+) -> None:
+    data = deepcopy(document_data)
+    data["pages"][page_index]["page_type"] = wrong_page_type
+    with pytest.raises(ValidationError, match=message):
+        Document.model_validate(data)
+
+
+@pytest.mark.parametrize(
     "change",
     [
         "unknown_block",

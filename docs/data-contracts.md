@@ -10,6 +10,8 @@
 
 `processing.partial=false` 要求所有页均存在且 complete，`is_complete_document_ocr=true`。反向地，`is_complete_document_ocr=true` 也要求全部页存在且 complete；完整 OCR 后仍可因为语义结构未完成而 `partial=true`。
 
+`content_extraction_status=complete` 的页面不得包含 `recognition_status=not_processed/not_transcribed` 的 Block、未处理表格片段或未处理公式。`unverified` 表示内容已识别但尚待人工审核，允许出现在 complete 页面；它与“尚未处理”不同。Schema 只能验证声明状态一致，不能证明 Parser 确实找全或识别准确。
+
 ## Table 与 RawGrid
 
 Page table Block 只保存本页 bbox、reading order、局部 OCR、`table_id/fragment_index/fragment_status`。完整结构只在顶层 `LogicalTable`：
@@ -28,9 +30,11 @@ Page table Block 只保存本页 bbox、reading order、局部 OCR、`table_id/f
 
 正文与说明分别位于 `clauses.normative/explanations`，同号可以共存但 `clause_id` 不同；说明可用 `explains_clause_id` 指向正文。`Clause.source_block_ids` 是按 ContentUnit 顺序去重后的索引缓存，必须完全一致。
 
+正文 Clause 的全部来源 Block 必须位于 `page_type=body`，说明 Clause 的全部来源 Block 必须位于 `page_type=explanation_body`。当前契约不默认放行混合页面；如未来需要，必须先通过 ADR 定义可审计的区域语义。
+
 ContentUnit 仅引用权威内容：body/list_item 引用 body Block；table 引用顶层 table 并覆盖所有片段；formula 引用公式 Block 与其中的 `formula_ids`；image 引用 image Block 与 `asset_id`。旧 `text/table/formula_group` 副本会因 strict Schema 被拒绝。
 
-`ClauseContent.plain_text` 可空。非空时必须带 `plain_text_renderer_version` 和 `plain_text_source_digest`；`derive_clause_plain_text()` 只读取有序引用对象，并由 Document 校验结果和摘要。来源改变、renderer 升版或数据仍缺失时必须清空/重算缓存，不能人工独立编辑。
+`ClauseContent.plain_text` 可空。非空时必须带 `plain_text_renderer_version` 和 `plain_text_source_digest`；`derive_clause_plain_text()` 只读取有序引用对象，并由 Document 校验结果和摘要。Renderer v2 在最后一个被引用的同组公式之后，以 `式中：符号：说明` 输出 `symbol_explanations`；同一公式组被多个连续 ContentUnit 部分引用时只输出一次。多行 LaTeX 仍保留在 Equation 权威字段中，不新增 `unit/intro`。来源改变、renderer 升版或数据仍缺失时必须清空/重算缓存，不能人工独立编辑。
 
 ## MandatoryEvidence
 
@@ -46,9 +50,9 @@ ContentUnit 仅引用权威内容：body/list_item 引用 body Block；table 引
 
 ## ArtifactManifest 与版本
 
-`ArtifactManifest` 必填 `artifact_id/artifact_version/schema_version/created_at/source_document_id/processing_status/document_json_ref`，资源引用含 URI、media type、SHA-256 和大小；`assets=[]`、`parser_version=null` 可选。时间必须为 UTC。`DocumentArtifact` 把 Manifest 与 Document 做内存一致性校验；failed Artifact 不携带 Document。
+`ArtifactManifest` 必填 `artifact_id/artifact_version/schema_version/created_at/source_document_id/processing_status/document_json_ref`，资源引用含 URI、media type、SHA-256 和大小；`assets=[]`、`parser_version=null` 可选。时间必须为 UTC。Manifest 声明 parser version 时须等于 `Document.processing.parser_version`；双方声明同一 Asset 的 SHA-256/大小时也必须一致。`DocumentArtifact` 做声明值的内存一致性校验；failed Artifact 不携带 Document。
 
-静态模型不打开 URI、不验证真实字节，也不实现原子存储。`ArtifactIntegrityErrorCode` 为未来 I/O 明确区分 resource not found、checksum mismatch、unsupported schema version 和 snapshot conflict。未来 FileStore 以 `document.json + assets/ + manifest.json` 提交不可变快照；同一键不可覆盖。显式迁移边界由 `DocumentMigrationService` 声明，当前不实现转换器。
+静态模型不打开 URI、不验证真实字节，也不实现原子存储。嵌套 Pydantic 对象原地修改不会自动重跑父级全图校验；输出或提交前必须重新序列化并完整 `DocumentArtifact.model_validate_json(...)`。`ArtifactIntegrityErrorCode` 为未来 I/O 明确区分 resource not found、checksum mismatch、unsupported schema version 和 snapshot conflict。未来 FileStore 以 `document.json + assets/ + manifest.json` 提交不可变快照；同一键不可覆盖。显式迁移边界由 `DocumentMigrationService` 声明，当前不实现转换器。
 
 ## 删除字段与序列化
 

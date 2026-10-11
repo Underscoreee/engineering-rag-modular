@@ -21,6 +21,9 @@
 - [x] `is_mandatory` 三态与 verified evidence 逻辑、冲突诊断有正反测试。
 - [x] 未完成 OCR、raw_grid=null、latex=null 和 pending evidence 均显式表达。
 - [x] `structure_path`、processing、Asset 版本、page_count 与 ocr.text 保留。
+- [x] 正文/说明 Clause 来源页分别限定为 body/explanation_body。
+- [x] complete 页面拒绝未处理 Block/片段/公式，允许已识别但待审核的 unverified。
+- [x] plain_text renderer v2 包含公式符号说明，并对同组部分引用去重。
 
 ## C. ID、Artifact 与校验
 
@@ -29,18 +32,21 @@
 - [x] `ArtifactManifest` 含版本、UTC 时间、document JSON、Assets、URI、SHA-256 和大小。
 - [x] FileStore 不可变提交与 Migration Protocol 已定义，未实现真实后端/转换器。
 - [x] 此前删除字段和 Task 0.1 ContentUnit 副本均被 strict validation 拒绝。
+- [x] Manifest parser version 与 Document 对齐；双方声明的 Asset 摘要/大小一致。
+- [x] 深层原地修改后的 Bundle 在提交前必须重新完整验证，边界已有测试和文档。
 
 ## D. 示例与测试证据
 
 | 检查命令 | 实际结果 | 备注 |
 |---|---|---|
-| `.venv/bin/python -m pytest tests/contracts -q` | `102 passed in 0.58s` | 完整/部分/Manifest 往返及正反例 |
+| `.venv/bin/python -m pytest tests/contracts/test_freeze_gaps.py -q` | `6 passed in 0.22s` | 修复前已确认同文件 `6 failed` |
+| `.venv/bin/python -m pytest tests/contracts -q` | `114 passed in 0.73s` | 完整/部分/Manifest 往返及正反例 |
 | Parser 模块独立测试 | `1 passed` | 无 OCR/PDF 实现 |
 | Chunking 模块独立测试 | `1 passed` | 无切分算法实现 |
 | 其余五业务模块独立测试 | 各 `1 passed` | 仅既有 Protocol 骨架 |
-| `.venv/bin/python -m pytest -q` | `115 passed in 0.68s` | 无 skip、xfail 或失败 |
+| `.venv/bin/python -m pytest -q` | `127 passed in 0.79s` | 无 skip、xfail 或失败 |
 | `.venv/bin/ruff check .` | 通过 | 无 lint 错误 |
-| `.venv/bin/ruff format --check .` | `108 files already formatted` | 通过 |
+| `.venv/bin/ruff format --check .` | `110 files already formatted` | 通过 |
 | 完整/部分 Document 与 Manifest JSON 往返 | 通过 | `tests/contracts/test_examples.py` 等 |
 | ID / 引用非法反例 | 通过 | duplicates、dangling refs、raw grid、evidence、cache |
 
@@ -50,7 +56,7 @@
 
 - `ready_to_freeze`: **true（等待维护者验收）**
 - 状态：`READY_FOR_REVIEW`
-- 自动化阻塞事项：无。
+- 自动化阻塞事项：独立评审提出的 3 项 P1、3 项 P2 已修复；无剩余自动化阻塞。
 - 不兼容变更处理：Task 0.1 是未发布候选；差异和显式 Migration Protocol 已记录，未提供猜测式迁移器。
 - 维护者确认：**待用户验收**
 - 最终冻结日期、提交 SHA / 标签：**待维护者填写**

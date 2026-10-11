@@ -86,3 +86,14 @@ def test_document_asset_must_match_manifest_snapshot() -> None:
     document.pages[1].blocks[1].asset.uri = "artifact://another/snapshot.png"
     with pytest.raises(ValidationError, match="conflicts with artifact manifest"):
         DocumentArtifact(manifest=manifest, document=document)
+
+
+def test_nested_mutation_requires_explicit_bundle_revalidation() -> None:
+    manifest = ArtifactManifest.model_validate(_manifest_data())
+    document = Document.model_validate_json(
+        (EXAMPLES / "document.partial.example.json").read_text(encoding="utf-8")
+    )
+    artifact = DocumentArtifact(manifest=manifest, document=document)
+    artifact.document.processing.parser_version = "mutated-after-validation"
+    with pytest.raises(ValidationError, match="parser_version"):
+        DocumentArtifact.model_validate_json(artifact.model_dump_json())

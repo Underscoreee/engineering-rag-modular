@@ -4,7 +4,13 @@ import pytest
 from pydantic import ValidationError
 
 from engineering_rag.contracts.common import ArtifactRef, BoundingBox, FileRef
-from engineering_rag.contracts.documents import BlockType, Document, PageType, StandardMetadata
+from engineering_rag.contracts.documents import (
+    BlockType,
+    Document,
+    Page,
+    PageType,
+    StandardMetadata,
+)
 
 
 def test_shared_refs_and_version_identity() -> None:
@@ -45,10 +51,10 @@ def test_exact_page_types_and_unknown(document_data: dict[str, object]) -> None:
     }
     data = deepcopy(document_data)
     data["pages"][0]["page_type"] = "unknown"
-    Document.model_validate(data)
+    Page.model_validate(data["pages"][0])
     data["pages"][0]["page_type"] = "invented"
     with pytest.raises(ValidationError):
-        Document.model_validate(data)
+        Page.model_validate(data["pages"][0])
 
 
 def test_block_types_are_exactly_five() -> None:

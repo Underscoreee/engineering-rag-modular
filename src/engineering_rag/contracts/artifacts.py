@@ -102,6 +102,11 @@ class DocumentArtifact(ContractModel):
         )
         if self.manifest.processing_status != expected_status:
             raise ValueError("manifest processing_status conflicts with Document.processing")
+        if (
+            self.manifest.parser_version is not None
+            and self.manifest.parser_version != self.document.processing.parser_version
+        ):
+            raise ValueError("manifest parser_version conflicts with Document.processing")
         manifest_assets = {asset.artifact_id: asset for asset in self.manifest.assets}
         document_assets = [
             block.asset
@@ -121,6 +126,15 @@ class DocumentArtifact(ContractModel):
             )
             if any(getattr(asset, field) != getattr(manifest_asset, field) for field in identity):
                 raise ValueError("Document asset conflicts with artifact manifest")
+            for field in ("sha256", "size_bytes"):
+                document_value = getattr(asset, field)
+                manifest_value = getattr(manifest_asset, field)
+                if (
+                    document_value is not None
+                    and manifest_value is not None
+                    and document_value != manifest_value
+                ):
+                    raise ValueError(f"Document asset {field} conflicts with artifact manifest")
         return self
 
 

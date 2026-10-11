@@ -17,7 +17,9 @@ class DocumentParser(Protocol):
 
 ## 校验、错误和部分成功
 
-Pydantic 字段错误或悬空引用抛 `ValidationError`；未来实现对资源不存在、不支持格式及读取失败须明确报错，不得返回伪成功。部分输出设置 `processing.partial=true`；若 OCR 也未完成，则设置 `is_complete_document_ocr=false`。逐页标记提取状态；未处理页的空 blocks 不等于空白。`raw_grid=null` 不等于没有表格，未识别公式保留 `formula_id` 且 `latex=null`。不填造数据、LaTeX、格网或证据。
+Pydantic 字段错误或悬空引用抛 `ValidationError`；未来实现对资源不存在、不支持格式及读取失败须明确报错，不得返回伪成功。部分输出设置 `processing.partial=true`；若 OCR 也未完成，则设置 `is_complete_document_ocr=false`。逐页标记提取状态；未处理页的空 blocks 不等于空白。complete 页面不能含未处理 Block，`unverified` 则表示已识别、待审核。`raw_grid=null` 不等于没有表格，未识别公式保留 `formula_id` 且 `latex=null`。不填造数据、LaTeX、格网或证据。
+
+静态 DTO 校验只证明声明之间自洽，不能证明页面分类、条文、表格或公式识别完整且准确。真实质量必须由后续带来源、版次和人工复核状态的 Golden Dataset 评估；本阶段不伪造准确率。
 
 ## 副作用、幂等、排序与依赖
 

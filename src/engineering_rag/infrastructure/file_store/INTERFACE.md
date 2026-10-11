@@ -30,7 +30,7 @@ class DocumentMigrationService(Protocol):
 
 ## 错误、部分成功与版本
 
-`commit_artifact` 只接受静态合法的 completed/partial bundle；同一快照键内容不一致必须报 `CONFLICT`，不得覆盖。failed Manifest 记录失败身份但不携带合法 Document。旧 Schema 只可经显式 Migration Protocol 转换；不支持的版本、缺资源和校验和不一致必须分别报告。
+`commit_artifact` 只接受静态合法的 completed/partial bundle。因为嵌套 Pydantic 对象原地修改不会自动重跑父级全图校验，未来实现必须先用序列化结果重新构造并完整验证 `DocumentArtifact`，然后才计算真实文件 hash、写资源并提交 Manifest。同一快照键内容不一致必须报 `CONFLICT`，不得覆盖。failed Manifest 记录失败身份但不携带合法 Document。旧 Schema 只可经显式 Migration Protocol 转换；不支持的版本、缺资源和校验和不一致必须分别报告。
 
 ## 副作用、幂等、排序与依赖
 
