@@ -1,6 +1,6 @@
 # Engineering RAG
 
-面向工程规范、建设标准与图集 PDF 的模块化单体 RAG 项目。**Document Schema V2.4 已于 2026-10-11 正式冻结（FROZEN）**。Architecture Task 1.1 已实现安全 PDF/OCR partial Document；Task 1.2 增加本地 MinerU 4.x 私有适配器；Task 1.3 增加有界 HTML 格网恢复、多级表头、保守跨页续表合并和 V2.4 表格映射。所有机器表格仍为待核验候选。页面分类、Clause、公式语义、Chunking、检索、LLM 与外部存储后端尚未实现。
+面向工程规范、建设标准与图集 PDF 的模块化单体 RAG 项目。**Document Schema V2.4 已于 2026-10-11 正式冻结（FROZEN）**。Architecture Task 1.1 已实现安全 PDF/OCR partial Document；Task 1.2 增加本地 MinerU 4.x 私有适配器；Task 1.3 增加复杂表格与跨页续表恢复；Task 1.4 增加公式编号、保守分组、“式中”符号解释及 V2.4 公式 Block 映射。所有机器结果仍为待核验候选。领域页面分类、Clause/Section、Chunking、检索、LLM 与外部存储后端尚未实现。
 
 ## 安装与检查
 
@@ -43,4 +43,6 @@ python -m pytest src/engineering_rag/modules/generation/tests -q
 Parser Task 1.1 的行为、OCR 后端与实测结果分别见 [实现说明](docs/document-parser-task1-1.md)、[OCR 后端](docs/document-parser-ocr-backend.md) 和 [验收报告](docs/document-parser-task1-1-report.md)。Task 1.2 的实际环境、逐例状态和已知失败见 [MinerU 真实测试报告](docs/task-1.2-mineru-real-test-report.md)。
 
 Task 1.3 的表格保真政策、三组真实 GB 50010 结果、可复现命令与 Known Issues 见 [复杂表格报告](docs/task-1.3-complex-tables.md)。
+
+Task 1.4 的公式编号三态、分组与符号解释策略、三页真实结果及页 24 回退记录见 [公式结构化报告](docs/task-1.4-formulas.md)。
 

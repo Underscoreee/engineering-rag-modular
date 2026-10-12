@@ -1,0 +1,532 @@
+{
+  "task": "Architecture Task 1.4",
+  "schema_version": "2.4",
+  "status": "executed_pending_maintainer_review",
+  "engine": "MinerU only",
+  "golden_dataset_status": "pending_human_review",
+  "source_pdf": "混凝土结构设计规范(2015年版) GB 50010-2010_纯图版.pdf",
+  "pdf_page_numbering": "physical_1_based",
+  "real_cases": [
+    {
+      "id": "GB-E332",
+      "physical_pdf_pages": [
+        24
+      ],
+      "focus": [
+        "2 numbered display equations",
+        "equation number geometry",
+        "symbol explanations"
+      ],
+      "source_observation": "原扫描图目视可见第3.3.2条两条式(3.3.2-1)/(3.3.2-2)及式中长说明；非MinerU实测",
+      "requires_real_mineru": true,
+      "run_status": "succeeded_with_local_raster_fallback",
+      "gold_status": "human_annotation_pending"
+    },
+    {
+      "id": "GB-E621",
+      "physical_pdf_pages": [
+        50
+      ],
+      "focus": [
+        "consecutive printed numbers 6.2.1-1 through 6.2.1-7",
+        "several symbol groups",
+        "dense mixed body"
+      ],
+      "source_observation": "原扫描图目视可见多条编号公式、换行释义；非MinerU实测",
+      "requires_real_mineru": true,
+      "run_status": "succeeded",
+      "gold_status": "human_annotation_pending"
+    },
+    {
+      "id": "GB-EEXPL",
+      "physical_pdf_pages": [
+        301
+      ],
+      "focus": [
+        "unnumbered display formula",
+        "explanation body",
+        "unknown vs confirmed_absent"
+      ],
+      "source_observation": "原扫描图目视未见该Ec显示公式旁有印刷式号；自动解析不得宣称confirmed_absent",
+      "requires_real_mineru": true,
+      "run_status": "succeeded",
+      "gold_status": "human_annotation_pending"
+    }
+  ],
+  "synthetic_test_cases": [
+    {
+      "id": "F01",
+      "name": "single_printed_equation",
+      "category": "positive",
+      "source": "synthetic_fixture",
+      "input_hint": {
+        "latex": "E=mc^2",
+        "printed_number_text": "(1.1-1)",
+        "geometry": "number right-aligned with equation"
+      },
+      "required_assertions": [
+        "equation_number=1.1-1",
+        "equation_number_status=printed",
+        "equation.recognition_status=unverified"
+      ]
+    },
+    {
+      "id": "F02",
+      "name": "multiple_equations_in_group",
+      "category": "positive",
+      "source": "synthetic_fixture",
+      "input_hint": {
+        "equations": [
+          {
+            "latex": "a=b",
+            "print_no": "(6.2.1-1)"
+          },
+          {
+            "latex": "c=d",
+            "print_no": "(6.2.1-2)"
+          }
+        ],
+        "share_symbol_explanations": true
+      },
+      "required_assertions": [
+        "2 Equations with distinct formula_id",
+        "numbers correctly paired",
+        "shared group explanation once"
+      ]
+    },
+    {
+      "id": "F03",
+      "name": "aligned_is_one_equation",
+      "category": "positive",
+      "source": "synthetic_fixture",
+      "input_hint": {
+        "latex": "\\begin{aligned}a&=b+c\\\\&=d+e\\end{aligned}",
+        "printed_number_text": "(2.3-1)"
+      },
+      "required_assertions": [
+        "one Equation only",
+        "do not split on LaTeX \\\\"
+      ]
+    },
+    {
+      "id": "F04",
+      "name": "cases_is_one_equation",
+      "category": "positive",
+      "source": "synthetic_fixture",
+      "input_hint": {
+        "latex": "f(x)=\\begin{cases}x&x>0\\\\0&x\\le0\\end{cases}"
+      },
+      "required_assertions": [
+        "one Equation only",
+        "no invented printed number"
+      ]
+    },
+    {
+      "id": "F05",
+      "name": "unknown_number",
+      "category": "negative",
+      "source": "synthetic_fixture",
+      "input_hint": {
+        "latex": "σ=f_c",
+        "number_candidates": []
+      },
+      "required_assertions": [
+        "equation_number=null",
+        "equation_number_status=unknown"
+      ]
+    },
+    {
+      "id": "F06",
+      "name": "human_confirmed_absent",
+      "category": "positive",
+      "source": "synthetic_fixture",
+      "input_hint": {
+        "latex": "x=y",
+        "evidence": "human-reviewed source image, no printed number"
+      },
+      "required_assertions": [
+        "verified equation may use confirmed_absent",
+        "human provenance recorded"
+      ]
+    },
+    {
+      "id": "F07",
+      "name": "forbid_machine_confirmed_absent",
+      "category": "negative",
+      "source": "synthetic_fixture",
+      "input_hint": {
+        "latex": "x=y",
+        "evidence": "no regex match, machine only"
+      },
+      "required_assertions": [
+        "must not use confirmed_absent",
+        "stay unknown"
+      ]
+    },
+    {
+      "id": "F08",
+      "name": "body_reference_number",
+      "category": "negative",
+      "source": "synthetic_fixture",
+      "input_hint": {
+        "body_text": "详见式（6.2.1-1）",
+        "geometry": "reference in body, no equation aligned"
+      },
+      "required_assertions": [
+        "do not attach 6.2.1-1 to nearby equation"
+      ]
+    },
+    {
+      "id": "F09",
+      "name": "unit_parentheses",
+      "category": "negative",
+      "source": "synthetic_fixture",
+      "input_hint": {
+        "body_text": "E (N/mm²)",
+        "printed_number_text": "(N/mm²)"
+      },
+      "required_assertions": [
+        "not a printed equation_number"
+      ]
+    },
+    {
+      "id": "F10",
+      "name": "clause_number",
+      "category": "negative",
+      "source": "synthetic_fixture",
+      "input_hint": {
+        "body_text": "6.2.1 适用范围",
+        "candidate": "6.2.1"
+      },
+      "required_assertions": [
+        "not an equation number"
+      ]
+    },
+    {
+      "id": "F11",
+      "name": "two_candidate_conflict",
+      "category": "negative",
+      "source": "synthetic_fixture",
+      "input_hint": {
+        "candidate_numbers": [
+          "(3.1-1)",
+          "(3.1-2)"
+        ],
+        "geometry": "both weak evidence"
+      },
+      "required_assertions": [
+        "number remains unknown",
+        "diagnostic lists conflict"
+      ]
+    },
+    {
+      "id": "F12",
+      "name": "missing_latex_image_only",
+      "category": "negative",
+      "source": "synthetic_fixture",
+      "input_hint": {
+        "latex": null,
+        "image_asset": "local formula crop present"
+      },
+      "required_assertions": [
+        "recognition_status=not_transcribed",
+        "equation_number_status=unknown",
+        "sidecar keeps image"
+      ]
+    },
+    {
+      "id": "F13",
+      "name": "latex_lossless_symbols",
+      "category": "positive",
+      "source": "synthetic_fixture",
+      "input_hint": {
+        "latex": "\\sigma_{c}\\leq f_{c}\\left(1-\\frac{\\varepsilon}{\\varepsilon_0}\\right)"
+      },
+      "required_assertions": [
+        "no semantic rewriting",
+        "keep subscripts and relation operators"
+      ]
+    },
+    {
+      "id": "F14",
+      "name": "symbol_explanations_three_items",
+      "category": "positive",
+      "source": "synthetic_fixture",
+      "input_hint": {
+        "raw_body": "式中：σc——混凝土压应力； fc——抗压强度； ε0——峰值应变。"
+      },
+      "required_assertions": [
+        "items length=3",
+        "original descriptions maintained",
+        "no separate unit field"
+      ]
+    },
+    {
+      "id": "F15",
+      "name": "symbol_explanations_wrapped",
+      "category": "positive",
+      "source": "synthetic_fixture",
+      "input_hint": {
+        "raw_lines": [
+          "式中：f_c——混凝土轴心抗压强度设计值，",
+          "按有关规范采用；",
+          "ε——混凝土应变。"
+        ]
+      },
+      "required_assertions": [
+        "line continuation retained",
+        "two symbol items not three"
+      ]
+    },
+    {
+      "id": "F16",
+      "name": "symbol_not_guess_latex",
+      "category": "negative",
+      "source": "synthetic_fixture",
+      "input_hint": {
+        "raw_body": "式中：δ——系数。",
+        "OCR_latex": null
+      },
+      "required_assertions": [
+        "symbol=δ",
+        "latex=null",
+        "do not guess LaTeX"
+      ]
+    },
+    {
+      "id": "F17",
+      "name": "stop_at_next_title",
+      "category": "negative",
+      "source": "synthetic_fixture",
+      "input_hint": {
+        "raw_lines": [
+          "式中：a——长度。",
+          "6.2.2 新条文",
+          "参数说明不属于上式"
+        ]
+      },
+      "required_assertions": [
+        "stop symbol scope before next clause title",
+        "do not swallow clause text"
+      ]
+    },
+    {
+      "id": "F18",
+      "name": "adjacent_unrelated_groups",
+      "category": "negative",
+      "source": "synthetic_fixture",
+      "input_hint": {
+        "two_formula_regions": true,
+        "different_subjects": true
+      },
+      "required_assertions": [
+        "separate formula_group_id",
+        "no one-group-for-whole-page"
+      ]
+    },
+    {
+      "id": "F19",
+      "name": "inline_math_stays_body",
+      "category": "negative",
+      "source": "synthetic_fixture",
+      "input_hint": {
+        "body_text": "当f_c≤f时，取β=1.0"
+      },
+      "required_assertions": [
+        "keep inline math within body/spans",
+        "no ungrounded new Formula Block"
+      ]
+    },
+    {
+      "id": "F20",
+      "name": "bbox_rotation_and_crop",
+      "category": "negative",
+      "source": "synthetic_fixture",
+      "input_hint": {
+        "page_rotation": 90,
+        "has_cropbox": true,
+        "raw_bbox": [
+          4,
+          10,
+          50,
+          80
+        ]
+      },
+      "required_assertions": [
+        "mapped to correct PDF top-left pt",
+        "no overflow",
+        "visual overlay correct"
+      ]
+    },
+    {
+      "id": "F21",
+      "name": "page_index_mapping",
+      "category": "negative",
+      "source": "synthetic_fixture",
+      "input_hint": {
+        "selected_original_page": 301,
+        "mineru_page_idx": 0
+      },
+      "required_assertions": [
+        "Document page_number=301",
+        "no 0/1 off-by-one"
+      ]
+    },
+    {
+      "id": "F22",
+      "name": "stable_id_on_ocr_correction",
+      "category": "positive",
+      "source": "synthetic_fixture",
+      "input_hint": {
+        "same_source_anchor": true,
+        "first_latex": "x=1",
+        "corrected_latex": "x=l"
+      },
+      "required_assertions": [
+        "formula_id and block_id remain stable"
+      ]
+    },
+    {
+      "id": "F23",
+      "name": "no_duplicate_blocks_on_replay",
+      "category": "negative",
+      "source": "synthetic_fixture",
+      "input_hint": {
+        "process_same_raw_twice": true
+      },
+      "required_assertions": [
+        "no duplicate blocks",
+        "existing table and body remain"
+      ]
+    },
+    {
+      "id": "F24",
+      "name": "source_missing_bbox",
+      "category": "negative",
+      "source": "synthetic_fixture",
+      "input_hint": {
+        "latex": "x=y",
+        "bbox": null
+      },
+      "required_assertions": [
+        "do not fabricate bbox",
+        "candidate preserved in raw + diagnostics"
+      ]
+    },
+    {
+      "id": "F25",
+      "name": "old_format_mismatch",
+      "category": "negative",
+      "source": "synthetic_fixture",
+      "input_hint": {
+        "schema": "unversioned",
+        "payload": "legacy pdf_info"
+      },
+      "required_assertions": [
+        "do not reinterpret as docvortex.middle",
+        "give explicit unsupported-version diagnostic"
+      ]
+    },
+    {
+      "id": "F26",
+      "name": "unsafe_asset_path",
+      "category": "negative",
+      "source": "synthetic_fixture",
+      "input_hint": {
+        "crop_path": "../../outside.png"
+      },
+      "required_assertions": [
+        "reject path traversal",
+        "no network request"
+      ]
+    },
+    {
+      "id": "F27",
+      "name": "pydantic_verified_without_latex",
+      "category": "negative",
+      "source": "synthetic_fixture",
+      "input_hint": {
+        "recognition_status": "verified",
+        "latex": null,
+        "equation_number_status": "printed",
+        "equation_number": "1.2-1"
+      },
+      "required_assertions": [
+        "must fail frozen Equation validation"
+      ]
+    },
+    {
+      "id": "F28",
+      "name": "pydantic_confirmed_absent_unverified",
+      "category": "negative",
+      "source": "synthetic_fixture",
+      "input_hint": {
+        "recognition_status": "unverified",
+        "latex": "x=y",
+        "equation_number_status": "confirmed_absent",
+        "equation_number": null
+      },
+      "required_assertions": [
+        "must fail frozen Equation validation"
+      ]
+    },
+    {
+      "id": "F29",
+      "name": "formula_block_no_group_id",
+      "category": "negative",
+      "source": "synthetic_fixture",
+      "input_hint": {
+        "block_type": "formula",
+        "formula_group_id": null
+      },
+      "required_assertions": [
+        "must fail frozen PageBlock validation"
+      ]
+    },
+    {
+      "id": "F30",
+      "name": "formula_block_non_formula_payload",
+      "category": "negative",
+      "source": "synthetic_fixture",
+      "input_hint": {
+        "block_type": "body",
+        "formula_group_id": "fg1"
+      },
+      "required_assertions": [
+        "must fail frozen PageBlock validation"
+      ]
+    },
+    {
+      "id": "F31",
+      "name": "plain_text_symbol_renderer_regression",
+      "category": "positive",
+      "source": "synthetic_fixture",
+      "input_hint": {
+        "existing_clause_fixture": true,
+        "symbol_explanations": true
+      },
+      "required_assertions": [
+        "existing derive_clause_plain_text test passes",
+        "symbol explanations not omitted or duplicated"
+      ]
+    },
+    {
+      "id": "F32",
+      "name": "lossless_digit_ambiguity",
+      "category": "negative",
+      "source": "synthetic_fixture",
+      "input_hint": {
+        "raw_latex": "l_0=O.5",
+        "suspected_OCR_confusions": [
+          "l/1",
+          "0/O"
+        ]
+      },
+      "required_assertions": [
+        "do not silently correct",
+        "emit low-confidence warning"
+      ]
+    }
+  ],
+  "protocol_notice": "Only actual installed MinerU schema is authoritative. 4.x generally uses docvortex.middle; legacy pdf_info is not interchangeable."
+}

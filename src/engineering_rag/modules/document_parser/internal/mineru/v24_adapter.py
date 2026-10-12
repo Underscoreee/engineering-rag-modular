@@ -2,7 +2,6 @@
 
 from __future__ import annotations
 
-import re
 from dataclasses import dataclass
 from uuid import NAMESPACE_URL, uuid5
 
@@ -14,9 +13,6 @@ from engineering_rag.contracts.documents import (
     ClauseGroups,
     ContentExtractionStatus,
     Document,
-    Equation,
-    FormulaGroup,
-    FormulaNumberStatus,
     LogicalTable,
     LogicalTableStatus,
     OcrContent,
@@ -29,15 +25,17 @@ from engineering_rag.contracts.documents import (
     TableFragment,
     TableFragmentStatus,
 )
+from engineering_rag.modules.document_parser.internal.formulas.assembler import (
+    FORMULA_ASSEMBLER_VERSION,
+    assemble_mineru_formulas,
+)
+from engineering_rag.modules.document_parser.internal.formulas.models import FormulaSidecar
 from engineering_rag.modules.document_parser.internal.tables.assembler import (
-    TABLE_ASSEMBLER_VERSION,
     assemble_mineru_tables,
 )
 from engineering_rag.modules.document_parser.internal.tables.models import TableSidecar
 
 from .models import MinerUElement, MinerUParseResult
-
-_TAG = re.compile(r"\\tag\{([^{}]+)\}\s*$")
 
 
 @dataclass(frozen=True, slots=True)
@@ -46,6 +44,8 @@ class MinerUV24Adaptation:
     omitted_elements: list[dict[str, object]]
     table_sidecars: list[TableSidecar]
     table_diagnostics: list[dict[str, object]]
+    formula_sidecars: list[FormulaSidecar]
+    formula_diagnostics: list[dict[str, object]]
 
 
 def adapt_to_v24(
@@ -59,6 +59,7 @@ def adapt_to_v24(
         "doc", source_file.file_id, standard.standard_code, standard.edition or ""
     )
     table_assembly = assemble_mineru_tables(result)
+    formula_assembly = assemble_mineru_formulas(result)
     tables: list[LogicalTable] = list(table_assembly.tables)
     pages: list[Page] = []
     omitted: list[dict[str, object]] = []
@@ -145,37 +146,31 @@ def adapt_to_v24(
                 )
                 continue
             if element.raw_type == "equation":
-                latex = element.latex
-                number_match = _TAG.search(latex or "")
-                equation_number = number_match.group(1) if number_match else None
-                formula_id = _stable_id("formula", block_id, "0")
+                placement = formula_assembly.placements.get(
+                    (element.page_number, element.source_index)
+                )
+                if placement is None:
+                    if (element.page_number, element.source_index) in formula_assembly.consumed:
+                        continue
+                    omitted.append(_omission(element, "formula_retained_only_in_raw_sidecar"))
+                    continue
+                group_bbox = BoundingBox(
+                    x_min=placement.bbox.x_min * parsed_page.width_points,
+                    y_min=placement.bbox.y_min * parsed_page.height_points,
+                    x_max=placement.bbox.x_max * parsed_page.width_points,
+                    y_max=placement.bbox.y_max * parsed_page.height_points,
+                )
                 blocks.append(
                     PageBlock(
-                        block_id=block_id,
+                        block_id=placement.block_id,
                         block_type=BlockType.FORMULA,
-                        bbox=bbox,
+                        bbox=group_bbox,
                         reading_order=len(blocks),
-                        ocr=OcrContent(
-                            formula_group=FormulaGroup(
-                                equations=[
-                                    Equation(
-                                        formula_id=formula_id,
-                                        equation_number=equation_number,
-                                        equation_number_status=(
-                                            FormulaNumberStatus.PRINTED
-                                            if equation_number
-                                            else FormulaNumberStatus.UNKNOWN
-                                        ),
-                                        latex=latex,
-                                        recognition_status=RecognitionStatus.UNVERIFIED,
-                                    )
-                                ]
-                            )
-                        ),
-                        recognition_status=RecognitionStatus.UNVERIFIED,
+                        ocr=OcrContent(formula_group=placement.formula_group),
+                        recognition_status=placement.recognition_status,
                         bbox_status=BboxStatus.UNVERIFIED,
                         extraction_method=f"mineru:{result.producer_version}",
-                        formula_group_id=_stable_id("formula-group", block_id),
+                        formula_group_id=placement.formula_group_id,
                     )
                 )
                 continue
@@ -206,14 +201,14 @@ def adapt_to_v24(
             Page(
                 page_number=parsed_page.page_number,
                 page_type=PageType.UNKNOWN,
-                page_type_basis="task1.3_mineru_candidate_not_domain_classified",
+                page_type_basis="task1.4_mineru_candidate_not_domain_classified",
                 width=parsed_page.width_points,
                 height=parsed_page.height_points,
                 content_extraction_status=ContentExtractionStatus.PARTIALLY_TRANSCRIBED,
                 blocks=blocks,
             )
         )
-    all_omitted = _unique_omissions([*omitted, *table_assembly.omitted])
+    all_omitted = _unique_omissions([*omitted, *table_assembly.omitted, *formula_assembly.omitted])
     if all_omitted:
         warnings.append(
             ContractError(
@@ -236,7 +231,7 @@ def adapt_to_v24(
         clauses=ClauseGroups(),
         processing=ProcessingMetadata(
             parser_id="engineering_rag.document_parser.mineru",
-            parser_version=TABLE_ASSEMBLER_VERSION,
+            parser_version=FORMULA_ASSEMBLER_VERSION,
             partial=True,
             is_complete_document_ocr=False,
             warnings=warnings,
@@ -247,6 +242,8 @@ def adapt_to_v24(
         omitted_elements=all_omitted,
         table_sidecars=table_assembly.sidecars,
         table_diagnostics=table_assembly.omitted,
+        formula_sidecars=formula_assembly.sidecars,
+        formula_diagnostics=formula_assembly.omitted,
     )
 
 
