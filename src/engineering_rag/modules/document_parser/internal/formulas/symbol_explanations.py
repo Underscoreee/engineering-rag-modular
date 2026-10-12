@@ -7,7 +7,7 @@ import re
 from engineering_rag.contracts.documents import SymbolExplanationItem, SymbolExplanations
 from engineering_rag.modules.document_parser.internal.mineru.models import MinerUElement
 
-from .models import SymbolEvidence
+from .models import SymbolEvidence, SymbolSourceCoverage
 
 _PREFIX = re.compile(r"^\s*式中\s*[:：]?\s*")
 _PLAIN_ITEM = re.compile(r"\s*([^；。]+?)\s*(?:——|--|—)\s*(.+?)(?:；|。|$)")
@@ -32,6 +32,7 @@ def collect_symbol_explanations(
     raw_fragments: list[dict[str, object]] = []
     source_indices: list[int] = []
     diagnostics: list[str] = []
+    coverage: list[SymbolSourceCoverage] = []
     position = start
     while position < len(elements):
         element = elements[position]
@@ -39,25 +40,45 @@ def collect_symbol_explanations(
             break
         if element.raw_type != "text":
             break
-        parsed = _parse_element(element, first=position == start)
+        item_start = len(items)
+        parsed, parser_consumed_all = _parse_element(element, first=position == start)
         if _has_ambiguous_inline_separator(element):
             diagnostics.append(
                 f"ambiguous OCR separator between symbols in block {element.source_index} retained"
             )
         if parsed:
             items.extend(parsed)
+            item_indices = list(range(item_start, len(items)))
         elif items and element.text:
             previous = items[-1]
             previous.description = f"{previous.description}{element.text.strip()}"
             diagnostics.append(f"continued wrapped description from block {element.source_index}")
+            item_indices = [len(items) - 1]
+            parser_consumed_all = True
         else:
             diagnostics.append(f"unparsed symbol text block {element.source_index}")
+            item_indices = []
+            parser_consumed_all = False
+        coverage.append(
+            SymbolSourceCoverage(
+                source_index=element.source_index,
+                item_indices=item_indices,
+                fully_consumed=parser_consumed_all,
+                unconsumed_text=None if parser_consumed_all else element.text,
+                reason=(
+                    "all OCR tokens mapped to authoritative symbol explanation"
+                    if parser_consumed_all
+                    else "source contains unparsed or mixed content"
+                ),
+            )
+        )
         raw_fragments.append(dict(element.raw))
         source_indices.append(element.source_index)
         position += 1
     evidence = SymbolEvidence(
         source_indices=source_indices,
         raw_fragments=raw_fragments,
+        source_coverage=coverage,
         diagnostics=diagnostics,
     )
     return SymbolExplanations(items=items) if items else None, evidence, position
@@ -75,10 +96,12 @@ def parse_plain_symbol_lines(lines: list[str]) -> SymbolExplanations | None:
     return SymbolExplanations(items=items) if items else None
 
 
-def _parse_element(element: MinerUElement, *, first: bool) -> list[SymbolExplanationItem]:
+def _parse_element(
+    element: MinerUElement, *, first: bool
+) -> tuple[list[SymbolExplanationItem], bool]:
     children = _children(element)
     if not children:
-        return _parse_plain(
+        return _parse_plain_with_coverage(
             _PREFIX.sub("", element.text or "", count=1) if first else element.text or ""
         )
     prepared: list[dict[str, object]] = []
@@ -118,39 +141,53 @@ def _parse_element(element: MinerUElement, *, first: bool) -> list[SymbolExplana
             else "、".join(leading_symbols)
         )
         description = "".join(description_parts).strip(" ：:—-")
-        return [
-            SymbolExplanationItem(
-                symbol=symbol,
-                latex=leading_symbols[0] if len(leading_symbols) == 1 else None,
-                description=description,
-            )
-        ]
+        return (
+            [
+                SymbolExplanationItem(
+                    symbol=symbol,
+                    latex=leading_symbols[0] if len(leading_symbols) == 1 else None,
+                    description=description,
+                )
+            ],
+            True,
+        )
     plain = "".join(str(child["content"]) for child in prepared)
-    return _parse_plain(plain)
+    return _parse_plain_with_coverage(plain)
 
 
 def _parse_plain(value: str) -> list[SymbolExplanationItem]:
+    return _parse_plain_with_coverage(value)[0]
+
+
+def _parse_plain_with_coverage(value: str) -> tuple[list[SymbolExplanationItem], bool]:
+    matches = list(_PLAIN_ITEM.finditer(value))
     items = [
         SymbolExplanationItem(
             symbol=match.group(1).strip(),
             latex=None,
             description=match.group(2).strip(),
         )
-        for match in _PLAIN_ITEM.finditer(value)
+        for match in matches
         if match.group(1).strip() and match.group(2).strip()
     ]
     if items:
-        return items
+        remainder = value
+        for match in reversed(matches):
+            remainder = remainder[: match.start()] + remainder[match.end() :]
+        return items, not remainder.strip()
     leading = _LEADING_SYMBOL.match(value)
     if leading is None:
-        return []
-    return [
-        SymbolExplanationItem(
-            symbol=leading.group(1),
-            latex=None,
-            description=leading.group(2).strip(),
-        )
-    ]
+        return [], False
+    return (
+        [
+            SymbolExplanationItem(
+                symbol=leading.group(1),
+                latex=None,
+                description=leading.group(2).strip(),
+            )
+        ],
+        leading.end() == len(value),
+    )
 
 
 def _children(element: MinerUElement) -> list[dict[str, object]]:

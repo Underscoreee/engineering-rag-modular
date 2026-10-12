@@ -15,7 +15,10 @@ from engineering_rag.contracts.documents import BlockType, Document, StandardMet
 from engineering_rag.modules.document_parser.internal.formulas.assembler import (
     FORMULA_ASSEMBLER_VERSION,
 )
-from engineering_rag.modules.document_parser.internal.formulas.models import FormulaSidecar
+from engineering_rag.modules.document_parser.internal.formulas.models import (
+    FormulaSemanticCoverage,
+    FormulaSidecar,
+)
 from engineering_rag.modules.document_parser.internal.mineru.models import MinerUParseResult
 from engineering_rag.modules.document_parser.internal.mineru.v24_adapter import adapt_to_v24
 
@@ -121,13 +124,81 @@ def _write_case(
     case_root.mkdir(parents=True, exist_ok=True)
     raw_root = case_root / "raw"
     raw_root.mkdir(parents=True, exist_ok=True)
-    shutil.copyfile(result.raw_middle_json, raw_root / "middle_json.json")
-    _write_formula_sidecars(adaptation.formula_sidecars, case_root)
-    (case_root / "document.partial.json").write_text(
-        document.model_dump_json(indent=2), encoding="utf-8"
+    raw_copy = raw_root / "middle_json.json"
+    if raw_copy.exists():
+        if _sha256(raw_copy) != _sha256(result.raw_middle_json):
+            raise SystemExit("refusing to replace an existing non-identical raw MiddleJson")
+    else:
+        shutil.copyfile(result.raw_middle_json, raw_copy)
+    grouped = case_id == "GB-E621"
+    _write_formula_sidecars(
+        adaptation.formula_sidecars,
+        case_root,
+        directory="formula_sidecars_grouped" if grouped else "formula_sidecars",
     )
+    document_name = "document.grouped.partial.json" if grouped else "document.partial.json"
+    (case_root / document_name).write_text(document.model_dump_json(indent=2), encoding="utf-8")
+    if grouped:
+        _write_json(
+            case_root / "formula_semantic_group_sidecar.json",
+            {
+                "algorithm_version": FORMULA_ASSEMBLER_VERSION,
+                "source_pdf_sha256": result.source_sha256,
+                "source_middle_json_sha256": _sha256(result.raw_middle_json),
+                "raw_layer_immutable": True,
+                "groups": [
+                    sidecar.model_dump(mode="json") for sidecar in adaptation.formula_sidecars
+                ],
+            },
+        )
+        _write_json(
+            case_root / "formula_source_consumption_report.json",
+            {
+                "algorithm_version": FORMULA_ASSEMBLER_VERSION,
+                "source_pdf_sha256": result.source_sha256,
+                "condition_sources": [
+                    {
+                        "source_block_id": condition.raw_source_block_ids[0],
+                        "source_page_number": condition.source_page_number,
+                        "source_index": condition.source_index,
+                        "raw_text": condition.raw_text,
+                        "raw_bbox": condition.bbox.model_dump(mode="json"),
+                        "consumed_text_ranges": [[0, len(condition.raw_text)]],
+                        "target_formula_group_id": sidecar.formula_group_id,
+                        "target_formula_ids": condition.target_formula_ids,
+                        "semantic_role": "condition",
+                        "disposition": "consumed",
+                        "review_status": condition.review_status,
+                        "correction_evidence": condition.match_evidence,
+                        "diagnostics": condition.diagnostics,
+                    }
+                    for sidecar in adaptation.formula_sidecars
+                    for condition in sidecar.conditions
+                ],
+                "symbol_explanation_sources": [
+                    item.model_dump(mode="json") for item in adaptation.formula_dedup_coverage
+                ],
+                "summary": {
+                    "condition_sources_consumed": sum(
+                        len(sidecar.conditions) for sidecar in adaptation.formula_sidecars
+                    ),
+                    "symbol_sources_consumed": sum(
+                        item.duplicate_disposition == "consumed"
+                        for item in adaptation.formula_dedup_coverage
+                    ),
+                    "unresolved_sources_retained": sum(
+                        item.duplicate_disposition != "consumed"
+                        for item in adaptation.formula_dedup_coverage
+                    ),
+                    "cross_page_incomplete_sources": sum(
+                        item.cross_page_incomplete for item in adaptation.formula_dedup_coverage
+                    ),
+                },
+            },
+        )
+    formulas_name = "formulas.grouped.json" if grouped else "formulas.json"
     _write_json(
-        case_root / "formulas.json",
+        case_root / formulas_name,
         [
             {
                 "block_id": block.block_id,
@@ -143,8 +214,9 @@ def _write_case(
             and block.ocr.formula_group is not None
         ],
     )
+    diagnostics_name = "diagnostics.grouped.json" if grouped else "diagnostics.json"
     _write_json(
-        case_root / "diagnostics.json",
+        case_root / diagnostics_name,
         {
             "normalizer": result.diagnostics,
             "formula_omissions": adaptation.formula_diagnostics,
@@ -168,6 +240,8 @@ def _write_case(
         result,
         adaptation.formula_sidecars,
         case_root / "overlays",
+        grouped=grouped,
+        dedup_coverage=adaptation.formula_dedup_coverage,
     )
     formulas = [
         block
@@ -226,12 +300,15 @@ def _write_case(
         provenance["task_1_2_manifest"] = json.loads(
             _read_bounded(source_manifest, source_manifest.parent)
         )
-    _write_json(case_root / "manifest.json", provenance)
+    manifest_name = "manifest.grouped.json" if grouped else "manifest.json"
+    _write_json(case_root / manifest_name, provenance)
     return summary
 
 
-def _write_formula_sidecars(sidecars: list[FormulaSidecar], case_root: Path) -> None:
-    root = case_root / "formula_sidecars"
+def _write_formula_sidecars(
+    sidecars: list[FormulaSidecar], case_root: Path, *, directory: str
+) -> None:
+    root = case_root / directory
     assets = root / "assets"
     root.mkdir(parents=True, exist_ok=True)
     for sidecar in sidecars:
@@ -250,6 +327,9 @@ def _render_overlay(
     result: MinerUParseResult,
     sidecars: list[FormulaSidecar],
     output: Path,
+    *,
+    grouped: bool,
+    dedup_coverage: list[FormulaSemanticCoverage],
 ) -> None:
     import pymupdf
     from PIL import Image, ImageDraw
@@ -268,6 +348,15 @@ def _render_overlay(
             scale_x = pixmap.width / page.width
             scale_y = pixmap.height / page.height
             for block in page.blocks:
+                if block.block_type == BlockType.BODY:
+                    box = (
+                        block.bbox.x_min * scale_x,
+                        block.bbox.y_min * scale_y,
+                        block.bbox.x_max * scale_x,
+                        block.bbox.y_max * scale_y,
+                    )
+                    draw.rectangle(box, outline="#6c757d", width=2)
+                    continue
                 if block.block_type != BlockType.FORMULA:
                     continue
                 box = (
@@ -279,7 +368,32 @@ def _render_overlay(
                 draw.rectangle(box, outline="#00a86b", width=4)
                 draw.text((box[0] + 2, box[1] + 2), block.formula_group_id[-8:], fill="#006b46")
             for sidecar in sidecars:
-                if sidecar.page_number != page.page_number or sidecar.symbol_evidence is None:
+                if sidecar.page_number != page.page_number:
+                    continue
+                for condition in sidecar.conditions:
+                    box = (
+                        condition.bbox.x_min * pixmap.width,
+                        condition.bbox.y_min * pixmap.height,
+                        condition.bbox.x_max * pixmap.width,
+                        condition.bbox.y_max * pixmap.height,
+                    )
+                    draw.rectangle(box, outline="#7b2cbf", width=4)
+                    draw.text(
+                        (box[0] + 2, box[1] + 2),
+                        f"condition->{condition.target_formula_ids[0][-8:]}",
+                        fill="#5a189a",
+                    )
+                for component in sidecar.semantic_components:
+                    if component.semantic_role != "equation":
+                        continue
+                    box = (
+                        component.component_bbox.x_min * pixmap.width,
+                        component.component_bbox.y_min * pixmap.height,
+                        component.component_bbox.x_max * pixmap.width,
+                        component.component_bbox.y_max * pixmap.height,
+                    )
+                    draw.rectangle(box, outline="#0057d9", width=2)
+                if sidecar.symbol_evidence is None:
                     continue
                 for source_index in sidecar.symbol_evidence.source_indices:
                     source = source_elements.get((page.page_number, source_index))
@@ -291,7 +405,22 @@ def _render_overlay(
                         source.bbox.x_max * pixmap.width,
                         source.bbox.y_max * pixmap.height,
                     )
-                    draw.rectangle(box, outline="#ff8c00", width=3)
+                    coverage = next(
+                        (
+                            item
+                            for item in dedup_coverage
+                            if getattr(item, "source_page_number", None) == page.page_number
+                            and getattr(item, "source_index", None) == source_index
+                        ),
+                        None,
+                    )
+                    consumed = getattr(coverage, "duplicate_disposition", None) == "consumed"
+                    incomplete = getattr(coverage, "cross_page_incomplete", False)
+                    draw.rectangle(
+                        box,
+                        outline="#d00000" if incomplete else "#ff8c00" if consumed else "#8b0000",
+                        width=3,
+                    )
                 for equation in sidecar.equations:
                     for evidence in equation.number_evidence:
                         if evidence.bbox is None:
@@ -303,7 +432,14 @@ def _render_overlay(
                             evidence.bbox.y_max * pixmap.height,
                         )
                         draw.rectangle(box, outline="#0057d9", width=3)
-            image.save(output / f"page-{page.page_number:04d}-formulas.png")
+            draw.rectangle((10, 10, 520, 88), fill="#ffffff", outline="#222222", width=2)
+            draw.text(
+                (20, 18), "GREEN semantic group | BLUE equation | PURPLE condition", fill="#111111"
+            )
+            draw.text((20, 42), "ORANGE explanation | RED cross-page incomplete", fill="#111111")
+            draw.text((20, 66), "GRAY/untouched document body remains in Document", fill="#111111")
+            suffix = "-grouped" if grouped else ""
+            image.save(output / f"page-{page.page_number:04d}-formulas{suffix}.png")
 
 
 def _validate_result(result: MinerUParseResult, page_number: int, expected_sha256: str) -> None:

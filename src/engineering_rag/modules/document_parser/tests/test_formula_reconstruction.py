@@ -63,11 +63,15 @@ def test_task_1_4_synthetic_case(case: dict[str, object], tmp_path: Path) -> Non
                 _text(2, "式中：a——演示量。"),
             ]
         )
-        blocks = _formula_blocks(_adapt(result).document)
+        adaptation = _adapt(result)
+        blocks = _formula_blocks(adaptation.document)
         assert len(blocks) == 1
-        group = blocks[0].ocr.formula_group  # type: ignore[union-attr]
-        assert len(group.equations) == 2 and len({item.formula_id for item in group.equations}) == 2
-        assert group.symbol_explanations is not None
+        equations = blocks[0].ocr.formula_group.equations  # type: ignore[union-attr]
+        assert len({item.formula_id for item in equations}) == 2
+        assert blocks[0].ocr.formula_group.symbol_explanations is not None  # type: ignore[union-attr]
+        assert adaptation.formula_sidecars[0].explanation_scope_formula_ids == [
+            item.formula_id for item in equations
+        ]
     elif case_id in {"F03", "F04"}:
         latex = str(case["input_hint"]["latex"])  # type: ignore[index]
         equation = _equations(_adapt(_result([_equation(0, latex)])).document)[0]

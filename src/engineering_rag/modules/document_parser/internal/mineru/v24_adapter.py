@@ -29,7 +29,10 @@ from engineering_rag.modules.document_parser.internal.formulas.assembler import 
     FORMULA_ASSEMBLER_VERSION,
     assemble_mineru_formulas,
 )
-from engineering_rag.modules.document_parser.internal.formulas.models import FormulaSidecar
+from engineering_rag.modules.document_parser.internal.formulas.models import (
+    FormulaSemanticCoverage,
+    FormulaSidecar,
+)
 from engineering_rag.modules.document_parser.internal.tables.assembler import (
     assemble_mineru_tables,
 )
@@ -45,6 +48,7 @@ class MinerUV24Adaptation:
     table_sidecars: list[TableSidecar]
     table_diagnostics: list[dict[str, object]]
     formula_sidecars: list[FormulaSidecar]
+    formula_dedup_coverage: list[FormulaSemanticCoverage]
     formula_diagnostics: list[dict[str, object]]
 
 
@@ -83,6 +87,11 @@ def adapt_to_v24(
                 str(element.source_index),
                 element.raw_type,
             )
+            if (
+                element.page_number,
+                element.source_index,
+            ) in formula_assembly.consumed_body:
+                continue
             if element.raw_type == "table":
                 placement = table_assembly.placements.get(
                     (element.page_number, element.source_index)
@@ -243,6 +252,7 @@ def adapt_to_v24(
         table_sidecars=table_assembly.sidecars,
         table_diagnostics=table_assembly.omitted,
         formula_sidecars=formula_assembly.sidecars,
+        formula_dedup_coverage=formula_assembly.dedup_coverage,
         formula_diagnostics=formula_assembly.omitted,
     )
 
