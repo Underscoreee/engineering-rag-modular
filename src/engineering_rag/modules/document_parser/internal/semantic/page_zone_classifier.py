@@ -42,13 +42,37 @@ def classify_pages(
         joined = "\n".join(texts)
         page_type = PageType.UNKNOWN
         reason = "insufficient_visible_zone_evidence"
-        if "条文说明" in joined and "混凝土结构设计规范" in joined:
+        if "条文说明" in joined and "混凝土结构设计规范" in joined and len(joined) < 300:
             page_type = PageType.EXPLANATION_COVER
             reason = "standard_identity_and_explanation_cover_marker"
             explanation_zone = True
+        elif "修订说明" in joined:
+            page_type = PageType.REVISION_NOTES
+            reason = "visible_revision_notes_heading"
+        elif "本规范用词说明" in joined:
+            page_type = PageType.WORDING_RULES
+            reason = "visible_wording_rules_heading"
+        elif "引用标准名录" in joined:
+            page_type = PageType.NORMATIVE_REFERENCES
+            reason = "visible_normative_references_heading"
+        elif any(text.strip().lower() == "contents" for text in texts):
+            page_type = PageType.TOC_EN
+            reason = "visible_english_contents_heading"
         elif _looks_like_toc(texts):
             page_type = PageType.EXPLANATION_TOC if explanation_zone else PageType.TOC_ZH
             reason = "dense_heading_page_number_pairs"
+        elif any(text.replace(" ", "") == "目次" for text in texts):
+            page_type = PageType.EXPLANATION_TOC if explanation_zone else PageType.TOC_ZH
+            reason = "visible_contents_heading"
+        elif _looks_like_publication_notice(joined):
+            page_type = PageType.PUBLICATION_NOTICE
+            reason = "visible_ministry_announcement_heading"
+        elif _looks_like_inner_cover(joined):
+            page_type = PageType.INNER_COVER
+            reason = "standard_identity_with_editor_approval_publisher_markers"
+        elif _looks_like_outer_cover(joined):
+            page_type = PageType.OUTER_COVER
+            reason = "standard_identity_with_release_and_joint_publication_markers"
         elif explanation_zone and (
             _has_structural_candidate(texts) or previous_type == PageType.EXPLANATION_BODY
         ):
@@ -110,3 +134,26 @@ def _looks_like_toc(texts: list[str]) -> bool:
     if not any("目次" in text for text in texts):
         return False
     return sum(bool(re.search(r"\d+\s*$", text)) for text in texts) >= 2
+
+
+def _looks_like_publication_notice(text: str) -> bool:
+    return "公告" in text and "住房和城乡建设部" in text and "发布" in text
+
+
+def _looks_like_inner_cover(text: str) -> bool:
+    return (
+        "混凝土结构设计规范" in text
+        and "主编部门" in text
+        and "批准部门" in text
+        and "出版社" in text
+    )
+
+
+def _looks_like_outer_cover(text: str) -> bool:
+    return (
+        "混凝土结构设计规范" in text
+        and "中华人民共和国国家标准" in text
+        and "发布" in text
+        and "实施" in text
+        and "联合发布" in text
+    )

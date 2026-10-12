@@ -272,16 +272,19 @@ class PyMuPdfDocumentParser:
             raise ParserConfigurationError("MinerU adapter and supplied_standard are required")
 
         def execute(output_dir: Path) -> Document:
-            result = adapter.parse(
-                MinerUParseRequest(
-                    source_pdf=pdf.source_path,
-                    source_sha256=pdf.source_sha256,
-                    original_pages=list(selected_pages),
-                    output_dir=output_dir,
-                    timeout_seconds=settings.engine_timeout_seconds,
-                    tier=settings.mineru_tier,
-                    ocr_mode="ocr",
-                )
+            mineru_request = MinerUParseRequest(
+                source_pdf=pdf.source_path,
+                source_sha256=pdf.source_sha256,
+                original_pages=list(selected_pages),
+                output_dir=output_dir,
+                timeout_seconds=settings.engine_timeout_seconds,
+                tier=settings.mineru_tier,
+                ocr_mode="ocr",
+            )
+            result = (
+                adapter.parse(mineru_request, bundle=True)
+                if settings.mineru_bundle
+                else adapter.parse(mineru_request)
             )
             self.last_mineru_result = result
             adaptation = adapt_to_v24(

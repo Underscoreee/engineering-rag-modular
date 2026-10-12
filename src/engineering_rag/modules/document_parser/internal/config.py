@@ -24,6 +24,7 @@ class ParserSettings:
     engine_timeout_seconds: int = 900
     engine_output_dir: str | None = None
     mineru_tier: str = "basic"
+    mineru_bundle: bool = False
     semantic_structure: bool = False
     semantic_explanation_cover_page: int | None = None
 
@@ -45,6 +46,7 @@ class ParserSettings:
             "engine_timeout_seconds",
             "engine_output_dir",
             "mineru_tier",
+            "mineru_bundle",
             "semantic_structure",
             "semantic_explanation_cover_page",
         }
@@ -100,6 +102,9 @@ class ParserSettings:
                 options.get("engine_output_dir"), "engine_output_dir"
             ),
             mineru_tier=mineru_tier,
+            mineru_bundle=_boolean(
+                options.get("mineru_bundle", defaults.mineru_bundle), "mineru_bundle"
+            ),
             semantic_structure=_boolean(
                 options.get("semantic_structure", defaults.semantic_structure),
                 "semantic_structure",

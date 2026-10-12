@@ -1,0 +1,453 @@
+{
+  "task": "Architecture Task 1.6",
+  "schema_version": "2.4",
+  "schema_status": "FROZEN",
+  "engine": "MinerU",
+  "spec_status": "pending_codex_execution",
+  "source": {
+    "filename": "混凝土结构设计规范(2015年版) GB 50010-2010_纯图版.pdf",
+    "source_sha256": "43048a647d595fc8e16545851491bab82d3df851b91fe227ba2f7f84f5b64682",
+    "size_bytes": 154122112,
+    "page_count": 441,
+    "page_base": 1,
+    "privacy": "local_only",
+    "source_identity_must_be_verified_at_runtime": true
+  },
+  "evaluation_status": "candidate_pending_human_review",
+  "candidate_count": 18,
+  "unique_physical_pages": [
+    1,
+    2,
+    3,
+    9,
+    12,
+    16,
+    24,
+    28,
+    29,
+    37,
+    38,
+    50,
+    126,
+    127,
+    275,
+    276,
+    277,
+    278,
+    279,
+    282,
+    301
+  ],
+  "rules": {
+    "batch_size_max_default": 20,
+    "full_441_pages_run_requires_explicit_approval": true,
+    "no_accuracy_metrics_without_human_verified_gold": true,
+    "keep_execution_modes_separate": [
+      "live_mineru",
+      "replay_saved_raw",
+      "synthetic"
+    ],
+    "report_zero_denominator_as": "not_evaluated"
+  },
+  "real_cases": [
+    {
+      "id": "P001",
+      "kind": "page_type",
+      "physical_pages": [
+        1
+      ],
+      "focus": "扫描封面，检查标准号和名称",
+      "candidate_labels": {
+        "suggested_page_type": "outer_cover"
+      },
+      "golden_status": "candidate_pending_human_review",
+      "source_task_1_2_case_id": "P001"
+    },
+    {
+      "id": "P002",
+      "kind": "page_type",
+      "physical_pages": [
+        2
+      ],
+      "focus": "内封面与发行信息",
+      "candidate_labels": {
+        "suggested_page_type": "inner_cover"
+      },
+      "golden_status": "candidate_pending_human_review",
+      "source_task_1_2_case_id": "P002"
+    },
+    {
+      "id": "P003",
+      "kind": "page_type",
+      "physical_pages": [
+        3
+      ],
+      "focus": "公告页面",
+      "candidate_labels": {
+        "suggested_page_type": "publication_notice"
+      },
+      "golden_status": "candidate_pending_human_review",
+      "source_task_1_2_case_id": "P003"
+    },
+    {
+      "id": "P009",
+      "kind": "page_type",
+      "physical_pages": [
+        9
+      ],
+      "focus": "中文目录",
+      "candidate_labels": {
+        "suggested_page_type": "toc_zh"
+      },
+      "golden_status": "candidate_pending_human_review",
+      "source_task_1_2_case_id": "P009"
+    },
+    {
+      "id": "P012",
+      "kind": "page_type",
+      "physical_pages": [
+        12
+      ],
+      "focus": "英文目录",
+      "candidate_labels": {
+        "suggested_page_type": "toc_en"
+      },
+      "golden_status": "candidate_pending_human_review",
+      "source_task_1_2_case_id": "P012"
+    },
+    {
+      "id": "P016",
+      "kind": "body_text",
+      "physical_pages": [
+        16
+      ],
+      "focus": "正文条文开头与编号",
+      "candidate_labels": {
+        "suggested_page_type": "body",
+        "suggested_clause_number": "1.0.1"
+      },
+      "golden_status": "candidate_pending_human_review",
+      "source_task_1_2_case_id": "P016"
+    },
+    {
+      "id": "P024",
+      "kind": "formula_group",
+      "physical_pages": [
+        24
+      ],
+      "focus": "多个编号公式与符号说明",
+      "candidate_labels": {
+        "suggested_clause_number": "3.3.2",
+        "suggested_equation_numbers": [
+          "(3.3.2-1)",
+          "(3.3.2-2)"
+        ]
+      },
+      "golden_status": "candidate_pending_human_review",
+      "source_task_1_2_case_id": "P024"
+    },
+    {
+      "id": "P028029",
+      "kind": "cross_page_table",
+      "physical_pages": [
+        28,
+        29
+      ],
+      "focus": "续表跨页、注解可能在续页",
+      "candidate_labels": {
+        "suggested_table_number": "表3.5.2"
+      },
+      "golden_status": "candidate_pending_human_review",
+      "source_task_1_2_case_id": "P028029"
+    },
+    {
+      "id": "P037038",
+      "kind": "cross_page_table",
+      "physical_pages": [
+        37,
+        38
+      ],
+      "focus": "多级表头与续表",
+      "candidate_labels": {
+        "suggested_table_number": "表4.2.2-2"
+      },
+      "golden_status": "candidate_pending_human_review",
+      "source_task_1_2_case_id": "P037038"
+    },
+    {
+      "id": "P050",
+      "kind": "formula_group",
+      "physical_pages": [
+        50
+      ],
+      "focus": "多个有编号公式及符号解释",
+      "candidate_labels": {
+        "suggested_clause_number": "6.2.1"
+      },
+      "golden_status": "candidate_pending_human_review",
+      "source_task_1_2_case_id": "P050"
+    },
+    {
+      "id": "P126127",
+      "kind": "cross_page_table_and_clause",
+      "physical_pages": [
+        126,
+        127
+      ],
+      "focus": "跨页续表结束后新条文开始",
+      "candidate_labels": {
+        "suggested_table_number": "表9.1.2",
+        "suggested_next_clause": "9.1.3"
+      },
+      "golden_status": "candidate_pending_human_review",
+      "source_task_1_2_case_id": "P126127"
+    },
+    {
+      "id": "P275",
+      "kind": "page_type",
+      "physical_pages": [
+        275
+      ],
+      "focus": "规范用词说明",
+      "candidate_labels": {
+        "suggested_page_type": "wording_rules"
+      },
+      "golden_status": "candidate_pending_human_review",
+      "source_task_1_2_case_id": "P275"
+    },
+    {
+      "id": "P276",
+      "kind": "page_type",
+      "physical_pages": [
+        276
+      ],
+      "focus": "引用标准名录",
+      "candidate_labels": {
+        "suggested_page_type": "normative_references"
+      },
+      "golden_status": "candidate_pending_human_review",
+      "source_task_1_2_case_id": "P276"
+    },
+    {
+      "id": "P277",
+      "kind": "page_type",
+      "physical_pages": [
+        277
+      ],
+      "focus": "条文说明封面",
+      "candidate_labels": {
+        "suggested_page_type": "explanation_cover"
+      },
+      "golden_status": "candidate_pending_human_review",
+      "source_task_1_2_case_id": "P277"
+    },
+    {
+      "id": "P278",
+      "kind": "page_type",
+      "physical_pages": [
+        278
+      ],
+      "focus": "说明修订说明",
+      "candidate_labels": {
+        "suggested_page_type": "revision_notes"
+      },
+      "golden_status": "candidate_pending_human_review",
+      "source_task_1_2_case_id": "P278"
+    },
+    {
+      "id": "P279",
+      "kind": "page_type",
+      "physical_pages": [
+        279
+      ],
+      "focus": "条文说明目次",
+      "candidate_labels": {
+        "suggested_page_type": "explanation_toc"
+      },
+      "golden_status": "candidate_pending_human_review",
+      "source_task_1_2_case_id": "P279"
+    },
+    {
+      "id": "P282",
+      "kind": "explanation_clause",
+      "physical_pages": [
+        282
+      ],
+      "focus": "条文说明正文和同号条文身份",
+      "candidate_labels": {
+        "suggested_page_type": "explanation_body",
+        "suggested_clause_number": "1.0.1"
+      },
+      "golden_status": "candidate_pending_human_review",
+      "source_task_1_2_case_id": "P282"
+    },
+    {
+      "id": "P301",
+      "kind": "formula_unnumbered",
+      "physical_pages": [
+        301
+      ],
+      "focus": "展示公式无印刷编号；复核后才能确认为无号",
+      "candidate_labels": {
+        "suggested_clause_number": "4.1.5",
+        "suggested_equation_number_status": "confirmed_absent"
+      },
+      "golden_status": "candidate_pending_human_review",
+      "source_task_1_2_case_id": "P301"
+    }
+  ],
+  "integration_cases": [
+    {
+      "id": "E2E-A01",
+      "pages": [
+        16
+      ],
+      "mode": "live_mineru",
+      "focus": "single page smoke test + Document V2.4 + provenance"
+    },
+    {
+      "id": "E2E-A02",
+      "pages": [
+        49,
+        50
+      ],
+      "mode": "live_mineru_or_replay_saved_raw",
+      "focus": "cross-page clause + numbered equations + condition-dedup + symbol explanations"
+    },
+    {
+      "id": "E2E-A03",
+      "pages": [
+        28,
+        29
+      ],
+      "mode": "live_mineru_or_replay_saved_raw",
+      "focus": "table 3.5.2 continuation + notes"
+    },
+    {
+      "id": "E2E-A04",
+      "pages": [
+        37,
+        38
+      ],
+      "mode": "live_mineru_or_replay_saved_raw",
+      "focus": "table 4.2.2-2 multi-level header"
+    },
+    {
+      "id": "E2E-A05",
+      "pages": [
+        126,
+        127
+      ],
+      "mode": "live_mineru_or_replay_saved_raw",
+      "focus": "table 9.1.2 continuation + next clause 9.1.3"
+    },
+    {
+      "id": "E2E-A06",
+      "pages": [
+        16,
+        282
+      ],
+      "mode": "live_mineru_or_replay_saved_raw",
+      "focus": "normative-explanations independent clause identities"
+    },
+    {
+      "id": "E2E-A07",
+      "pages": [
+        301
+      ],
+      "mode": "live_mineru_or_replay_saved_raw",
+      "focus": "unknown zone without cover evidence, unnumbered formula status, pending"
+    },
+    {
+      "id": "E2E-A08",
+      "pages": [
+        1,
+        2,
+        3,
+        9,
+        12,
+        16,
+        24,
+        28,
+        29,
+        37,
+        38,
+        50,
+        126,
+        127,
+        275,
+        276,
+        277,
+        278,
+        279,
+        282,
+        301
+      ],
+      "mode": "live_mineru",
+      "focus": "representative 21 physical pages: batch <=20, strict merged V2.4 output",
+      "requires_resource_preflight": true
+    }
+  ],
+  "failure_injection_cases": [
+    {
+      "id": "FAIL01",
+      "scenario": "different PDF hash with same document_id",
+      "expected": "reject as source_identity_mismatch"
+    },
+    {
+      "id": "FAIL02",
+      "scenario": "incorrect 0-based original page mapping",
+      "expected": "reject or correct only using authoritative source mapping"
+    },
+    {
+      "id": "FAIL03",
+      "scenario": "overlapping duplicate page with conflicting block data",
+      "expected": "fail closed and preserve diagnostics"
+    },
+    {
+      "id": "FAIL04",
+      "scenario": "OCR equation condition duplicated in body block",
+      "expected": "dedup exact consumed spans, retain unresolved content"
+    },
+    {
+      "id": "FAIL05",
+      "scenario": "MinerU exits nonzero or times out",
+      "expected": "failed checkpoint, no fake success; resume available"
+    },
+    {
+      "id": "FAIL06",
+      "scenario": "corrupted middle_json/ZIP and forged manifest output hash",
+      "expected": "integrity mismatch and no unsafe extraction"
+    },
+    {
+      "id": "FAIL07",
+      "scenario": "crash after complete batch before final Document commit",
+      "expected": "atomic snapshot; idempotent resume without rerunning successful batch"
+    },
+    {
+      "id": "FAIL08",
+      "scenario": "mixed normative and explanation blocks with absent zone evidence",
+      "expected": "unknown and pending, not coerced to body"
+    },
+    {
+      "id": "FAIL09",
+      "scenario": "span bbox outside parent Block bbox",
+      "expected": "reject or conservative no-split diagnostic"
+    },
+    {
+      "id": "FAIL10",
+      "scenario": "no verified golden labels",
+      "expected": "quality metrics not_evaluated, coverage metrics still available"
+    },
+    {
+      "id": "FAIL11",
+      "scenario": "full document run without explicit user confirmation",
+      "expected": "NOT_RUN and display resource budget"
+    },
+    {
+      "id": "FAIL12",
+      "scenario": "previously succeeded batch produced under different model config",
+      "expected": "not reused by resume"
+    }
+  ]
+}

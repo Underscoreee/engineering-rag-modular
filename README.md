@@ -1,6 +1,6 @@
 # Engineering RAG
 
-面向工程规范、建设标准与图集 PDF 的模块化单体 RAG 项目。**Document Schema V2.4 已于 2026-10-11 正式冻结（FROZEN）**。Architecture Task 1.1 已实现安全 PDF/OCR partial Document；Task 1.2 增加本地 MinerU 4.x 私有适配器；Task 1.3 增加复杂表格与跨页续表恢复；Task 1.4 增加公式编号、保守分组、“式中”符号解释及 V2.4 公式 Block 映射；Task 1.5 增加工程规范页面分区、Section/Clause、正文—条文说明关联与引用式内容装配。所有机器结果仍为待核验的部分解析候选。Chunking、检索、LLM 与外部存储后端尚未实现。
+面向工程规范、建设标准与图集 PDF 的模块化单体 RAG 项目。**Document Schema V2.4 已于 2026-10-11 正式冻结（FROZEN）**。Architecture Task 1.1～1.5 已完成 PDF/OCR、MinerU 私有适配、复杂表格、公式与章节/条文结构化；Task 1.6 增加可恢复的端到端批次编排、严格来源合并、真实代表页回放和人工 Golden Dataset 评估入口。机器结果仍是待核验的部分解析候选。Chunking、检索、LLM 与外部存储后端尚未实现。
 
 ## 安装与检查
 
@@ -59,4 +59,22 @@ python scripts/assemble_mineru_clauses.py \
 Task 1.5 四项语义来源修复、反例与真实回放结果见
 [修复报告](docs/task-1.5-semantic-source-repair.md)。`runs/final/` 是只读对照基线；修复后
 Document、diff、manifest 和 overlays 单独保存在 `runs/repair-20261012/`。
+
+Task 1.6 端到端入口严格区分真实推理和保存产物回放：
+
+```bash
+python scripts/run_document_parser_e2e.py \
+  --mode live_mineru \
+  --pdf '混凝土结构设计规范(2015年版) GB 50010-2010_纯图版.pdf' \
+  --pages 16 \
+  --run-id live-p16 \
+  --output data/eval/task1_6_e2e/runs/live-p16
+```
+
+同一来源、配置、模型签名和产物哈希全部一致时，可加 `--resume` 复用成功批次。
+21 页代表集的真实运行结论为 20/21 页成功；第 24 页触发 MinerU 4.0.12
+`Unsupported warp settings`，因此 Task 1.6 当前为 PARTIAL。完整说明见
+[端到端报告](docs/task-1.6-end-to-end-report.md)、
+[质量分析](docs/task-1.6-quality-analysis.md)和
+[运行与恢复手册](docs/task-1.6-operations.md)。441 页全本未获授权且未运行。
 
