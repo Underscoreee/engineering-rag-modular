@@ -24,6 +24,8 @@ class ParserSettings:
     engine_timeout_seconds: int = 900
     engine_output_dir: str | None = None
     mineru_tier: str = "basic"
+    semantic_structure: bool = False
+    semantic_explanation_cover_page: int | None = None
 
     @classmethod
     def from_contract(cls, config: ParseConfig | None) -> "ParserSettings":
@@ -43,6 +45,8 @@ class ParserSettings:
             "engine_timeout_seconds",
             "engine_output_dir",
             "mineru_tier",
+            "semantic_structure",
+            "semantic_explanation_cover_page",
         }
         unknown = sorted(set(options) - allowed)
         if unknown:
@@ -96,6 +100,14 @@ class ParserSettings:
                 options.get("engine_output_dir"), "engine_output_dir"
             ),
             mineru_tier=mineru_tier,
+            semantic_structure=_boolean(
+                options.get("semantic_structure", defaults.semantic_structure),
+                "semantic_structure",
+            ),
+            semantic_explanation_cover_page=_optional_positive_int(
+                options.get("semantic_explanation_cover_page"),
+                "semantic_explanation_cover_page",
+            ),
         )
 
     def resolve_pages(self, page_count: int) -> tuple[int, ...]:
@@ -160,6 +172,12 @@ def _positive_int(value: object, name: str) -> int:
     if isinstance(value, bool) or not isinstance(value, int) or value <= 0:
         raise ParserConfigurationError(f"{name} must be a positive integer")
     return value
+
+
+def _optional_positive_int(value: object, name: str) -> int | None:
+    if value is None:
+        return None
+    return _positive_int(value, name)
 
 
 def _boolean(value: object, name: str) -> bool:

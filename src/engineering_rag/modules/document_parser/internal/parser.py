@@ -34,6 +34,7 @@ from .mineru.v24_adapter import adapt_to_v24
 from .ocr import PageTextRecognizer
 from .ocr_rapidocr import RapidOcrRecognizer
 from .pdf_backend import PdfDocument, PyMuPdfBackend, pixel_bbox_to_pdf
+from .semantic import SemanticAssemblyResult, assemble_semantics
 
 PARSER_ID = "engineering_rag.document_parser.pymupdf_ocr"
 PARSER_VERSION = "1.1.0"
@@ -70,10 +71,12 @@ class PyMuPdfDocumentParser:
         self._mineru_adapter = mineru_adapter
         self.last_diagnostics: ParserDiagnostics | None = None
         self.last_mineru_result: MinerUParseResult | None = None
+        self.last_semantic_result: SemanticAssemblyResult | None = None
 
     def parse(self, request: ParseRequest) -> Document:
         self.last_diagnostics = None
         self.last_mineru_result = None
+        self.last_semantic_result = None
         if request.supplied_standard is None:
             raise ParserConfigurationError(
                 "supplied_standard is required; Task 1.1 does not infer identity from filenames"
@@ -281,12 +284,28 @@ class PyMuPdfDocumentParser:
                 )
             )
             self.last_mineru_result = result
-            return adapt_to_v24(
+            adaptation = adapt_to_v24(
                 result,
                 source_file=request.source_file,
                 standard=standard,
                 page_count=page_count,
-            ).document
+            )
+            if not settings.semantic_structure:
+                return adaptation.document
+            incomplete_blocks = {
+                sidecar.block_id
+                for coverage in adaptation.formula_dedup_coverage
+                if coverage.cross_page_incomplete
+                for sidecar in adaptation.formula_sidecars
+                if sidecar.formula_group_id == coverage.target_formula_group_id
+            }
+            semantic = assemble_semantics(
+                adaptation.document,
+                incomplete_block_ids=incomplete_blocks,
+                known_explanation_cover_page=settings.semantic_explanation_cover_page,
+            )
+            self.last_semantic_result = semantic
+            return semantic.document
 
         if settings.engine_output_dir is not None:
             return execute(Path(settings.engine_output_dir))

@@ -179,6 +179,29 @@ def test_parser_mineru_path_returns_frozen_partial_document(tmp_path: Path) -> N
     assert parser.last_mineru_result is not None
 
 
+def test_parser_mineru_semantic_option_returns_structured_document(tmp_path: Path) -> None:
+    content = make_text_pdf(["first"])
+    store, request = request_for(
+        content,
+        pages="1",
+        options={
+            "document_engine": "mineru",
+            "engine_output_dir": str(tmp_path),
+            "mineru_tier": "basic",
+            "semantic_structure": True,
+        },
+    )
+    parser = PyMuPdfDocumentParser(
+        store,
+        mineru_adapter=_SemanticFakeAdapter(tmp_path),  # type: ignore[arg-type]
+    )
+    document = parser.parse(request)
+    assert [section.number for section in document.sections] == ["1"]
+    assert [clause.clause_number for clause in document.clauses.normative] == ["1.0.1"]
+    assert parser.last_semantic_result is not None
+    assert document.processing.parser_version == "1.5.0"
+
+
 def _result(tmp_path: Path, page: MinerUPage) -> MinerUParseResult:
     return MinerUParseResult(
         schema_id="docvortex.middle",
@@ -221,6 +244,40 @@ class _FakeAdapter:
                         text="真实引擎候选",
                         raw={"type": "text"},
                     )
+                ],
+            ),
+        )
+
+
+class _SemanticFakeAdapter(_FakeAdapter):
+    def parse(self, request: object) -> MinerUParseResult:
+        page_number = request.original_pages[0]
+        return _result(
+            self.tmp_path,
+            MinerUPage(
+                page_number=page_number,
+                page_idx=page_number - 1,
+                width_points=360,
+                height_points=240,
+                elements=[
+                    MinerUElement(
+                        page_number=page_number,
+                        page_idx=page_number - 1,
+                        source_index=0,
+                        raw_type="paragraph_title",
+                        bbox={"x_min": 0.1, "y_min": 0.1, "x_max": 0.8, "y_max": 0.2},
+                        text="1 总则",
+                        raw={"type": "paragraph_title"},
+                    ),
+                    MinerUElement(
+                        page_number=page_number,
+                        page_idx=page_number - 1,
+                        source_index=1,
+                        raw_type="text",
+                        bbox={"x_min": 0.1, "y_min": 0.3, "x_max": 0.8, "y_max": 0.4},
+                        text="1.0.1 虚构测试条文。",
+                        raw={"type": "text"},
+                    ),
                 ],
             ),
         )

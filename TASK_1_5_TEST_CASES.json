@@ -1,0 +1,391 @@
+{
+  "task": "Architecture Task 1.5",
+  "schema_version": "2.4",
+  "schema_status": "FROZEN",
+  "engine": "MinerU",
+  "status": "task_specification_only",
+  "real_pdf": "混凝土结构设计规范(2015年版) GB 50010-2010_纯图版.pdf",
+  "page_number_policy": "physical_pdf_pages_are_1_based",
+  "golden_dataset_status": "candidate_only_pending_manual_review",
+  "task14_dependency": "formula semantic-block correction must be independently verified; do not assume accepted",
+  "real_cases": [
+    {
+      "id": "GB-C01",
+      "physical_pdf_pages": [
+        16
+      ],
+      "focus": [
+        "normative_page",
+        "chapter_1",
+        "clauses_1_0_x"
+      ],
+      "observation_or_expected_behavior": "第1章“总则”和多条1.0.x正文条文；不能读取印刷页码作为physical page",
+      "requires_actual_mineru_raw_json": true,
+      "gold_status": "pending"
+    },
+    {
+      "id": "GB-C02",
+      "physical_pdf_pages": [
+        49,
+        50
+      ],
+      "focus": [
+        "chapter_6",
+        "section_6_2",
+        "cross_page_clause_6_2_1",
+        "list_items",
+        "formula_groups"
+      ],
+      "observation_or_expected_behavior": "第49页出现条文起点，第50页分项2–5和两组公式是跨页延续；须以真实MinerU输出核对",
+      "requires_actual_mineru_raw_json": true,
+      "gold_status": "pending"
+    },
+    {
+      "id": "GB-C03",
+      "physical_pdf_pages": [
+        50
+      ],
+      "focus": [
+        "orphan_continuation_without_start"
+      ],
+      "observation_or_expected_behavior": "第50页单独解析不得凭推断创建6.2.1 Clause；必须保留等待第49页",
+      "requires_actual_mineru_raw_json": true,
+      "gold_status": "pending"
+    },
+    {
+      "id": "GB-C04",
+      "physical_pdf_pages": [
+        126,
+        127
+      ],
+      "focus": [
+        "table_cross_page",
+        "clause_boundary",
+        "9_1_3"
+      ],
+      "observation_or_expected_behavior": "表9.1.2跨页，后续9.1.3不属于该表或上一条",
+      "requires_actual_mineru_raw_json": true,
+      "gold_status": "pending"
+    },
+    {
+      "id": "GB-C05",
+      "physical_pdf_pages": [
+        28,
+        29
+      ],
+      "focus": [
+        "table_in_clause",
+        "table_continuation"
+      ],
+      "observation_or_expected_behavior": "续表来源和Clause归属候选；需有真实原始解析证明",
+      "requires_actual_mineru_raw_json": true,
+      "gold_status": "pending"
+    },
+    {
+      "id": "GB-C06",
+      "physical_pdf_pages": [
+        37,
+        38
+      ],
+      "focus": [
+        "multi_header_table",
+        "clause_order"
+      ],
+      "observation_or_expected_behavior": "多级表头与跨页表格归属候选",
+      "requires_actual_mineru_raw_json": true,
+      "gold_status": "pending"
+    },
+    {
+      "id": "GB-C07",
+      "physical_pdf_pages": [
+        277
+      ],
+      "focus": [
+        "explanation_cover_no_clause"
+      ],
+      "observation_or_expected_behavior": "第277页为条文说明封面，禁止生成说明Clause",
+      "requires_actual_mineru_raw_json": true,
+      "gold_status": "pending"
+    },
+    {
+      "id": "GB-C08",
+      "physical_pdf_pages": [
+        282
+      ],
+      "focus": [
+        "explanation_body",
+        "same_number_independent_identity",
+        "pending_link"
+      ],
+      "observation_or_expected_behavior": "条文说明1.0.1，若正文1.0.1未加载，pending 而非悬空链接",
+      "requires_actual_mineru_raw_json": true,
+      "gold_status": "pending"
+    },
+    {
+      "id": "GB-C09",
+      "physical_pdf_pages": [
+        16,
+        282
+      ],
+      "focus": [
+        "normative_to_explanation_link",
+        "two_section_trees"
+      ],
+      "observation_or_expected_behavior": "同一文档同时加载正文与说明，进行同号条文有证据关联",
+      "requires_actual_mineru_raw_json": true,
+      "gold_status": "pending"
+    },
+    {
+      "id": "GB-C10",
+      "physical_pdf_pages": [
+        301
+      ],
+      "focus": [
+        "explanation_body",
+        "formula_not_clause"
+      ],
+      "observation_or_expected_behavior": "条文说明正文与无编号公式；不可当新条文编号",
+      "requires_actual_mineru_raw_json": true,
+      "gold_status": "pending"
+    },
+    {
+      "id": "GB-C11",
+      "physical_pdf_pages": [
+        1,
+        2,
+        3
+      ],
+      "focus": [
+        "front_matter",
+        "no_fake_clauses"
+      ],
+      "observation_or_expected_behavior": "封面/公告等非正文应被排除，具体类型以实际版面为准",
+      "requires_actual_mineru_raw_json": true,
+      "gold_status": "pending"
+    }
+  ],
+  "synthetic_cases": [
+    {
+      "id": "S01",
+      "description": "章节父子和structure_path",
+      "category": "positive",
+      "expected_behavior": "章节1->1.1 且path延伸正确"
+    },
+    {
+      "id": "S02",
+      "description": "章节路径冲突",
+      "category": "negative",
+      "expected_behavior": "编号1.1但path为[1,9]应回退并记录"
+    },
+    {
+      "id": "S03",
+      "description": "正文与说明同号",
+      "category": "positive",
+      "expected_behavior": "两个clause_id不同，独立source/page/section"
+    },
+    {
+      "id": "S04",
+      "description": "未知页类型不强造Clause",
+      "category": "negative",
+      "expected_behavior": "unknown页保留候选且没有normative Clause"
+    },
+    {
+      "id": "S05",
+      "description": "目录编号不是正文条文",
+      "category": "negative",
+      "expected_behavior": "toc_zh的1.0.1不产生Clause"
+    },
+    {
+      "id": "S06",
+      "description": "条文编号与分项编号区分",
+      "category": "negative",
+      "expected_behavior": "单行2 纵向...不是Clause 2"
+    },
+    {
+      "id": "S07",
+      "description": "正文中的公式编号引用",
+      "category": "negative",
+      "expected_behavior": "“按式(6.2.1-1)”不产生Clause或Formula"
+    },
+    {
+      "id": "S08",
+      "description": "表号不是条文号",
+      "category": "negative",
+      "expected_behavior": "表9.1.2不生成Clause 9.1.2"
+    },
+    {
+      "id": "S09",
+      "description": "一页多条文边界",
+      "category": "positive",
+      "expected_behavior": "独立Clause相邻起止无交叠或正文复制"
+    },
+    {
+      "id": "S10",
+      "description": "同一OCR Block含两条文",
+      "category": "edge",
+      "expected_behavior": "有span+bbox才拆分，保留ID lineage"
+    },
+    {
+      "id": "S11",
+      "description": "无法安全拆分",
+      "category": "negative",
+      "expected_behavior": "保留原Block与诊断，禁止复制字符串构造两个Clause"
+    },
+    {
+      "id": "S12",
+      "description": "跨页条文",
+      "category": "positive",
+      "expected_behavior": "两页来源、单一Clause、page_start/end准确"
+    },
+    {
+      "id": "S13",
+      "description": "孤立续页",
+      "category": "edge",
+      "expected_behavior": "无条文起点则pending，不编造所属条文"
+    },
+    {
+      "id": "S14",
+      "description": "跨页LogicalTable完整覆盖",
+      "category": "positive",
+      "expected_behavior": "table Unit包含fragments的所有source_block_ids"
+    },
+    {
+      "id": "S15",
+      "description": "跨页表格仅引用首页",
+      "category": "negative",
+      "expected_behavior": "应被验出或推迟构造，不得通过validator"
+    },
+    {
+      "id": "S16",
+      "description": "表后出现新Clause",
+      "category": "positive",
+      "expected_behavior": "新Clause不引用上一表或前一个条文的block"
+    },
+    {
+      "id": "S17",
+      "description": "组级五条公式的ContentUnit",
+      "category": "positive",
+      "expected_behavior": "一个source formula Block，五个实际formula_ids按序"
+    },
+    {
+      "id": "S18",
+      "description": "FormulaGroup与body去重",
+      "category": "positive",
+      "expected_behavior": "条件及式中仅一次、七式完整"
+    },
+    {
+      "id": "S19",
+      "description": "Formula Unit引用虚构ID",
+      "category": "negative",
+      "expected_behavior": "拒绝悬空formula_id"
+    },
+    {
+      "id": "S20",
+      "description": "Clause.source_block_ids顺序不一致",
+      "category": "negative",
+      "expected_behavior": "严格与units来源按顺序去重一致"
+    },
+    {
+      "id": "S21",
+      "description": "解释链接正文不存在",
+      "category": "negative",
+      "expected_behavior": "explains_clause_id=null并进入pending sidecar"
+    },
+    {
+      "id": "S22",
+      "description": "解释链接已有可信正文",
+      "category": "positive",
+      "expected_behavior": "解释精确引用normative clause_id"
+    },
+    {
+      "id": "S23",
+      "description": "无法确认的同号链接",
+      "category": "edge",
+      "expected_behavior": "有歧义则只留pending不硬匹配"
+    },
+    {
+      "id": "S24",
+      "description": "强制条文候选没有权威证据",
+      "category": "negative",
+      "expected_behavior": "is_mandatory=null, mandatory_evidence=[]"
+    },
+    {
+      "id": "S25",
+      "description": "核验强条证据字段",
+      "category": "positive",
+      "expected_behavior": "UTC/来源/审核人/结论满足Frozen校验"
+    },
+    {
+      "id": "S26",
+      "description": "派生plain_text缓存正确",
+      "category": "positive",
+      "expected_behavior": "renderer输出与version/digest一致"
+    },
+    {
+      "id": "S27",
+      "description": "缓存不完整",
+      "category": "negative",
+      "expected_behavior": "缺来源plain_text/version/digest全null"
+    },
+    {
+      "id": "S28",
+      "description": "重试稳定ID",
+      "category": "positive",
+      "expected_behavior": "同输入跨轮次ID/组顺序一致"
+    },
+    {
+      "id": "S29",
+      "description": "来源页冲突",
+      "category": "negative",
+      "expected_behavior": "说明Clause不可引用body来源页"
+    },
+    {
+      "id": "S30",
+      "description": "未处理页面与partial",
+      "category": "edge",
+      "expected_behavior": "not_processed页不意味着空白或内容已完整"
+    },
+    {
+      "id": "S31",
+      "description": "图片资产缺失",
+      "category": "negative",
+      "expected_behavior": "不能制造asset_id或image Unit"
+    },
+    {
+      "id": "S32",
+      "description": "大公式组已有ContentUnit引用迁移",
+      "category": "edge",
+      "expected_behavior": "更新旧新block ID或安全失败，不许dangling"
+    },
+    {
+      "id": "S33",
+      "description": "印刷页码不是物理页码",
+      "category": "negative",
+      "expected_behavior": "物理页50但印刷35不替换page_number"
+    },
+    {
+      "id": "S34",
+      "description": "章节候选缺父级",
+      "category": "edge",
+      "expected_behavior": "保守待定；不得凭目录虚构父级"
+    },
+    {
+      "id": "S35",
+      "description": "跨组错误父节点",
+      "category": "negative",
+      "expected_behavior": "explanation section不能以normative section作parent"
+    },
+    {
+      "id": "S36",
+      "description": "OCR修正后重新派生缓存",
+      "category": "positive",
+      "expected_behavior": "renderer重新计算，旧digest不能复用"
+    }
+  ],
+  "minimum_outputs": [
+    "document.semantic.partial.json",
+    "semantic_source_lineage.json",
+    "semantic_pending_links.json",
+    "TASK_1_5_IMPLEMENTATION_REPORT.md"
+  ]
+}

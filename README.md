@@ -1,6 +1,6 @@
 # Engineering RAG
 
-面向工程规范、建设标准与图集 PDF 的模块化单体 RAG 项目。**Document Schema V2.4 已于 2026-10-11 正式冻结（FROZEN）**。Architecture Task 1.1 已实现安全 PDF/OCR partial Document；Task 1.2 增加本地 MinerU 4.x 私有适配器；Task 1.3 增加复杂表格与跨页续表恢复；Task 1.4 增加公式编号、保守分组、“式中”符号解释及 V2.4 公式 Block 映射。所有机器结果仍为待核验候选。领域页面分类、Clause/Section、Chunking、检索、LLM 与外部存储后端尚未实现。
+面向工程规范、建设标准与图集 PDF 的模块化单体 RAG 项目。**Document Schema V2.4 已于 2026-10-11 正式冻结（FROZEN）**。Architecture Task 1.1 已实现安全 PDF/OCR partial Document；Task 1.2 增加本地 MinerU 4.x 私有适配器；Task 1.3 增加复杂表格与跨页续表恢复；Task 1.4 增加公式编号、保守分组、“式中”符号解释及 V2.4 公式 Block 映射；Task 1.5 增加工程规范页面分区、Section/Clause、正文—条文说明关联与引用式内容装配。所有机器结果仍为待核验的部分解析候选。Chunking、检索、LLM 与外部存储后端尚未实现。
 
 ## 安装与检查
 
@@ -45,4 +45,12 @@ Parser Task 1.1 的行为、OCR 后端与实测结果分别见 [实现说明](do
 Task 1.3 的表格保真政策、三组真实 GB 50010 结果、可复现命令与 Known Issues 见 [复杂表格报告](docs/task-1.3-complex-tables.md)。
 
 Task 1.4 的公式编号三态、分组与符号解释策略、三页真实结果及页 24 回退记录见 [公式结构化报告](docs/task-1.4-formulas.md)。
+
+Task 1.5 的章节/条文边界、跨页内容引用、说明关联、安全退化策略及真实页结果见 [语义结构化报告](docs/task-1.5-semantic-structure.md)。真实回放命令：
+
+```bash
+python scripts/assemble_mineru_clauses.py \
+  --pdf '混凝土结构设计规范(2015年版) GB 50010-2010_纯图版.pdf' \
+  --output data/eval/task1_5_semantics/runs/final/GB-COMBINED
+```
 
