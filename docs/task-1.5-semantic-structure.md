@@ -8,7 +8,8 @@
 
 ## 保守识别规则
 
-- 页面分类先于 Clause。`body` / `explanation_body` 需要可见章、节、条文证据或已建立文档区段的连续性；277 页由标准身份和“条文说明”标记识别为 `explanation_cover`。
+- 页面分类先于 Clause。新建 `body` 区段要求 Title Block、页顶版面位置、标题—条文编号层级相互印证，且不能有明确的修订说明语境；仅有三段式编号不足以判定正文。`explanation_body` 依据已核验说明封面或已建立的连续说明区段；277 页由标准身份和“条文说明”标记识别为 `explanation_cover`。
+- 无法分区的页保持 `unknown`，不强制创建 Clause。实质文本、表格、公式和图像按页合并为 `unclassified_content` pending，保留 block ID、物理页、bbox 和阻断条件；纯数字页脚依明示政策排除。补入相邻页后同一 Block 被 Clause 消费时，该 pending 自动消失。
 - 只把 Title Block 中有合法层级的章、节写入 Section；正文与说明命名空间隔离。缺父章节的节候选进入 pending。
 - 只把 Body Block 段首三段式编号识别为 Clause。分项、表号、公式号、引用、页脚不创建 Clause。跨页需要连续物理页和同一内容组。
 - table ContentUnit 引用 LogicalTable 的全部 fragment block；formula ContentUnit 引用一个 FormulaGroup Block 及其中真实 formula IDs。条件和“式中”解释不再生成重复 Body Unit。
@@ -28,14 +29,16 @@
 - 282：说明章 1 与 1.0.1～1.0.3；组合文档中与已加载正文唯一同号条文关联。
 - 301：分类为说明正文；因 4.1 父 Section 未加载，4.1.4～4.1.6 及无编号公式保留 pending，不制造章节或条文。
 
-组合产物统计：8 页、7 个 Section、14 个正文 Clause、3 个说明 Clause、13 个 pending 关系。实际 JSON、manifest、lineage、pending、摘要、结果和八张 overlay 位于 `data/eval/task1_5_semantics/runs/final/GB-COMBINED/`。该目录由数据策略忽略，不覆盖历史 Task 1.2～1.4 产物。
+组合产物统计：8 页、7 个 Section、14 个正文 Clause、3 个说明 Clause、13 个 pending 关系。原始验收基线位于 `data/eval/task1_5_semantics/runs/final/GB-COMBINED/` 并保持只读。四项修复从同一组真实 MinerU normalized 产物重放到 `data/eval/task1_5_semantics/runs/repair-20261012/GB-COMBINED/`，额外生成 `repair_diff.json` 和 `repair_replay_manifest.json`。数据目录按项目策略忽略，未覆盖任何 Task 1.2～1.5 历史产物。
 
 ## 回放与测试
 
 ```bash
 python scripts/assemble_mineru_clauses.py \
   --pdf '混凝土结构设计规范(2015年版) GB 50010-2010_纯图版.pdf' \
-  --output data/eval/task1_5_semantics/runs/final/GB-COMBINED
+  --output data/eval/task1_5_semantics/runs/repair-20261012/GB-COMBINED \
+  --comparison-baseline \
+    data/eval/task1_5_semantics/runs/final/GB-COMBINED/document.semantic.partial.json
 ENGINEERING_RAG_RUN_REAL_MINERU=1 \
   python -m pytest tests/integration/test_task1_5_real_semantics.py -q
 ```

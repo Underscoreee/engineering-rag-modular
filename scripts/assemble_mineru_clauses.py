@@ -7,6 +7,7 @@ import argparse
 import hashlib
 import json
 import time
+from datetime import UTC, datetime
 from pathlib import Path
 from uuid import NAMESPACE_URL, uuid5
 
@@ -14,6 +15,8 @@ from engineering_rag.contracts.common import FileRef
 from engineering_rag.contracts.documents import (
     ClauseGroups,
     Document,
+    LogicalTable,
+    Page,
     ProcessingMetadata,
     StandardMetadata,
 )
@@ -121,6 +124,20 @@ def main() -> int:
         },
     )
     _render_overlays(args.pdf, semantic.document, output / "overlays")
+    if args.comparison_baseline is not None:
+        _write_json(
+            output / "repair_diff.json",
+            _repair_diff(args.comparison_baseline, semantic.document, semantic.statistics),
+        )
+        _write_json(
+            output / "repair_replay_manifest.json",
+            _repair_replay_manifest(
+                output,
+                args.comparison_baseline,
+                normalized_paths,
+                args.pdf,
+            ),
+        )
     print(
         json.dumps(
             {
@@ -138,17 +155,20 @@ def _merge_documents(documents: list[Document]) -> Document:
     if not documents:
         raise SystemExit("at least one normalized input is required")
     base = documents[0]
-    if any(document.document_id != base.document_id for document in documents):
-        raise SystemExit("normalized inputs do not share one document identity")
+    _validate_merge_source_identity(base, documents)
     pages = sorted(
         [page for document in documents for page in document.pages],
         key=lambda page: page.page_number,
     )
     if len({page.page_number for page in pages}) != len(pages):
         raise SystemExit("normalized inputs contain duplicate physical pages")
+    block_ids = [block.block_id for page in pages for block in page.blocks]
+    if len(set(block_ids)) != len(block_ids):
+        raise SystemExit("normalized inputs contain duplicate block identities")
     tables = [table for document in documents for table in document.tables]
     if len({table.table_id for table in tables}) != len(tables):
         raise SystemExit("normalized inputs contain duplicate table identities")
+    _validate_merged_table_fragments(pages, tables)
     warnings = [warning for document in documents for warning in document.processing.warnings]
     payload = base.model_dump(mode="json")
     payload.update(
@@ -165,6 +185,79 @@ def _merge_documents(documents: list[Document]) -> Document:
         ).model_dump(mode="json"),
     )
     return Document.model_validate(payload)
+
+
+def _validate_merge_source_identity(base: Document, documents: list[Document]) -> None:
+    """Fail closed before combining evidence from independently parsed batches."""
+
+    if base.source_file.sha256 is None:
+        raise SystemExit(
+            "source identity cannot be verified: source_file.sha256 is required or a trusted "
+            "upstream manifest must resolve it"
+        )
+    expected = {
+        "document_id": base.document_id,
+        "source_file.file_id": base.source_file.file_id,
+        "source_file.sha256": base.source_file.sha256,
+        "page_count": base.page_count,
+        "standard.standard_code": base.standard.standard_code,
+        "standard.edition": base.standard.edition,
+        "bbox_coordinate_system": base.bbox_coordinate_system.model_dump(mode="json"),
+    }
+    for batch_index, document in enumerate(documents[1:], start=1):
+        actual = {
+            "document_id": document.document_id,
+            "source_file.file_id": document.source_file.file_id,
+            "source_file.sha256": document.source_file.sha256,
+            "page_count": document.page_count,
+            "standard.standard_code": document.standard.standard_code,
+            "standard.edition": document.standard.edition,
+            "bbox_coordinate_system": document.bbox_coordinate_system.model_dump(mode="json"),
+        }
+        if actual["source_file.sha256"] is None:
+            raise SystemExit(
+                f"source identity cannot be verified for batch {batch_index}: "
+                "source_file.sha256 is required"
+            )
+        conflicts = [field for field, value in actual.items() if value != expected[field]]
+        if conflicts:
+            raise SystemExit(
+                f"source identity conflict in batch {batch_index}: {', '.join(conflicts)}"
+            )
+
+
+def _validate_merged_table_fragments(pages: list[Page], tables: list[LogicalTable]) -> None:
+    blocks = {block.block_id: (page.page_number, block) for page in pages for block in page.blocks}
+    claimed_fragments: dict[str, str] = {}
+    for table in tables:
+        fragment_ids = [fragment.block_id for fragment in table.fragments]
+        source_ids = list(table.source_block_ids)
+        if fragment_ids != source_ids:
+            raise SystemExit(
+                f"table fragment integrity conflict for {table.table_id}: source order mismatch"
+            )
+        for fragment in table.fragments:
+            previous_table = claimed_fragments.setdefault(fragment.block_id, table.table_id)
+            if previous_table != table.table_id:
+                raise SystemExit(
+                    f"table fragment {fragment.block_id} is claimed by multiple logical tables"
+                )
+            location = blocks.get(fragment.block_id)
+            if location is None:
+                raise SystemExit(
+                    f"table fragment integrity conflict for {table.table_id}: missing block "
+                    f"{fragment.block_id}"
+                )
+            page_number, block = location
+            if (
+                page_number != fragment.page_number
+                or block.table_id != table.table_id
+                or block.fragment_index != fragment.fragment_index
+            ):
+                raise SystemExit(
+                    f"table fragment integrity conflict for {table.table_id}: "
+                    f"page/table/index mismatch at {fragment.block_id}"
+                )
 
 
 def _source_index_map(
@@ -311,6 +404,73 @@ def _raw_manifest(
     }
 
 
+def _repair_diff(
+    baseline_path: Path,
+    repaired: Document,
+    repaired_statistics: dict[str, int],
+) -> dict[str, object]:
+    if baseline_path.is_symlink() or baseline_path.stat().st_size > MAX_JSON_BYTES:
+        raise SystemExit(f"unsafe or oversized comparison baseline: {baseline_path}")
+    baseline = Document.model_validate_json(baseline_path.read_text(encoding="utf-8"))
+    baseline_pages = {page.page_number: page for page in baseline.pages}
+    repaired_pages = {page.page_number: page for page in repaired.pages}
+    page_zone_changes = []
+    for page_number in sorted(set(baseline_pages) | set(repaired_pages)):
+        before = baseline_pages.get(page_number)
+        after = repaired_pages.get(page_number)
+        before_value = None if before is None else before.page_type.value
+        after_value = None if after is None else after.page_type.value
+        before_basis = None if before is None else before.page_type_basis
+        after_basis = None if after is None else after.page_type_basis
+        if (before_value, before_basis) != (after_value, after_basis):
+            page_zone_changes.append(
+                {
+                    "physical_page": page_number,
+                    "before": {"page_type": before_value, "page_type_basis": before_basis},
+                    "after": {"page_type": after_value, "page_type_basis": after_basis},
+                }
+            )
+    return {
+        "baseline": _file_record(baseline_path),
+        "repaired_document_id": repaired.document_id,
+        "source_pdf_sha256": repaired.source_file.sha256,
+        "schema_version": repaired.schema_version,
+        "algorithm_version": SEMANTIC_ASSEMBLER_VERSION,
+        "page_zone_changes": page_zone_changes,
+        "baseline_statistics": {
+            "pages": len(baseline.pages),
+            "sections": len(baseline.sections),
+            "normative_clauses": len(baseline.clauses.normative),
+            "explanation_clauses": len(baseline.clauses.explanations),
+        },
+        "repaired_statistics": repaired_statistics,
+        "public_schema_changed": False,
+    }
+
+
+def _repair_replay_manifest(
+    output: Path,
+    baseline_path: Path,
+    normalized_paths: list[Path],
+    pdf_path: Path,
+) -> dict[str, object]:
+    output_files = [
+        path
+        for path in sorted(output.rglob("*"))
+        if path.is_file() and path.name != "repair_replay_manifest.json"
+    ]
+    return {
+        "generated_at_utc": datetime.now(UTC).isoformat(),
+        "repair_scope": "task1.5-semantic-source-repair",
+        "algorithm_version": SEMANTIC_ASSEMBLER_VERSION,
+        "source_pdf": _file_record(pdf_path),
+        "immutable_normalized_inputs": [_file_record(path) for path in normalized_paths],
+        "comparison_baseline": _file_record(baseline_path),
+        "output_directory": str(output),
+        "outputs": [_file_record(path) for path in output_files],
+    }
+
+
 def _render_overlays(pdf_path: Path, document: Document, output: Path) -> None:
     import pymupdf
     from PIL import Image, ImageDraw
@@ -404,6 +564,11 @@ def _arguments() -> argparse.Namespace:
     parser.add_argument("--pdf", type=Path, required=True)
     parser.add_argument("--output", type=Path, required=True)
     parser.add_argument("--normalized", action="append", default=[])
+    parser.add_argument(
+        "--comparison-baseline",
+        type=Path,
+        help="optional prior Document JSON used only to emit an auditable semantic diff",
+    )
     return parser.parse_args()
 
 

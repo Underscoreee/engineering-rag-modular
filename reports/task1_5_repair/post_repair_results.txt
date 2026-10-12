@@ -1,0 +1,29 @@
+Task 1.5 semantic-source repair: post-repair verification
+Date: 2026-10-12 Asia/Shanghai
+Interpreter: Python 3.11.17
+Pydantic: 2.14.0
+pytest: 8.4.2
+Ruff: 0.17.0
+
+  .venv/bin/python -m pytest tests/audit/test_task15_independent_gaps.py -q
+  4 passed in 0.33s
+
+  .venv/bin/python -m pytest src/engineering_rag/modules/document_parser/tests -q
+  137 passed in 3.10s
+
+  .venv/bin/python -m pytest tests/contracts -q
+  114 passed in 0.47s
+
+  .venv/bin/python -m pytest -q
+  274 passed, 15 skipped in 3.89s
+
+  ENGINEERING_RAG_RUN_REAL_MINERU=1 .venv/bin/python -m pytest tests/integration/test_task1_5_real_semantics.py -q
+  5 passed in 0.23s
+
+  .venv/bin/ruff check .
+  All checks passed!
+
+  .venv/bin/ruff format --check .
+  202 files already formatted
+
+The six non-parser business-module test directories each reported 1 passed.

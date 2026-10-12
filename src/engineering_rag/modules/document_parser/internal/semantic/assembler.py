@@ -35,7 +35,7 @@ from .models import (
 )
 from .page_zone_classifier import classify_pages
 
-SEMANTIC_ASSEMBLER_VERSION = "1.5.0"
+SEMANTIC_ASSEMBLER_VERSION = "1.5.1"
 _CLAUSE = re.compile(r"^\s*(?P<number>\d+\.\d+\.\d+)(?![-.\d])\s*")
 _SECTION = re.compile(r"^\s*(?P<number>\d+\.\d+)\s+(?P<title>.+?)\s*$")
 _CHAPTER = re.compile(r"^\s*(?P<number>\d+)\s*(?P<title>[\u4e00-\u9fff].+?)\s*$")
@@ -217,6 +217,14 @@ def _build_clauses(
                 open_clause.incomplete_end = True
                 _finish_clause(open_clause, normative, explanations)
                 open_clause = None
+            if page.page_type == PageType.UNKNOWN:
+                _queue_unclassified_page(
+                    document,
+                    page,
+                    records=records,
+                    pending=pending,
+                    source_indexes=source_indexes,
+                )
             previous_page = page.page_number
             previous_group = None
             continue
@@ -575,6 +583,87 @@ def _is_page_footer(page: Page, block: PageBlock, text: str | None) -> bool:
     return bool(text and _PAGE_NUMBER.fullmatch(text) and block.bbox.y_min >= page.height * 0.82)
 
 
+def _queue_unclassified_page(
+    document: Document,
+    page: Page,
+    *,
+    records: list[SemanticSourceEvidence],
+    pending: list[PendingSemanticRelation],
+    source_indexes: dict[str, int],
+) -> None:
+    """Keep one auditable retry relation for substantive content on an unknown page."""
+
+    evidence_blocks: list[PageBlock] = []
+    for block in sorted(page.blocks, key=lambda item: item.reading_order):
+        text = block.ocr.text if block.ocr else None
+        if _is_page_footer(page, block, text):
+            records.append(
+                _record(
+                    document,
+                    page,
+                    block,
+                    source_indexes,
+                    kind="printed_page_label",
+                    label=text,
+                    group=None,
+                    decision="excluded_from_semantic_retry",
+                    reason="numeric_only_block_in_page_footer_zone",
+                )
+            )
+            continue
+        if not _is_substantive_candidate(block, text):
+            continue
+        evidence_blocks.append(block)
+        records.append(
+            _record(
+                document,
+                page,
+                block,
+                source_indexes,
+                kind="unclassified_content",
+                label=text,
+                group=None,
+                decision="pending",
+                reason="page_zone_is_unknown_without_verified_normative_or_explanation_context",
+            )
+        )
+    if not evidence_blocks:
+        return
+    block_ids = [block.block_id for block in evidence_blocks]
+    pending.append(
+        PendingSemanticRelation(
+            relation_type="unclassified_content",
+            source_id=_stable_id(
+                "pending-unclassified-page",
+                document.document_id,
+                str(page.page_number),
+                *block_ids,
+            ),
+            physical_pages=[page.page_number],
+            reason="page_type_ambiguous; content retained for replay with adjacent-page evidence",
+            evidence_block_ids=block_ids,
+            source_bboxes={
+                block.block_id: block.bbox.model_dump(mode="json") for block in evidence_blocks
+            },
+            blocking_conditions=[
+                "no_verified_normative_zone_evidence",
+                "no_verified_explanation_zone_evidence",
+                "no_reliable_preceding_clause_boundary",
+            ],
+        )
+    )
+
+
+def _is_substantive_candidate(block: PageBlock, text: str | None) -> bool:
+    if block.block_type in {BlockType.TITLE, BlockType.BODY}:
+        return bool(text and text.strip())
+    if block.block_type == BlockType.TABLE:
+        return block.table_id is not None
+    if block.block_type == BlockType.FORMULA:
+        return block.formula_group_id is not None
+    return block.block_type == BlockType.IMAGE and block.asset is not None
+
+
 def _record(
     document: Document,
     page: Page,
@@ -583,7 +672,7 @@ def _record(
     *,
     kind: str,
     label: str | None,
-    group: ContentGroup,
+    group: ContentGroup | None,
     decision: str,
     reason: str,
     consumed_by: list[str] | None = None,
@@ -597,7 +686,7 @@ def _record(
         raw_text=block.ocr.text if block.ocr else None,
         candidate_kind=kind,
         candidate_label=label,
-        content_group=group.value,
+        content_group=group.value if group is not None else None,
         decision=decision,
         decision_reason=reason,
         consumed_by=consumed_by or [],

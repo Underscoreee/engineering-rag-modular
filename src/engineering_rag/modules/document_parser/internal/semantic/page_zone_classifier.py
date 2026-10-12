@@ -4,10 +4,18 @@ from __future__ import annotations
 
 import re
 
-from engineering_rag.contracts.documents import Page, PageType
+from engineering_rag.contracts.documents import BlockType, Page, PageType
 
 _CLAUSE_START = re.compile(r"^\s*\d+\.\d+\.\d+(?![-.\d])")
-_SECTION_TITLE = re.compile(r"^\s*\d+(?:\.\d+)?\s*[\u4e00-\u9fff]")
+_HEADING_NUMBER = re.compile(r"^\s*(?P<number>\d+(?:\.\d+)?)\s*(?P<title>[\u4e00-\u9fff].+?)\s*$")
+_CLAUSE_NUMBER = re.compile(r"^\s*(?P<number>\d+\.\d+\.\d+)(?![-.\d])")
+_EXPLANATION_LANGUAGE = (
+    "本次修订",
+    "上一版规范",
+    "原规范",
+    "修订规范",
+    "编制组",
+)
 
 
 def classify_pages(
@@ -42,13 +50,13 @@ def classify_pages(
             page_type = PageType.EXPLANATION_TOC if explanation_zone else PageType.TOC_ZH
             reason = "dense_heading_page_number_pairs"
         elif explanation_zone and (
-            _has_clause_or_heading(texts) or previous_type == PageType.EXPLANATION_BODY
+            _has_structural_candidate(texts) or previous_type == PageType.EXPLANATION_BODY
         ):
             page_type = PageType.EXPLANATION_BODY
             reason = "after_explanation_cover_with_clause_or_heading_evidence"
-        elif _has_clause_or_heading(texts):
+        elif _has_verified_normative_start(page, texts):
             page_type = PageType.BODY
-            reason = "visible_chapter_section_or_clause_start"
+            reason = "matched_title_clause_hierarchy_with_normative_page_evidence"
         elif previous_number is not None and page.page_number == previous_number + 1:
             if previous_type in {PageType.BODY, PageType.EXPLANATION_BODY} and texts:
                 page_type = previous_type
@@ -67,8 +75,35 @@ def classify_pages(
     return classified, reasons
 
 
-def _has_clause_or_heading(texts: list[str]) -> bool:
-    return any(_CLAUSE_START.match(text) or _SECTION_TITLE.match(text) for text in texts)
+def _has_structural_candidate(texts: list[str]) -> bool:
+    return any(_CLAUSE_START.match(text) or _HEADING_NUMBER.match(text) for text in texts)
+
+
+def _has_verified_normative_start(page: Page, texts: list[str]) -> bool:
+    """Require mutually supporting layout and hierarchy evidence for a new body zone."""
+
+    if any(marker in text for marker in _EXPLANATION_LANGUAGE for text in texts):
+        return False
+    clause_numbers = [
+        match.group("number") for text in texts if (match := _CLAUSE_NUMBER.match(text)) is not None
+    ]
+    if not clause_numbers:
+        return False
+    for block in page.blocks:
+        if block.block_type != BlockType.TITLE or block.ocr is None or not block.ocr.text:
+            continue
+        heading = _HEADING_NUMBER.match(block.ocr.text)
+        if heading is None or "\\" in block.ocr.text or "_{" in block.ocr.text.replace(" ", ""):
+            continue
+        number = heading.group("number")
+        if not any(
+            clause == number or clause.startswith(f"{number}.") for clause in clause_numbers
+        ):
+            continue
+        if block.bbox.y_min > page.height * 0.35:
+            continue
+        return True
+    return False
 
 
 def _looks_like_toc(texts: list[str]) -> bool:

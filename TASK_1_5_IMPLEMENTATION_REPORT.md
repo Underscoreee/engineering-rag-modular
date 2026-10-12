@@ -2,7 +2,10 @@
 
 ## 结论
 
-**PARTIAL**。私有语义结构化实现、S01～S36 合成回归、关键真实页回放、合法 V2.4 JSON、来源 sidecar、pending links 和 overlays 已交付。物理页 301 缺少前置 4.1 Section 页面，按保守策略未导出其 Clause；28–29、37–38 未在本轮重复回放，其 Task 1.3 逻辑表产物仍保留。
+**本次四项修复：PASS。Task 1.5 真实数据品质状态：PARTIAL。**
+页面分区证据、unknown pending、批次来源一致性和 bbox 包含性四项独立反例已修复并回归。私有语义结构化实现、S01～S36 合成回归、关键真实页回放、合法 V2.4 JSON、来源 sidecar、pending links 和 overlays 已交付。物理页 301 缺少前置 4.1 Section 页面，按保守策略仍不导出其 Clause；这是证据不足时的预期 partial 结果，不是修复门槛失败。
+
+详细修复证据见 `docs/task-1.5-semantic-source-repair.md`；修复前失败日志见 `reports/task1_5_repair/pre_repair_failures.txt`。
 
 ## 前置 Gates
 
@@ -19,6 +22,8 @@
 - `internal/semantic/models.py`：来源证据、未决关系和 lineage 私有模型。
 - `scripts/assemble_mineru_clauses.py`：有界本地回放、输入哈希/协议校验、合并、双次幂等检查、JSON/overlay/manifest 输出。
 
+2026-10-12 修复将私有算法版本升为 `1.5.1`：批次合并现在 fail closed 校验 document/file/SHA/page count/standard/edition/bbox 坐标系和页、Block、Table、fragment 完整性；缺 SHA 直接拒绝并要求可信上游 manifest。安全切分使用 `0.01` PDF point 包含容差，并拒绝不可信或与文本顺序矛盾的几何；异常携带“保留原 Block” pending 诊断。
+
 MinerU Parser 路径可通过私有 `ParseConfig.options.semantic_structure=true` 在同一次
 `DocumentParser.parse()` 中启用语义装配；孤立说明选页可传入已核验的
 `semantic_explanation_cover_page` 区段锚点。默认关闭以维持旧调用的显式阶段边界。
@@ -33,21 +38,22 @@ MinerU Parser 路径可通过私有 `ParseConfig.options.semantic_structure=true
 
 输出：
 
-- `data/eval/task1_5_semantics/runs/final/GB-COMBINED/document.semantic.partial.json`
+- 只读基线：`data/eval/task1_5_semantics/runs/final/GB-COMBINED/document.semantic.partial.json`
+- 修复回放：`data/eval/task1_5_semantics/runs/repair-20261012/GB-COMBINED/document.semantic.partial.json`
 - `semantic_source_lineage.json`、`semantic_pending_links.json`、`semantic_summary.json`
-- `raw_inputs_manifest.json`、`task_1_5_results.json`
+- `raw_inputs_manifest.json`、`task_1_5_results.json`、`repair_diff.json`、`repair_replay_manifest.json`
 - `overlays/page_0016|0049|0050|0126|0127|0277|0282|0301_semantic_overlay.png`
 
 ## 测试
 
-- Document Parser 独立测试：`136 passed`。
+- 独立评审四反例：修复前 `4 failed`；修复后 `4 passed`。
+- Document Parser 独立测试：`137 passed`。
 - contracts：`114 passed`。
 - Chunking、keyword/vector/hybrid retrieval、query、generation：各 `1 passed`。
-- 默认完整 pytest：`262 passed, 15 skipped`（真实产物测试默认显式跳过）。
-- `ENGINEERING_RAG_RUN_REAL_MINERU=1` 完整 pytest：`277 passed`。
+- 默认完整 pytest：`274 passed, 15 skipped`（真实产物测试默认显式跳过）。
 - Task 1.5 真实集成测试：`5 passed`。
 - `ruff check .`：通过。
-- `ruff format --check .`：`197 files already formatted`。
+- `ruff format --check .`：`202 files already formatted`。
 - `Document.model_validate()`、JSON 往返、同输入双次装配一致性：通过。
 
 ## 已知限制

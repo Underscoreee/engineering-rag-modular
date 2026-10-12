@@ -51,6 +51,12 @@ Task 1.5 的章节/条文边界、跨页内容引用、说明关联、安全退�
 ```bash
 python scripts/assemble_mineru_clauses.py \
   --pdf '混凝土结构设计规范(2015年版) GB 50010-2010_纯图版.pdf' \
-  --output data/eval/task1_5_semantics/runs/final/GB-COMBINED
+  --output data/eval/task1_5_semantics/runs/repair-20261012/GB-COMBINED \
+  --comparison-baseline \
+    data/eval/task1_5_semantics/runs/final/GB-COMBINED/document.semantic.partial.json
 ```
+
+Task 1.5 四项语义来源修复、反例与真实回放结果见
+[修复报告](docs/task-1.5-semantic-source-repair.md)。`runs/final/` 是只读对照基线；修复后
+Document、diff、manifest 和 overlays 单独保存在 `runs/repair-20261012/`。
 

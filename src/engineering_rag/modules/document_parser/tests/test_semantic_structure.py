@@ -141,7 +141,17 @@ def test_cross_page_clause_and_orphan_continuation_degrade_safely() -> None:
 
     orphan = assemble_semantics(_document([pages[1]]))
     assert orphan.document.clauses.normative == []
-    assert {item.source_id for item in orphan.pending_links.relations} == {"item2", "item3"}
+    relation = next(
+        item
+        for item in orphan.pending_links.relations
+        if item.relation_type == "unclassified_content"
+    )
+    assert relation.evidence_block_ids == ["item2", "item3"]
+    assert set(relation.source_bboxes) == {"item2", "item3"}
+    assert "no_reliable_preceding_clause_boundary" in relation.blocking_conditions
+    assert not any(
+        item.relation_type == "unclassified_content" for item in result.pending_links.relations
+    )
 
 
 def test_table_unit_covers_all_fragments_and_stops_at_next_clause() -> None:
@@ -280,8 +290,16 @@ def test_safe_block_split_requires_complete_geometry_and_preserves_lineage() -> 
         document,
         "mixed",
         [
-            TextSpanEvidence(start=0, end=boundary, bbox=_bbox(20, 40)),
-            TextSpanEvidence(start=boundary, end=len(text), bbox=_bbox(45, 65)),
+            TextSpanEvidence(
+                start=0,
+                end=boundary,
+                bbox=BoundingBox(x_min=20, y_min=20, x_max=195, y_max=40),
+            ),
+            TextSpanEvidence(
+                start=boundary,
+                end=len(text),
+                bbox=BoundingBox(x_min=195, y_min=20, x_max=380, y_max=40),
+            ),
         ],
     )
     assert len(split.pages[0].blocks) == 2
@@ -292,6 +310,55 @@ def test_safe_block_split_requires_complete_geometry_and_preserves_lineage() -> 
             "mixed",
             [TextSpanEvidence(start=0, end=boundary, bbox=_bbox(20, 40))],
         )
+    with pytest.raises(ValueError, match="not reliable") as rejected:
+        split_body_block(
+            document,
+            "mixed",
+            [
+                TextSpanEvidence(
+                    start=0,
+                    end=boundary,
+                    bbox=BoundingBox(x_min=20, y_min=20, x_max=195, y_max=40),
+                    geometry_reliable=False,
+                ),
+                TextSpanEvidence(
+                    start=boundary,
+                    end=len(text),
+                    bbox=BoundingBox(x_min=195, y_min=20, x_max=380, y_max=40),
+                ),
+            ],
+        )
+    assert rejected.value.pending_diagnostic()["decision"] == "original_block_retained"
+    assert document.pages[0].blocks[0].block_id == "mixed"
+
+
+def test_page_zone_needs_matching_title_hierarchy_not_just_numbered_text() -> None:
+    mismatched = assemble_semantics(
+        _document(
+            [
+                _page(
+                    301,
+                    _title("list-heading", "2 轴心抗拉强度标准值", 0),
+                    _body("explanation-clause", "4.1.4 说明文本。", 1),
+                )
+            ]
+        )
+    )
+    assert mismatched.document.pages[0].page_type == PageType.UNKNOWN
+    assert mismatched.document.clauses.normative == []
+
+    explanation_like = assemble_semantics(
+        _document(
+            [
+                _page(
+                    282,
+                    _title("chapter", "1 总则", 0),
+                    _body("revision", "1.0.1 本次修订总结了上一版规范的应用。", 1),
+                )
+            ]
+        )
+    )
+    assert explanation_like.document.pages[0].page_type == PageType.UNKNOWN
 
 
 def test_contract_rejects_invalid_formula_reference_and_incomplete_cache_metadata() -> None:

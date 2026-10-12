@@ -23,7 +23,12 @@ pytestmark = [
     ),
 ]
 
-ROOT = Path("data/eval/task1_5_semantics/runs/final/GB-COMBINED")
+ROOT = Path(
+    os.environ.get(
+        "ENGINEERING_RAG_TASK15_ARTIFACT_ROOT",
+        "data/eval/task1_5_semantics/runs/repair-20261012/GB-COMBINED",
+    )
+)
 
 
 def test_real_document_roundtrip_sections_and_page_zones() -> None:
@@ -114,6 +119,18 @@ def test_real_outputs_retain_manifest_pending_links_and_overlays() -> None:
     assert any(item["physical_pages"] == [301] for item in pending["relations"])
     for page in (49, 50, 126, 127, 282):
         assert (ROOT / "overlays" / f"page_{page:04d}_semantic_overlay.png").is_file()
+
+    repair = json.loads((ROOT / "repair_diff.json").read_text(encoding="utf-8"))
+    assert repair["algorithm_version"] == "1.5.1"
+    assert repair["public_schema_changed"] is False
+    assert repair["baseline_statistics"] == {
+        "pages": 8,
+        "sections": 7,
+        "normative_clauses": 14,
+        "explanation_clauses": 3,
+    }
+    replay_manifest = json.loads((ROOT / "repair_replay_manifest.json").read_text(encoding="utf-8"))
+    assert replay_manifest["source_pdf"]["sha256"] == manifest["source_pdf"]["sha256"]
 
 
 def _document() -> Document:

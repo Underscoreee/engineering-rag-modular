@@ -30,6 +30,7 @@ from engineering_rag.modules.document_parser.internal.mineru.runner import (
 )
 from engineering_rag.modules.document_parser.internal.mineru.v24_adapter import adapt_to_v24
 from engineering_rag.modules.document_parser.internal.parser import PyMuPdfDocumentParser
+from engineering_rag.modules.document_parser.internal.semantic import SEMANTIC_ASSEMBLER_VERSION
 from engineering_rag.modules.document_parser.tests.support import make_text_pdf, request_for
 
 
@@ -199,7 +200,7 @@ def test_parser_mineru_semantic_option_returns_structured_document(tmp_path: Pat
     assert [section.number for section in document.sections] == ["1"]
     assert [clause.clause_number for clause in document.clauses.normative] == ["1.0.1"]
     assert parser.last_semantic_result is not None
-    assert document.processing.parser_version == "1.5.0"
+    assert document.processing.parser_version == SEMANTIC_ASSEMBLER_VERSION
 
 
 def _result(tmp_path: Path, page: MinerUPage) -> MinerUParseResult:

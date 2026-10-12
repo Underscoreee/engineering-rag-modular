@@ -1,6 +1,6 @@
 # Task 1.5 验收清单 — Section、Clause 与条文说明（Document V2.4 Frozen）
 
-> 状态：**已执行，结论 PARTIAL**。实现与测试门槛通过；页 301 缺少前置 4.1 Section 页面，相关候选按保守策略 pending。证据见 `TASK_1_5_IMPLEMENTATION_REPORT.md` 与 `data/eval/task1_5_semantics/runs/final/GB-COMBINED/`。
+> 状态：**四项语义来源修复 PASS；真实候选数据仍按 PARTIAL 管理**。页 301 缺少前置 4.1 Section 页面，相关候选按保守策略 pending，这不是本次四项修复的失败。证据见 `TASK_1_5_IMPLEMENTATION_REPORT.md`、`docs/task-1.5-semantic-source-repair.md` 与 `data/eval/task1_5_semantics/runs/repair-20261012/GB-COMBINED/`。
 
 ## A. 前置与安全
 
@@ -47,7 +47,9 @@
 - [x] `Document.model_validate()`、JSON round-trip、页面引用、Section/Clause 验证全部通过。
 - [x] 完整 pytest、`ruff check .`、`ruff format --check .` 均实际运行并通过。
 - [x] 测试包含不依赖真实 MinerU 环境的离线 Fixture Replay；真实测试来自真正 MinerU 原始结果。
-- [x] `TASK_1_5_IMPLEMENTATION_REPORT.md` 包括每项真实结果、歧义及后续风险，结论 PARTIAL。
+- [x] `TASK_1_5_IMPLEMENTATION_REPORT.md` 包括每项真实结果、歧义及后续风险；四项修复结论 PASS，真实候选数据继续标注 PARTIAL。
+- [x] 独立评审的四项反例已纳入 `tests/audit/`，修复后 `4 passed`。
+- [x] 修复回放未覆盖原产物，diff/manifest 位于 `runs/repair-20261012/GB-COMBINED/`。
 - [x] Task 1.5 结束后停止，不自行进入 Task 1.6、Chunking 或其它业务模块。
 
 ## 验收判定
