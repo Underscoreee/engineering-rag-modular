@@ -1,6 +1,6 @@
 # Engineering RAG
 
-面向工程规范、建设标准与图集 PDF 的模块化单体 RAG 项目。**Document Schema V2.4 已于 2026-10-11 正式冻结（FROZEN）**。Architecture Task 1.1 已实现安全 PDF 读取、选页渲染、文本层提取、中文 OCR 和合法 partial Document 输出。Task 1.2 增加可选的本地 MinerU 4.x 私有适配器与受限真实案例执行工具；页面分类、跨页表聚合、Clause 等领域算法仍未实现。Chunking、检索、LLM 与外部存储后端也未实现。
+面向工程规范、建设标准与图集 PDF 的模块化单体 RAG 项目。**Document Schema V2.4 已于 2026-10-11 正式冻结（FROZEN）**。Architecture Task 1.1 已实现安全 PDF/OCR partial Document；Task 1.2 增加本地 MinerU 4.x 私有适配器；Task 1.3 增加有界 HTML 格网恢复、多级表头、保守跨页续表合并和 V2.4 表格映射。所有机器表格仍为待核验候选。页面分类、Clause、公式语义、Chunking、检索、LLM 与外部存储后端尚未实现。
 
 ## 安装与检查
 
@@ -41,4 +41,6 @@ python -m pytest src/engineering_rag/modules/generation/tests -q
 字段说明见 [data-contracts.md](docs/data-contracts.md)，身份规则见 [id-policy.md](docs/id-policy.md)，快照与迁移见 [artifact-policy.md](docs/artifact-policy.md)，版本差异见 [schema-changelog.md](docs/schema-changelog.md)。[schema-freeze-checklist.md](docs/schema-freeze-checklist.md) 是唯一权威冻结验收表，[schema-v2.4-freeze-record.md](docs/schema-v2.4-freeze-record.md) 是正式冻结记录。V2.4 冻结后的破坏性变更必须升级 Schema 版本并提供显式迁移机制。
 
 Parser Task 1.1 的行为、OCR 后端与实测结果分别见 [实现说明](docs/document-parser-task1-1.md)、[OCR 后端](docs/document-parser-ocr-backend.md) 和 [验收报告](docs/document-parser-task1-1-report.md)。Task 1.2 的实际环境、逐例状态和已知失败见 [MinerU 真实测试报告](docs/task-1.2-mineru-real-test-report.md)。
+
+Task 1.3 的表格保真政策、三组真实 GB 50010 结果、可复现命令与 Known Issues 见 [复杂表格报告](docs/task-1.3-complex-tables.md)。
 

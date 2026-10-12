@@ -1,8 +1,8 @@
-# Document Parser 接口（Document V2.4 FROZEN / Task 1.2）
+# Document Parser 接口（Document V2.4 FROZEN / Task 1.3）
 
 ## 职责与非职责
 
-Parser 最终负责从源 PDF 识别物理页类型、Block、Section、正文/说明 Clause，以及跨页表格的逻辑聚合，输出合法 V2.4 `Document`。Task 1.1 提供安全 PDF 读取与基础 OCR；Task 1.2 新增可选、本地、进程隔离的 MinerU 4.x 私有适配路径。该路径只生成候选 Block、单片段 `structure_only` LogicalTable 与公式，不执行领域页面分类、跨页表合并或 Clause 推断。Parser 不调用 Chunking，不写检索索引，也不凭措辞判定强制性。
+Parser 最终负责从源 PDF 识别物理页类型、Block、Section、正文/说明 Clause，以及跨页表格的逻辑聚合，输出合法 V2.4 `Document`。Task 1.1 提供安全 PDF 读取与基础 OCR；Task 1.2 新增可选、本地、进程隔离的 MinerU 4.x 私有适配路径；Task 1.3 在该私有路径中增加安全 HTML 格网恢复、多级表头与保守跨页续表合并。当前仍不执行领域页面分类、Clause/Section 或公式语义推断。Parser 不调用 Chunking，不写检索索引，也不凭措辞判定强制性。
 
 ## 公开路径与签名
 
@@ -34,16 +34,18 @@ Pydantic 字段错误或悬空引用抛 `ValidationError`。Task 1.1 对缺失�
 
 MinerU 路径严格读取 `docvortex.middle` 2.0，要求 producer 为 MinerU 4.x，并将源 `page_idx` 加一恢复原 PDF 物理页码。MiddleJson 归一化 bbox 按该页 PDF point 尺寸映射到 `pdf_points/top_left`；缺失或非法 bbox 的元素只留在 raw sidecar/诊断中，不伪造位置。命令超时、非零退出、协议版本不兼容和不安全 ZIP 都是显式失败。成功输出仍为 `partial=true`、全部识别候选为 `unverified`。
 
+MinerU 表格 HTML 只由有资源上限的本地解析器读取，不执行脚本、不请求外部资源；嵌套/多个表、非法跨度和超限输入显式失败。原始物理格位写入 `RawTableGrid`，跨行/跨列覆盖位不会复制工程值；派生 `columns`/`data` 保留字符串、空值、单位、符号和精度。只有显式编号表注进入 `notes`，未编号表注保留在 sidecar 和诊断。自动跨页合并同时要求原始物理页相邻、显式续表标识、表号一致和列签名相容；证据不足或冲突时不合并。续页重复表头保留在 raw grid/sidecar，但不进入派生数据行。
+
 若 `FileRef.size_bytes` 或 `sha256` 已声明，Parser 在流式复制时核对实际字节数与增量 SHA-256；不一致抛私有 `SourceIntegrityError`，未声明字段维持可选语义。原生文字层 bbox 经 PyMuPDF `rotation_matrix` 转到可视页面坐标，并与 CropBox 可视区域求交；部分裁切和完全不可见块写入私有诊断。`diagnostics.json` 的 OCR 页面包含 confidence count/min/max/mean 摘要，但 confidence 不会把 Block 提升为 `verified`。
 
 静态 DTO 校验只证明声明之间自洽，不能证明页面分类、条文、表格或公式识别完整且准确。真实质量必须由后续带来源、版次和人工复核状态的 Golden Dataset 评估；本阶段不伪造准确率。
 
 ## 副作用、幂等、排序与依赖
 
-`parse` 只通过注入的 `FileStore.read` 读取源文件，不写索引。源流按块复制到自动清理的临时目录；只处理选页。Document ID 基于 File 身份和标准版次，Block ID 基于来源哈希、物理页、引擎顺序和类型，均不使用 OCR 文本哈希。基础路径 reading order 是确定性几何启发式；MinerU 路径保留引擎 block 顺序。实现仅依赖 contracts、自身 internal 和注入的 FileStore Protocol；导入 API 不接触外部服务。指定 `engine_output_dir` 时会保存本地 raw/log sidecar；否则使用自动清理的临时目录。
+`parse` 只通过注入的 `FileStore.read` 读取源文件，不写索引。源流按块复制到自动清理的临时目录；只处理选页。Document ID 基于 File 身份和标准版次，Block ID 基于来源哈希、物理页、引擎顺序和类型，均不使用 OCR 文本哈希。LogicalTable ID 基于源身份和首片段锚点，相同输入重试以及连续双页/逐页输入保持稳定。基础路径 reading order 是确定性几何启发式；MinerU 路径保留引擎 block 顺序。实现仅依赖 contracts、自身 internal 和注入的 FileStore Protocol；导入 API 不接触外部服务。指定 `engine_output_dir` 时会保存本地 raw/log sidecar；否则使用自动清理的临时目录。
 
 ## 接口示例与版本
 
-Python API 版本 1；Document 持久化 Schema 为 **2.4 FROZEN**。Task 1.2 不生成 PageType 分类、Section、Clause、RawGrid，也不合并跨页 LogicalTable；它只在真实 MinerU 候选存在时映射单片段表格和 FormulaGroup。OCR 读到表格/公式不表示结构或领域语义已核验。旧版及 `2.4-proposal` 必须显式迁移和核验，破坏性变更另立版本和 ADR。
+Python API 版本 1；Document 持久化 Schema 为 **2.4 FROZEN**。Task 1.3 在真实 MinerU 表格候选存在且结构证据充分时映射 `RawTableGrid`、`columns`、`data` 和跨页 LogicalTable；不生成领域 PageType、Section 或 Clause。OCR 读到表格/公式、格网结构完整都不表示文字或领域语义已核验，机器输出保持 `unverified`，整体仍为 partial Document。旧版及 `2.4-proposal` 必须显式迁移和核验，破坏性变更另立版本和 ADR。
 
 常规安装与独立测试：`python -m pip install -e '.[dev,parser-ocr]'`，然后运行 `python -m pytest src/engineering_rag/modules/document_parser/tests -q`。MinerU 使用独立虚拟环境和 `requirements/mineru-task1-2.txt`，不会成为主项目导入依赖。

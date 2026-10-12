@@ -29,6 +29,11 @@ from engineering_rag.contracts.documents import (
     TableFragment,
     TableFragmentStatus,
 )
+from engineering_rag.modules.document_parser.internal.tables.assembler import (
+    TABLE_ASSEMBLER_VERSION,
+    assemble_mineru_tables,
+)
+from engineering_rag.modules.document_parser.internal.tables.models import TableSidecar
 
 from .models import MinerUElement, MinerUParseResult
 
@@ -39,6 +44,8 @@ _TAG = re.compile(r"\\tag\{([^{}]+)\}\s*$")
 class MinerUV24Adaptation:
     document: Document
     omitted_elements: list[dict[str, object]]
+    table_sidecars: list[TableSidecar]
+    table_diagnostics: list[dict[str, object]]
 
 
 def adapt_to_v24(
@@ -51,7 +58,8 @@ def adapt_to_v24(
     document_id = _stable_id(
         "doc", source_file.file_id, standard.standard_code, standard.edition or ""
     )
-    tables: list[LogicalTable] = []
+    table_assembly = assemble_mineru_tables(result)
+    tables: list[LogicalTable] = list(table_assembly.tables)
     pages: list[Page] = []
     omitted: list[dict[str, object]] = []
     warnings: list[ContractError] = []
@@ -75,6 +83,26 @@ def adapt_to_v24(
                 element.raw_type,
             )
             if element.raw_type == "table":
+                placement = table_assembly.placements.get(
+                    (element.page_number, element.source_index)
+                )
+                if placement is not None:
+                    blocks.append(
+                        PageBlock(
+                            block_id=block_id,
+                            block_type=BlockType.TABLE,
+                            bbox=bbox,
+                            reading_order=len(blocks),
+                            ocr=OcrContent(text=element.table_caption),
+                            recognition_status=RecognitionStatus.UNVERIFIED,
+                            bbox_status=BboxStatus.UNVERIFIED,
+                            extraction_method=f"mineru:{result.producer_version}",
+                            table_id=placement.table_id,
+                            fragment_index=placement.fragment_index,
+                            fragment_status=TableFragmentStatus.UNVERIFIED,
+                        )
+                    )
+                    continue
                 table_id = _stable_id("table", block_id)
                 block = PageBlock(
                     block_id=block_id,
@@ -178,18 +206,19 @@ def adapt_to_v24(
             Page(
                 page_number=parsed_page.page_number,
                 page_type=PageType.UNKNOWN,
-                page_type_basis="task1.2_mineru_candidate_not_domain_classified",
+                page_type_basis="task1.3_mineru_candidate_not_domain_classified",
                 width=parsed_page.width_points,
                 height=parsed_page.height_points,
                 content_extraction_status=ContentExtractionStatus.PARTIALLY_TRANSCRIBED,
                 blocks=blocks,
             )
         )
-    if omitted:
+    all_omitted = _unique_omissions([*omitted, *table_assembly.omitted])
+    if all_omitted:
         warnings.append(
             ContractError(
                 code=ErrorCode.UNSUPPORTED,
-                message=f"{len(omitted)} MinerU elements retained only in raw sidecar",
+                message=f"{len(all_omitted)} MinerU elements retained only in raw sidecar",
                 field="pages",
                 retryable=False,
             )
@@ -207,7 +236,7 @@ def adapt_to_v24(
         clauses=ClauseGroups(),
         processing=ProcessingMetadata(
             parser_id="engineering_rag.document_parser.mineru",
-            parser_version="1.2.0",
+            parser_version=TABLE_ASSEMBLER_VERSION,
             partial=True,
             is_complete_document_ocr=False,
             warnings=warnings,
@@ -215,7 +244,9 @@ def adapt_to_v24(
     )
     return MinerUV24Adaptation(
         document=Document.model_validate_json(document.model_dump_json()),
-        omitted_elements=omitted,
+        omitted_elements=all_omitted,
+        table_sidecars=table_assembly.sidecars,
+        table_diagnostics=table_assembly.omitted,
     )
 
 
@@ -230,3 +261,14 @@ def _omission(element: MinerUElement, reason: str) -> dict[str, object]:
 
 def _stable_id(prefix: str, *parts: str) -> str:
     return f"{prefix}-{uuid5(NAMESPACE_URL, '|'.join(parts)).hex}"
+
+
+def _unique_omissions(values: list[dict[str, object]]) -> list[dict[str, object]]:
+    unique: list[dict[str, object]] = []
+    seen: set[tuple[object, ...]] = set()
+    for value in values:
+        key = (value.get("page_number"), value.get("source_index"), value.get("raw_type"))
+        if key not in seen:
+            seen.add(key)
+            unique.append(value)
+    return unique

