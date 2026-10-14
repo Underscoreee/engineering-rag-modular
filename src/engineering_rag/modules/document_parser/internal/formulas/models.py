@@ -95,7 +95,13 @@ class FormulaSemanticComponent(_PrivateModel):
     consumed_text_ranges: list[tuple[int, int]] = Field(min_length=1)
     target_formula_group_id: str = Field(min_length=1)
     target_formula_id: str | None = None
-    semantic_role: Literal["condition", "equation", "equation_number", "symbol_explanation"]
+    semantic_role: Literal[
+        "condition",
+        "equation",
+        "equation_number",
+        "symbol_explanation",
+        "printed_note",
+    ]
     component_bbox: MinerUBbox
     review_status: Literal["visual_evidence", "unverified", "needs_review"]
     corrected_from: str | None = None
@@ -111,6 +117,17 @@ class FormulaGroupLineage(_PrivateModel):
     new_block_id: str = Field(min_length=1)
     new_formula_group_id: str = Field(min_length=1)
     formula_ids: list[str] = Field(min_length=1)
+
+
+class FormulaPrintedNoteEvidence(_PrivateModel):
+    source_page_number: int = Field(ge=1)
+    source_index: int = Field(ge=0)
+    source_block_id: str = Field(min_length=1)
+    raw_text: str = Field(min_length=1)
+    raw_bbox: MinerUBbox
+    target_formula_group_id: str = Field(min_length=1)
+    referenced_equation_numbers: list[str] = Field(default_factory=list)
+    review_status: Literal["unverified", "needs_review"] = "unverified"
 
 
 class FormulaPlacement(_PrivateModel):
@@ -133,6 +150,7 @@ class FormulaSidecar(_PrivateModel):
     symbol_evidence: SymbolEvidence | None = None
     explanation_scope_formula_ids: list[str] = Field(default_factory=list)
     semantic_components: list[FormulaSemanticComponent] = Field(default_factory=list)
+    printed_notes: list[FormulaPrintedNoteEvidence] = Field(default_factory=list)
     lineage: list[FormulaGroupLineage] = Field(default_factory=list)
     grouping_basis: str
     diagnostics: list[str] = Field(default_factory=list)

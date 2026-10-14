@@ -2,10 +2,10 @@
 
 from __future__ import annotations
 
-from collections.abc import Iterable
+from collections.abc import Iterable, Mapping
 from datetime import datetime
 
-from engineering_rag.contracts.documents import Document
+from engineering_rag.contracts.documents import Document, PageType
 
 REQUIRED_REVIEW_FIELDS = ("reviewer", "reviewed_at", "dataset_version", "provenance")
 
@@ -59,16 +59,58 @@ def build_candidate_records(
     return records
 
 
-def evaluate_verified_records(records: Iterable[dict[str, object]]) -> dict[str, object]:
+def evaluate_verified_records(
+    records: Iterable[dict[str, object]],
+    *,
+    document: Document | None = None,
+    expected_source_sha256: str | None = None,
+    authoritative_page_types: Mapping[str, str] | None = None,
+) -> dict[str, object]:
+    """Evaluate reviewed labels against parser-owned predictions.
+
+    A publishable evaluation requires an authoritative ``Document`` (or the
+    deliberately narrow ``authoritative_page_types`` projection used by audit
+    tests) and a matching PDF identity.  Prediction-shaped fields in a review
+    file are never read in that mode.  The legacy no-context branch is retained
+    only for source-less metric unit fixtures and is explicitly marked as
+    non-publishable.
+    """
+    if document is not None:
+        document_sha256 = document.source_file.sha256
+        if expected_source_sha256 not in (None, document_sha256):
+            raise ValueError("Document source identity mismatch")
+        expected_source_sha256 = document_sha256
+        document_page_types = {
+            str(page.page_number): page.page_type.value for page in document.pages
+        }
+        if authoritative_page_types is not None and dict(authoritative_page_types) != (
+            document_page_types
+        ):
+            raise ValueError("authoritative page predictions mismatch the Document")
+        authoritative_page_types = document_page_types
+    authoritative = authoritative_page_types is not None
+    if authoritative and expected_source_sha256 is None:
+        raise ValueError("authoritative evaluation requires a source PDF identity")
+
     verified = []
+    dataset_versions: set[str] = set()
     for record in records:
         if record.get("golden_status") != "verified":
             continue
         missing = [name for name in REQUIRED_REVIEW_FIELDS if not record.get(name)]
         if missing:
             raise ValueError("verified record missing review metadata: " + ", ".join(missing))
-        datetime.fromisoformat(str(record["reviewed_at"]).replace("Z", "+00:00"))
+        reviewed_at = datetime.fromisoformat(str(record["reviewed_at"]).replace("Z", "+00:00"))
+        if reviewed_at.tzinfo is None or reviewed_at.utcoffset() is None:
+            raise ValueError("verified review timestamp must include a timezone")
+        dataset_versions.add(str(record["dataset_version"]))
+        if authoritative:
+            record_sha256 = record.get("source_sha256")
+            if record_sha256 != expected_source_sha256:
+                raise ValueError("verified label source identity mismatch")
         verified.append(record)
+    if len(dataset_versions) > 1:
+        raise ValueError("verified records contain conflicting dataset versions")
     page_type_total = 0
     page_type_correct = 0
     page_confusion: dict[str, dict[str, int]] = {}
@@ -87,21 +129,49 @@ def evaluate_verified_records(records: Iterable[dict[str, object]]) -> dict[str,
             "source_trace_accuracy",
         )
     }
+    seen_page_labels: dict[str, str] = {}
     for record in verified:
         labels = record.get("verified_labels")
+        if not isinstance(labels, dict):
+            raise ValueError("verified record must contain structured verified_labels")
         predictions = record.get("machine_predictions")
-        if not isinstance(labels, dict) or not isinstance(predictions, dict):
-            continue
+        if authoritative:
+            actual: Mapping[str, object] = authoritative_page_types or {}
+        else:
+            # Compatibility is intentionally limited to source-less test fixtures.
+            # A review record carrying a source identity may not self-certify its
+            # own predictions.
+            if record.get("source_sha256") is not None:
+                raise ValueError("source-bound evaluation requires authoritative predictions")
+            predictions = predictions if isinstance(predictions, dict) else {}
+            candidate = predictions.get("page_types")
+            actual = candidate if isinstance(candidate, dict) else {}
         expected = labels.get("page_types")
-        actual = predictions.get("page_types")
         expected = expected if isinstance(expected, dict) else {}
-        actual = actual if isinstance(actual, dict) else {}
         for page, expected_type in expected.items():
+            page_key = str(page)
+            try:
+                PageType(str(expected_type))
+            except ValueError as exc:
+                raise ValueError(f"unknown verified page type: {expected_type}") from exc
+            if page_key in seen_page_labels:
+                raise ValueError(f"duplicate verified page label: {page_key}")
+            seen_page_labels[page_key] = str(expected_type)
+            if authoritative and page_key not in actual:
+                raise ValueError(f"verified page is absent from authoritative Document: {page_key}")
             page_type_total += 1
-            actual_type = str(actual.get(page))
+            actual_type = str(actual.get(page_key))
             page_type_correct += int(actual_type == expected_type)
             row = page_confusion.setdefault(str(expected_type), {})
             row[actual_type] = row.get(actual_type, 0) + 1
+        if authoritative:
+            unsupported = set(labels) - {"page_types"}
+            if unsupported:
+                raise ValueError(
+                    "verified labels lack a Document-derived evaluator: "
+                    + ", ".join(sorted(unsupported))
+                )
+            continue
         for pair in labels.get("ocr_text_pairs", []):
             if not isinstance(pair, dict):
                 continue
@@ -123,7 +193,16 @@ def evaluate_verified_records(records: Iterable[dict[str, object]]) -> dict[str,
                         generic_counts[name][0] += float(value)
                         generic_counts[name][1] += 1
     return {
-        "golden_dataset_status": "verified" if verified else "not_evaluated",
+        "golden_dataset_status": (
+            "verified"
+            if verified and authoritative
+            else "fixture_only_not_publishable"
+            if verified
+            else "not_evaluated"
+        ),
+        "prediction_provenance": (
+            "document_v2.4" if authoritative else "source_less_metric_fixture"
+        ),
         "verified_case_count": len(verified),
         "metrics": {
             "page_type_accuracy": _metric(page_type_correct, page_type_total),
@@ -156,18 +235,14 @@ def _page_type_scores(confusion: dict[str, dict[str, int]]) -> dict[str, object]
         precision = (
             true_positive / (true_positive + false_positive)
             if true_positive + false_positive
-            else None
+            else 0.0
         )
         recall = (
             true_positive / (true_positive + false_negative)
             if true_positive + false_negative
-            else None
+            else 0.0
         )
-        f1 = (
-            2 * precision * recall / (precision + recall)
-            if precision is not None and recall is not None and precision + recall
-            else None
-        )
+        f1 = 2 * precision * recall / (precision + recall) if precision + recall else 0.0
         scores[label] = {
             "true_positive": true_positive,
             "false_positive": false_positive,
@@ -176,12 +251,11 @@ def _page_type_scores(confusion: dict[str, dict[str, int]]) -> dict[str, object]
             "recall": recall,
             "f1": f1,
         }
-        if f1 is not None:
-            f1_values.append(f1)
+        f1_values.append(f1)
     return {
         "status": "evaluated",
         "classes": scores,
-        "macro_f1": sum(f1_values) / len(f1_values) if f1_values else None,
+        "macro_f1": sum(f1_values) / len(f1_values),
     }
 
 

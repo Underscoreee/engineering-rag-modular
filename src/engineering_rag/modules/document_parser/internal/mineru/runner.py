@@ -42,6 +42,11 @@ def run_local(
     environment = os.environ.copy()
     environment["MINERU_HOME"] = str(mineru_home)
     environment.setdefault("NO_COLOR", "1")
+    compatibility_root = Path(__file__).with_name("compat")
+    inherited_python_path = environment.get("PYTHONPATH")
+    environment["PYTHONPATH"] = os.pathsep.join(
+        item for item in (str(compatibility_root), inherited_python_path) if item
+    )
     started = perf_counter()
     try:
         completed = subprocess.run(

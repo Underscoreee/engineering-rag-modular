@@ -137,3 +137,53 @@ def test_resume_rejects_stale_configuration_and_tampered_output(tmp_path: Path) 
             expected_config_sha256="b" * 64,
             expected_model_signature="c" * 64,
         )
+
+
+def test_resume_rejects_symbolic_artifact_and_symbolic_parent(tmp_path: Path) -> None:
+    external = tmp_path / "external.json"
+    external.write_text("{}", encoding="utf-8")
+    external_hash = hashlib.sha256(external.read_bytes()).hexdigest()
+    source = SourceIdentity(
+        document_id="doc-1",
+        file_id="file-1",
+        sha256="a" * 64,
+        size_bytes=1,
+        page_count=1,
+        standard_code="GB TEST",
+    )
+    now = datetime.now(UTC)
+    for relative in ("linked.json", "linked-parent/document.json"):
+        run_dir = tmp_path / relative.replace("/", "-")
+        run_dir.mkdir()
+        if "/" in relative:
+            (run_dir / "linked-parent").symlink_to(tmp_path, target_is_directory=True)
+        else:
+            (run_dir / relative).symlink_to(external)
+        state = RunState(
+            run_id="run-symbolic",
+            mode=RunMode.REPLAY_SAVED_RAW,
+            status=RunStatus.SUCCEEDED,
+            created_at=now,
+            updated_at=now,
+            source=source,
+            config_sha256="b" * 64,
+            model_signature="c" * 64,
+            batches=[
+                BatchState(
+                    batch_id="batch-001",
+                    pages=[1],
+                    status=RunStatus.SUCCEEDED,
+                    document_path=relative,
+                    document_sha256=external_hash,
+                    artifact_sha256={relative: external_hash},
+                )
+            ],
+        )
+        store = CheckpointStore(run_dir)
+        store.save(state)
+        with pytest.raises(CheckpointMismatchError, match="missing or unsafe"):
+            store.load(
+                expected_source_sha256="a" * 64,
+                expected_config_sha256="b" * 64,
+                expected_model_signature="c" * 64,
+            )

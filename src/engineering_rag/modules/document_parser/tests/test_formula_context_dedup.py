@@ -60,7 +60,7 @@ def test_page_50_builds_two_complete_semantic_groups() -> None:
     document = adaptation.document
     blocks = document.pages[0].blocks
     formula_blocks = [block for block in blocks if block.block_type == BlockType.FORMULA]
-    assert len(blocks) == 7
+    assert len(blocks) == 6
     assert [_numbers(block) for block in formula_blocks] == [
         [f"6.2.1-{index}" for index in range(1, 6)],
         ["6.2.1-6", "6.2.1-7"],
@@ -79,7 +79,6 @@ def test_page_50_builds_two_complete_semantic_groups() -> None:
         "3 混凝土受压的应力与应变关系按下列规定取用:",
         "4 纵向受拉钢筋的极限拉应变取为0.01。",
         "5 纵向钢筋的应力取钢筋应变与其弹性模量的乘积。",
-        "35",
     ]
     for block, sidecar in zip(formula_blocks, adaptation.formula_sidecars, strict=True):
         for component in sidecar.semantic_components:

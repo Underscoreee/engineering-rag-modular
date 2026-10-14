@@ -11,6 +11,7 @@ from .models import SymbolEvidence, SymbolSourceCoverage
 
 _PREFIX = re.compile(r"^\s*式中\s*[:：]?\s*")
 _PLAIN_ITEM = re.compile(r"\s*([^；。]+?)\s*(?:——|--|—)\s*(.+?)(?:；|。|$)")
+_SINGLE_PLAIN_ITEM = re.compile(r"^\s*([^；。]{1,80}?)\s*(?:——|--|—)\s*(.+?)\s*$")
 _LEADING_SYMBOL = re.compile(r"^\s*([A-Za-zΑ-ωα-ω][A-Za-z0-9_]*)\s+(.+?)(?:；|。|$)")
 _STRUCTURAL_BOUNDARY = re.compile(r"^\s*(?:\d+(?:\.\d+)+|\d+\s+\S)")
 
@@ -127,6 +128,7 @@ def _parse_element(
         elif (
             leading_symbols
             and not description_started
+            and bool(value.strip())
             and len(value.strip()) <= 3
             and not _contains_cjk(value)
         ):
@@ -136,11 +138,11 @@ def _parse_element(
             description_parts.append(value)
     if leading_symbols and description_parts:
         symbol = (
-            " ".join(token for token in leading_tokens if token)
+            "".join(token for token in leading_tokens if token)
             if len(leading_tokens) > len(leading_symbols)
             else "、".join(leading_symbols)
         )
-        description = "".join(description_parts).strip(" ：:—-")
+        description = "".join(description_parts).strip(" ：:—-").rstrip("；。;").strip()
         return (
             [
                 SymbolExplanationItem(
@@ -160,6 +162,14 @@ def _parse_plain(value: str) -> list[SymbolExplanationItem]:
 
 
 def _parse_plain_with_coverage(value: str) -> tuple[list[SymbolExplanationItem], bool]:
+    single = _SINGLE_PLAIN_ITEM.match(value)
+    if single is not None and len(re.findall(r"(?:——|--|—)", value)) == 1:
+        symbol = single.group(1).strip()
+        raw_description = single.group(2).strip()
+        description = raw_description.rstrip("；。;").strip()
+        has_mixed_sentence = "。" in raw_description.rstrip("。").strip()
+        if symbol and description and not has_mixed_sentence:
+            return [SymbolExplanationItem(symbol=symbol, latex=None, description=description)], True
     matches = list(_PLAIN_ITEM.finditer(value))
     items = [
         SymbolExplanationItem(

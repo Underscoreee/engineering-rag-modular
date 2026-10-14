@@ -38,6 +38,12 @@ from engineering_rag.modules.document_parser.internal.e2e import (
     plan_batches,
 )
 from engineering_rag.modules.document_parser.internal.e2e.models import RunStatus
+from engineering_rag.modules.document_parser.internal.e2e.path_safety import (
+    UnsafeArtifactPathError,
+    read_regular_file,
+    trusted_artifact,
+)
+from engineering_rag.modules.document_parser.internal.e2e.run_directory import RunDirectoryLease
 from engineering_rag.modules.document_parser.internal.mineru.models import MinerUParseResult
 from engineering_rag.modules.document_parser.internal.mineru.v24_adapter import adapt_to_v24
 from engineering_rag.modules.document_parser.internal.semantic import assemble_semantics
@@ -45,6 +51,7 @@ from engineering_rag.modules.document_parser.internal.semantic import assemble_s
 SOURCE_SHA256 = "43048a647d595fc8e16545851491bab82d3df851b91fe227ba2f7f84f5b64682"
 DEFAULT_PAGES = "1,2,3,9,12,16,24,28-29,37-38,50,126-127,275-279,282,301"
 MAX_JSON_BYTES = 128 * 1024 * 1024
+MINERU_RUNTIME_COMPATIBILITY = "mineru-4.0.12-zero-area-ocr-pre-crop-filter-v1"
 REPLAY_CATALOG = {
     (1,): "data/eval/task1_2_mineru/runs/final/P001/single_page/normalized.json",
     (2,): "data/eval/task1_2_mineru/runs/final/P002/single_page/normalized.json",
@@ -79,8 +86,29 @@ class LocalReadOnlyFileStore:
             yield stream
 
 
-def main(argv: list[str] | None = None) -> int:
+class _PageProgress:
+    def __init__(self, selected_pages: list[int], *, enabled: bool = False) -> None:
+        self._selected_pages = set(selected_pages)
+        self._completed_pages: set[int] = set()
+        self._enabled = enabled
+
+    def batch_finished(self, page_numbers: list[int], *, succeeded: bool) -> None:
+        if not self._enabled or not succeeded:
+            return
+        self._completed_pages.update(self._selected_pages.intersection(page_numbers))
+        completed = len(self._completed_pages)
+        total = len(self._selected_pages)
+        percentage = completed * 100 // total
+        print(f"PDF 解析进度：{completed}/{total} 页 ({percentage}%)", flush=True)
+
+
+def main(argv: list[str] | None = None, *, show_progress: bool = False) -> int:
     args = _arguments(argv)
+    with RunDirectoryLease(args.output, resume=args.resume) as run_dir:
+        return _run(args, run_dir, show_progress=show_progress or args.show_progress)
+
+
+def _run(args: argparse.Namespace, run_dir: Path, *, show_progress: bool = False) -> int:
     started = time.perf_counter()
     pdf = args.pdf.resolve()
     sha256, size_bytes = _digest(pdf)
@@ -97,8 +125,7 @@ def main(argv: list[str] | None = None) -> int:
     except PermissionError as exc:
         raise SystemExit(f"{exc}; --confirm-full-document is also required") from exc
     plans = plan_batches(pages, max_batch_size=args.batch_size)
-    run_dir = args.output.resolve()
-    run_dir.mkdir(parents=True, exist_ok=True)
+    progress = _PageProgress(pages, enabled=show_progress)
     standard = StandardMetadata(
         standard_name=args.standard_name,
         standard_code=args.standard_code,
@@ -131,14 +158,21 @@ def main(argv: list[str] | None = None) -> int:
         "standard": standard.model_dump(mode="json"),
         "explanation_cover_page": args.explanation_cover_page,
     }
+    if args.mode == RunMode.LIVE_MINERU:
+        config_payload["mineru_runtime_compatibility"] = MINERU_RUNTIME_COMPATIBILITY
     config_sha = _json_sha(config_payload)
     replay_paths = (
         [] if args.mode == RunMode.LIVE_MINERU else (args.normalized or _catalog_paths(pages))
     )
+    replay_root = args.replay_root or Path.cwd()
     model_signature = (
         _model_signature(args.mineru_home)
         if args.mode == RunMode.LIVE_MINERU
-        else _replay_signature(replay_paths)
+        else _replay_signature(
+            replay_paths,
+            expected_source_sha256=sha256,
+            trusted_root=replay_root,
+        )
     )
     source = SourceIdentity(
         document_id=document_id,
@@ -153,20 +187,37 @@ def main(argv: list[str] | None = None) -> int:
     checkpoint = CheckpointStore(run_dir)
     resumed_batch_ids: list[str] = []
     if replay_paths:
-        _atomic_json(
-            run_dir / "replay_inputs_manifest.json",
-            {
-                "mode": args.mode,
-                "claim": "saved real MinerU output replay; no inference performed",
-                "inputs": [_replay_file_record(path) for path in replay_paths],
-            },
-        )
+        replay_manifest = {
+            "mode": args.mode,
+            "claim": "saved real MinerU output replay; no inference performed",
+            "inputs": [
+                _replay_file_record(
+                    path,
+                    expected_source_sha256=sha256,
+                    trusted_root=replay_root,
+                )
+                for path in replay_paths
+            ],
+        }
+        replay_manifest_path = run_dir / "replay_inputs_manifest.json"
+        if args.resume:
+            committed_manifest = json.loads(
+                read_regular_file(replay_manifest_path, max_bytes=MAX_JSON_BYTES).decode("utf-8")
+            )
+            if committed_manifest != replay_manifest:
+                raise ValueError("resume replay input manifest mismatch")
+        else:
+            _atomic_json(replay_manifest_path, replay_manifest)
     if args.resume:
         state = checkpoint.load(
             expected_source_sha256=sha256,
             expected_config_sha256=config_sha,
             expected_model_signature=model_signature,
         )
+        if state.run_id != args.run_id:
+            raise ValueError(
+                f"resume run_id mismatch: existing {state.run_id!r}, requested {args.run_id!r}"
+            )
         resumed_batch_ids = [
             batch.batch_id for batch in state.batches if batch.status == RunStatus.SUCCEEDED
         ]
@@ -203,11 +254,15 @@ def main(argv: list[str] | None = None) -> int:
             batch_dir.mkdir(parents=True, exist_ok=True)
             document_path = batch_dir / "document.partial.json"
             if batch_state.status == RunStatus.SUCCEEDED and args.resume:
-                batch_documents.append(
-                    Document.model_validate_json(document_path.read_text(encoding="utf-8"))
+                document = Document.model_validate_json(document_path.read_text(encoding="utf-8"))
+                batch_documents.append(document)
+                all_results.extend(
+                    _load_saved_batch_results(batch_dir, expected_source_sha256=sha256)
                 )
-                all_results.extend(_load_saved_batch_results(batch_dir))
                 _merge_saved_sidecars(sidecars, batch_dir / "private_sidecars.json")
+                progress.batch_finished(
+                    [page.page_number for page in document.pages], succeeded=True
+                )
                 continue
             batch_state.status = RunStatus.RUNNING
             batch_state.attempts += 1
@@ -219,7 +274,12 @@ def main(argv: list[str] | None = None) -> int:
                 results = (
                     [_run_live_batch(args, pdf, file_ref, standard, plan.pages, batch_dir)]
                     if args.mode == RunMode.LIVE_MINERU
-                    else _load_replay_batch(plan.pages, args.normalized)
+                    else _load_replay_batch(
+                        plan.pages,
+                        args.normalized,
+                        expected_source_sha256=sha256,
+                        trusted_root=replay_root,
+                    )
                 )
                 adaptations = [
                     adapt_to_v24(
@@ -257,7 +317,9 @@ def main(argv: list[str] | None = None) -> int:
                 batch_state.peak_rss_bytes = _peak_rss_bytes()
                 checkpoint.save(state)
             if batch_state.status == RunStatus.FAILED:
+                progress.batch_finished([], succeeded=False)
                 continue
+            progress.batch_finished([page.page_number for page in document.pages], succeeded=True)
         if not batch_documents:
             raise RuntimeError("all parser batches failed; no final Document can be committed")
         merged = merge_documents(batch_documents)
@@ -292,14 +354,18 @@ def main(argv: list[str] | None = None) -> int:
             semantic.pending_links.model_dump(mode="json"),
         )
         _render_overlays(pdf, final_document, final_dir / "overlays")
-        matrix = json.loads(args.test_matrix.read_text(encoding="utf-8"))
+        matrix = json.loads(read_regular_file(args.test_matrix).decode("utf-8"))
         candidates = build_candidate_records(matrix, final_document)
         qa_dir = run_dir / "qa"
         qa_dir.mkdir(exist_ok=True)
         _write_jsonl(qa_dir / "gold_candidates.jsonl", candidates)
         verified = _read_jsonl(args.verified_gold) if args.verified_gold else []
         _write_jsonl(qa_dir / "gold_verified.jsonl", verified)
-        metrics = evaluate_verified_records(verified)
+        metrics = evaluate_verified_records(
+            verified,
+            document=final_document,
+            expected_source_sha256=sha256,
+        )
         metrics["coverage"] = _coverage(final_document, semantic.statistics, pages)
         _atomic_json(qa_dir / "metrics.json", metrics)
         _atomic_json(qa_dir / "semantic_integrity.json", _semantic_integrity(final_document))
@@ -418,14 +484,34 @@ def _run_live_batch(
     return parser.last_mineru_result
 
 
-def _load_replay_batch(pages: list[int], explicit: list[Path]) -> list[MinerUParseResult]:
+def _load_replay_batch(
+    pages: list[int],
+    explicit: list[Path],
+    *,
+    expected_source_sha256: str,
+    trusted_root: Path,
+) -> list[MinerUParseResult]:
     if explicit:
-        loaded = [_load_result(path) for path in explicit]
+        loaded = [
+            _load_result(
+                path,
+                expected_source_sha256=expected_source_sha256,
+                trusted_root=trusted_root,
+            )
+            for path in explicit
+        ]
         results = [
             result for result in loaded if {page.page_number for page in result.pages} <= set(pages)
         ]
     else:
-        results = [_load_result(path) for path in _catalog_paths(pages)]
+        results = [
+            _load_result(
+                path,
+                expected_source_sha256=expected_source_sha256,
+                trusted_root=trusted_root,
+            )
+            for path in _catalog_paths(pages)
+        ]
     actual = sorted(page.page_number for result in results for page in result.pages)
     if actual != pages:
         raise ValueError(f"replay page mapping mismatch: expected {pages}, got {actual}")
@@ -444,18 +530,34 @@ def _catalog_paths(pages: list[int]) -> list[Path]:
     return paths
 
 
-def _load_result(path: Path) -> MinerUParseResult:
-    path = path.resolve()
-    if path.is_symlink() or not path.is_file() or path.stat().st_size > MAX_JSON_BYTES:
-        raise ValueError(f"unsafe, absent, or oversized replay input: {path}")
-    result = MinerUParseResult.model_validate_json(path.read_text(encoding="utf-8"))
-    if result.source_sha256 != SOURCE_SHA256:
+def _load_result(
+    path: Path,
+    *,
+    expected_source_sha256: str = SOURCE_SHA256,
+    trusted_root: Path | None = None,
+) -> MinerUParseResult:
+    try:
+        safe_path = trusted_artifact(trusted_root or Path.cwd(), path)
+        payload = read_regular_file(safe_path, max_bytes=MAX_JSON_BYTES)
+    except (FileNotFoundError, UnsafeArtifactPathError) as exc:
+        raise ValueError(f"unsafe, absent, or oversized replay input: {path}") from exc
+    result = MinerUParseResult.model_validate_json(payload)
+    if result.source_sha256 != expected_source_sha256:
         raise ValueError(f"replay source identity mismatch: {path}")
     return result
 
 
-def _load_saved_batch_results(batch_dir: Path) -> list[MinerUParseResult]:
-    return [_load_result(path) for path in sorted(batch_dir.glob("normalized-*.json"))]
+def _load_saved_batch_results(
+    batch_dir: Path, *, expected_source_sha256: str
+) -> list[MinerUParseResult]:
+    return [
+        _load_result(
+            path,
+            expected_source_sha256=expected_source_sha256,
+            trusted_root=batch_dir,
+        )
+        for path in sorted(batch_dir.glob("normalized-*.json"))
+    ]
 
 
 def _adaptation_sidecars(adaptations: list[object]) -> dict[str, list[object]]:
@@ -489,7 +591,7 @@ def _extend_sidecars(target: dict[str, list[object]], source: dict[str, list[obj
 
 
 def _merge_saved_sidecars(target: dict[str, list[object]], path: Path) -> None:
-    payload = json.loads(path.read_text(encoding="utf-8"))
+    payload = json.loads(read_regular_file(path, max_bytes=MAX_JSON_BYTES).decode("utf-8"))
     _extend_sidecars(target, payload)
 
 
@@ -693,14 +795,20 @@ def _arguments(argv: list[str] | None) -> argparse.Namespace:
     parser.add_argument("--run-id", required=True)
     parser.add_argument("--batch-size", type=int, default=20)
     parser.add_argument("--resume", action="store_true")
+    parser.add_argument("--show-progress", action="store_true")
     parser.add_argument("--continue-on-batch-error", action="store_true")
     parser.add_argument("--confirm-full-document", action="store_true", help=argparse.SUPPRESS)
     parser.add_argument("--normalized", type=Path, action="append", default=[])
+    parser.add_argument(
+        "--replay-root",
+        type=Path,
+        help="trusted root containing all --normalized replay inputs (default: cwd)",
+    )
     parser.add_argument("--verified-gold", type=Path)
     parser.add_argument("--test-matrix", type=Path, default=Path("TASK_1_6_TEST_MATRIX.json"))
     parser.add_argument("--standard-name", default="混凝土结构设计规范")
     parser.add_argument("--standard-code", default="GB 50010-2010")
-    parser.add_argument("--expected-sha256", default=SOURCE_SHA256)
+    parser.add_argument("--expected-sha256")
     parser.add_argument("--edition", default="2015年版")
     parser.add_argument("--revision")
     parser.add_argument("--explanation-cover-page", type=int, default=277)
@@ -752,19 +860,39 @@ def _model_signature(root: Path) -> str:
     for path in files:
         digest.update(str(path.relative_to(model_root)).encode())
         digest.update(_digest(path)[0].encode())
+    compatibility_hook = (
+        Path(__file__).parents[1]
+        / "src/engineering_rag/modules/document_parser/internal/mineru/compat/sitecustomize.py"
+    )
+    digest.update(MINERU_RUNTIME_COMPATIBILITY.encode())
+    digest.update(_digest(compatibility_hook)[0].encode())
     return digest.hexdigest()
 
 
-def _replay_signature(paths: list[Path]) -> str:
+def _replay_signature(paths: list[Path], *, expected_source_sha256: str, trusted_root: Path) -> str:
     digest = hashlib.sha256()
-    for path in sorted(path.resolve() for path in paths):
-        digest.update(_digest(path)[0].encode())
+    for path in sorted(paths, key=str):
+        safe_path = trusted_artifact(trusted_root, path)
+        _load_result(
+            safe_path,
+            expected_source_sha256=expected_source_sha256,
+            trusted_root=trusted_root,
+        )
+        digest.update(hashlib.sha256(read_regular_file(safe_path)).hexdigest().encode())
     return digest.hexdigest()
 
 
-def _replay_file_record(path: Path) -> dict[str, object]:
-    result = _load_result(path)
-    sha256, size = _digest(path)
+def _replay_file_record(
+    path: Path, *, expected_source_sha256: str, trusted_root: Path
+) -> dict[str, object]:
+    safe_path = trusted_artifact(trusted_root, path)
+    result = _load_result(
+        safe_path,
+        expected_source_sha256=expected_source_sha256,
+        trusted_root=trusted_root,
+    )
+    payload = read_regular_file(safe_path)
+    sha256, size = hashlib.sha256(payload).hexdigest(), len(payload)
     return {
         "path": str(path),
         "sha256": sha256,
@@ -815,7 +943,9 @@ def _write_jsonl(path: Path, records: list[dict[str, object]]) -> None:
 
 def _read_jsonl(path: Path) -> list[dict[str, object]]:
     return [
-        json.loads(line) for line in path.read_text(encoding="utf-8").splitlines() if line.strip()
+        json.loads(line)
+        for line in read_regular_file(path, max_bytes=MAX_JSON_BYTES).decode("utf-8").splitlines()
+        if line.strip()
     ]
 
 
@@ -846,7 +976,9 @@ def _percentile(values: list[float], proportion: float) -> float | None:
 
 def _directory_bytes(root: Path) -> int:
     return sum(
-        path.stat().st_size for path in root.rglob("*") if path.is_file() and not path.is_symlink()
+        path.stat().st_size
+        for path in root.rglob("*")
+        if path.is_file() and not path.is_symlink() and path.name != ".task1_6_run.lock"
     )
 
 
@@ -854,7 +986,7 @@ def _artifact_records(root: Path) -> list[dict[str, object]]:
     excluded = {root / "run_manifest.json", root / "final" / "artifact_manifest.json"}
     records = []
     for path in sorted(item for item in root.rglob("*") if item.is_file()):
-        if path in excluded or path.is_symlink():
+        if path in excluded or path.is_symlink() or path.name == ".task1_6_run.lock":
             continue
         sha256, size = _digest(path)
         records.append({"path": str(path.relative_to(root)), "sha256": sha256, "size_bytes": size})

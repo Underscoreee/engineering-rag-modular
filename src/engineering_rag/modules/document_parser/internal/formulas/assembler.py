@@ -17,6 +17,7 @@ from engineering_rag.contracts.documents import (
 from engineering_rag.modules.document_parser.internal.mineru.models import (
     MinerUBbox,
     MinerUElement,
+    MinerUPage,
     MinerUParseResult,
 )
 
@@ -26,6 +27,7 @@ from .models import (
     FormulaEquationCandidate,
     FormulaGroupLineage,
     FormulaPlacement,
+    FormulaPrintedNoteEvidence,
     FormulaSemanticComponent,
     FormulaSemanticCoverage,
     FormulaSidecar,
@@ -44,6 +46,8 @@ _PAGE_50_VISUAL_CORRECTION = (
     "6.2.1-1",
 )
 _TRAILING_TAG = re.compile(r"\\tag\{[^{}]+\}\s*$")
+_CLAUSE_BOUNDARY = re.compile(r"^\s*\d+\.\d+\.\d+(?![-.\d条])")
+_FORMULA_NOTE = re.compile(r"^\s*注\s*[:：].*公式[（(](?P<number>\d+(?:\.\d+)+(?:-\d+)?)[）)]")
 
 
 def assemble_mineru_formulas(result: MinerUParseResult) -> FormulaAssemblyResult:
@@ -53,6 +57,7 @@ def assemble_mineru_formulas(result: MinerUParseResult) -> FormulaAssemblyResult
     sidecars: list[FormulaSidecar] = []
     dedup_coverage: list[FormulaSemanticCoverage] = []
     omitted: list[dict[str, object]] = []
+    pages_by_number = {page.page_number: page for page in result.pages}
     for page in result.pages:
         formula_count = sum(element.raw_type == "equation" for element in page.elements)
         if formula_count > MAX_FORMULAS_PER_PAGE:
@@ -91,6 +96,10 @@ def assemble_mineru_formulas(result: MinerUParseResult) -> FormulaAssemblyResult
                 symbols, symbol_evidence, _ = collect_symbol_explanations(
                     page.elements, symbol_start
                 )
+                if symbols is not None:
+                    corrections = _reconcile_symbol_prime_ocr(symbols, candidates)
+                    if symbol_evidence is not None:
+                        symbol_evidence.diagnostics.extend(corrections)
             equations: list[Equation] = []
             conditions: list[FormulaApplicabilityLink | None] = []
             for position, candidate in zip(candidate_positions, candidates, strict=True):
@@ -127,11 +136,33 @@ def assemble_mineru_formulas(result: MinerUParseResult) -> FormulaAssemblyResult
                 if symbol_evidence is not None
                 else []
             )
+            printed_notes: list[FormulaPrintedNoteEvidence] = []
+            extra_components: list[FormulaSemanticComponent] = []
+            if symbols is not None and coverage and coverage[-1].cross_page_incomplete:
+                (
+                    symbols,
+                    cross_page_coverage,
+                    printed_notes,
+                    extra_components,
+                    cross_page_consumed,
+                ) = _extend_cross_page_formula_semantics(
+                    result,
+                    page.page_number,
+                    group_id,
+                    symbols,
+                    coverage[-1],
+                    pages_by_number,
+                )
+                coverage.extend(cross_page_coverage)
+                consumed_body.update(cross_page_consumed)
             symbols = _symbols_without_unresolved_sources(symbols, coverage)
             group_bbox_values = [candidate.bbox for candidate in candidates]
             group_bbox_values.extend(condition.bbox for condition in linked_conditions)
             group_bbox_values.extend(
-                item.raw_bbox for item in coverage if item.duplicate_disposition == "consumed"
+                item.raw_bbox
+                for item in coverage
+                if item.duplicate_disposition == "consumed"
+                and item.source_page_number == page.page_number
             )
             placement = FormulaPlacement(
                 block_id=block_id,
@@ -161,6 +192,7 @@ def assemble_mineru_formulas(result: MinerUParseResult) -> FormulaAssemblyResult
                 linked_conditions,
                 coverage,
             )
+            components.extend(extra_components)
             sidecars.append(
                 FormulaSidecar(
                     block_id=block_id,
@@ -174,6 +206,7 @@ def assemble_mineru_formulas(result: MinerUParseResult) -> FormulaAssemblyResult
                         scope_formula_ids if symbols is not None else []
                     ),
                     semantic_components=components,
+                    printed_notes=printed_notes,
                     lineage=[
                         FormulaGroupLineage(
                             old_block_id=candidate.source_block_id,
@@ -207,7 +240,7 @@ def assemble_mineru_formulas(result: MinerUParseResult) -> FormulaAssemblyResult
             if coverage:
                 dedup_coverage.extend(coverage)
                 consumed_body.update(
-                    (page.page_number, item.source_index)
+                    (item.source_page_number, item.source_index)
                     for item in coverage
                     if item.duplicate_disposition == "consumed"
                 )
@@ -218,6 +251,179 @@ def assemble_mineru_formulas(result: MinerUParseResult) -> FormulaAssemblyResult
         sidecars=sidecars,
         dedup_coverage=dedup_coverage,
         omitted=omitted,
+    )
+
+
+def _extend_cross_page_formula_semantics(
+    result: MinerUParseResult,
+    page_number: int,
+    group_id: str,
+    symbols: SymbolExplanations,
+    incomplete: FormulaSemanticCoverage,
+    pages_by_number: dict[int, MinerUPage],
+) -> tuple[
+    SymbolExplanations,
+    list[FormulaSemanticCoverage],
+    list[FormulaPrintedNoteEvidence],
+    list[FormulaSemanticComponent],
+    set[tuple[int, int]],
+]:
+    """Conservatively consume leading next-page symbol semantics until a clause boundary."""
+
+    next_page = pages_by_number.get(page_number + 1)
+    if next_page is None or not symbols.items:
+        return symbols, [], [], [], set()
+    elements = next_page.elements
+    coverage: list[FormulaSemanticCoverage] = []
+    notes: list[FormulaPrintedNoteEvidence] = []
+    components: list[FormulaSemanticComponent] = []
+    consumed: set[tuple[int, int]] = set()
+    needs_continuation = True
+    for element in elements:
+        if element.raw_type == "page_number":
+            break
+        if element.raw_type not in {"text", "paragraph_title", "title"}:
+            break
+        raw_text = (element.text or "").strip()
+        if not raw_text or element.bbox is None or _CLAUSE_BOUNDARY.match(raw_text):
+            break
+        source_block_id = _stable_id(
+            "block",
+            result.source_sha256,
+            str(element.page_number),
+            str(element.source_index),
+            element.raw_type,
+        )
+        if needs_continuation:
+            symbols.items[-1].description = f"{symbols.items[-1].description}{raw_text}"
+            item_index = len(symbols.items) - 1
+            coverage.append(_cross_page_coverage(element, source_block_id, group_id, [item_index]))
+            consumed.add((element.page_number, element.source_index))
+            incomplete.cross_page_incomplete = False
+            incomplete.review_status = "unverified"
+            incomplete.reason = "symbol explanation completed by contiguous next-page evidence"
+            needs_continuation = False
+            continue
+        note_match = _FORMULA_NOTE.match(raw_text)
+        if note_match is not None:
+            note = FormulaPrintedNoteEvidence(
+                source_page_number=element.page_number,
+                source_index=element.source_index,
+                source_block_id=source_block_id,
+                raw_text=raw_text,
+                raw_bbox=element.bbox,
+                target_formula_group_id=group_id,
+                referenced_equation_numbers=[note_match.group("number")],
+            )
+            notes.append(note)
+            components.append(
+                _cross_page_component(element, source_block_id, group_id, "printed_note")
+            )
+            consumed.add((element.page_number, element.source_index))
+            continue
+        if not _is_cross_page_symbol_candidate(element):
+            break
+        parsed, _, _ = collect_symbol_explanations([element], 0)
+        if parsed is None:
+            break
+        first_new_index = len(symbols.items)
+        symbols.items.extend(parsed.items)
+        item_indices = list(range(first_new_index, len(symbols.items)))
+        coverage.append(_cross_page_coverage(element, source_block_id, group_id, item_indices))
+        consumed.add((element.page_number, element.source_index))
+    return symbols, coverage, notes, components, consumed
+
+
+def _reconcile_symbol_prime_ocr(
+    symbols: SymbolExplanations, candidates: list[FormulaEquationCandidate]
+) -> list[str]:
+    """Remove a spurious prime only when the group's equation LaTeX confirms the base symbol."""
+
+    formula_text = _compact_latex(" ".join(item.raw_latex or "" for item in candidates))
+    diagnostics: list[str] = []
+    for item in symbols.items:
+        tokens = item.symbol.split("、")
+        corrected: list[str] = []
+        changed = False
+        for token in tokens:
+            without_prime = re.sub(r"\s*\^\s*\{\s*\\prime\s*\}", "", token)
+            if without_prime != token and _compact_latex(without_prime) in formula_text:
+                corrected.append(without_prime)
+                changed = True
+            else:
+                corrected.append(token)
+        if changed:
+            item.symbol = "、".join(corrected)
+            diagnostics.append(
+                "symbol prime removed because the grouped equation LaTeX contains the base symbol"
+            )
+    return diagnostics
+
+
+def _compact_latex(value: str) -> str:
+    compact = re.sub(r"\\(?:mathrm|mathbf|mathit)\s*", "", value)
+    return re.sub(r"[\s{}\\]", "", compact)
+
+
+def _is_cross_page_symbol_candidate(element: MinerUElement) -> bool:
+    if element.raw_type != "text" or not element.text:
+        return False
+    content = element.raw.get("content")
+    has_inline_formula = isinstance(content, list) and any(
+        isinstance(item, dict) and item.get("type") == "equation_inline" for item in content
+    )
+    return has_inline_formula or bool(re.search(r"(?:——|--|—)", element.text))
+
+
+def _cross_page_coverage(
+    element: MinerUElement,
+    source_block_id: str,
+    group_id: str,
+    item_indices: list[int],
+) -> FormulaSemanticCoverage:
+    assert element.text is not None and element.bbox is not None
+    return FormulaSemanticCoverage(
+        source_block_id=source_block_id,
+        source_page_number=element.page_number,
+        source_index=element.source_index,
+        raw_text=element.text,
+        raw_bbox=element.bbox,
+        raw_sha256=hashlib.sha256(
+            json.dumps(
+                element.raw, ensure_ascii=False, sort_keys=True, separators=(",", ":")
+            ).encode("utf-8")
+        ).hexdigest(),
+        target_formula_group_id=group_id,
+        target_symbol_item_indices=item_indices,
+        matched_source_span=element.text,
+        consumed_text_ranges=[(0, len(element.text))],
+        duplicate_disposition="consumed",
+        review_status="unverified",
+        reason="contiguous next-page formula semantic source fully consumed",
+    )
+
+
+def _cross_page_component(
+    element: MinerUElement,
+    source_block_id: str,
+    group_id: str,
+    role: str,
+) -> FormulaSemanticComponent:
+    assert element.text is not None and element.bbox is not None
+    return FormulaSemanticComponent(
+        source_id=_stable_id("formula-source", source_block_id, role),
+        original_block_id=source_block_id,
+        source_page_number=element.page_number,
+        source_index=element.source_index,
+        raw_text=element.text,
+        raw_bbox=element.bbox,
+        original_status=RecognitionStatus.UNVERIFIED,
+        consumed_text_ranges=[(0, len(element.text))],
+        target_formula_group_id=group_id,
+        semantic_role=role,
+        component_bbox=element.bbox,
+        review_status="unverified",
+        diagnostics=["contiguous next-page source consumed by formula group"],
     )
 
 

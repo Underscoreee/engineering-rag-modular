@@ -7,6 +7,7 @@ from dataclasses import dataclass
 from pydantic import BaseModel, ConfigDict, Field
 
 from engineering_rag.contracts.documents import LogicalTable
+from engineering_rag.modules.document_parser.internal.mineru.models import MinerUBbox
 
 
 class _PrivateModel(BaseModel):
@@ -59,11 +60,22 @@ class TablePlacement(_PrivateModel):
     label: str | None = None
 
 
+class TableNoteEvidence(_PrivateModel):
+    source_page_number: int = Field(ge=1)
+    source_index: int = Field(ge=0)
+    source_block_id: str = Field(min_length=1)
+    source_bbox: MinerUBbox
+    raw_text: str = Field(min_length=1)
+    note_number: int = Field(ge=1)
+    consumed_by_table_id: str = Field(min_length=1)
+
+
 class TableSidecar(_PrivateModel):
     table_id: str = Field(min_length=1)
     table_number: str | None = None
     fragments: list[TableFragmentCandidate]
     continuation_decisions: list[ContinuationDecision] = Field(default_factory=list)
+    note_evidence: list[TableNoteEvidence] = Field(default_factory=list)
     unnumbered_notes: list[str] = Field(default_factory=list)
     diagnostics: list[str] = Field(default_factory=list)
 
@@ -73,4 +85,5 @@ class TableAssemblyResult:
     tables: list[LogicalTable]
     placements: dict[tuple[int, int], TablePlacement]
     sidecars: list[TableSidecar]
+    consumed_body: set[tuple[int, int]]
     omitted: list[dict[str, object]]

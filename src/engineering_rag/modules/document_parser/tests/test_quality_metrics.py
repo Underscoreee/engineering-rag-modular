@@ -1,7 +1,10 @@
 """Task 1.6 verified-gold safeguards."""
 
+from pathlib import Path
+
 import pytest
 
+from engineering_rag.contracts.documents import Document
 from engineering_rag.modules.document_parser.internal.e2e.quality import (
     evaluate_verified_records,
 )
@@ -73,3 +76,55 @@ def test_verified_ocr_and_reviewed_observations_use_real_denominators() -> None:
     assert result["metrics"]["ocr_cer"]["denominator"] == 3
     assert result["metrics"]["formula_accuracy"]["value"] == pytest.approx(2 / 3)
     assert result["metrics"]["bbox_iou"]["value"] == pytest.approx(0.7)
+
+
+def test_publishable_page_type_metric_uses_document_not_review_predictions() -> None:
+    document = Document.model_validate_json(
+        Path("examples/document.partial.example.json").read_text(encoding="utf-8")
+    )
+    document = document.model_copy(
+        update={"source_file": document.source_file.model_copy(update={"sha256": "a" * 64})}
+    )
+    page = document.pages[0]
+    result = evaluate_verified_records(
+        [
+            {
+                "golden_status": "verified",
+                "reviewer": "reviewer-1",
+                "reviewed_at": "2026-10-13T08:00:00+08:00",
+                "dataset_version": "1",
+                "provenance": "source PDF plus reviewed overlay",
+                "source_sha256": document.source_file.sha256,
+                "verified_labels": {"page_types": {str(page.page_number): page.page_type.value}},
+                "machine_predictions": {"page_types": {str(page.page_number): "unknown"}},
+            }
+        ],
+        document=document,
+    )
+    assert result["golden_dataset_status"] == "verified"
+    assert result["prediction_provenance"] == "document_v2.4"
+    assert result["metrics"]["page_type_accuracy"]["value"] == 1.0
+
+
+def test_publishable_evaluation_rejects_source_mismatch_and_naive_review_time() -> None:
+    document = Document.model_validate_json(
+        Path("examples/document.partial.example.json").read_text(encoding="utf-8")
+    )
+    document = document.model_copy(
+        update={"source_file": document.source_file.model_copy(update={"sha256": "a" * 64})}
+    )
+    record = {
+        "golden_status": "verified",
+        "reviewer": "reviewer-1",
+        "reviewed_at": "2026-10-13T08:00:00+08:00",
+        "dataset_version": "1",
+        "provenance": "source PDF plus reviewed overlay",
+        "source_sha256": "f" * 64,
+        "verified_labels": {},
+    }
+    with pytest.raises(ValueError, match="source identity mismatch"):
+        evaluate_verified_records([record], document=document)
+    record["source_sha256"] = document.source_file.sha256
+    record["reviewed_at"] = "2026-10-13T08:00:00"
+    with pytest.raises(ValueError, match="timezone"):
+        evaluate_verified_records([record], document=document)

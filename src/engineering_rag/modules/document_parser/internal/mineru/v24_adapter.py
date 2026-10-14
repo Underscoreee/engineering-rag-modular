@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+import re
+from collections import Counter
 from dataclasses import dataclass
 from uuid import NAMESPACE_URL, uuid5
 
@@ -40,6 +42,9 @@ from engineering_rag.modules.document_parser.internal.tables.models import Table
 
 from .models import MinerUElement, MinerUParseResult
 
+_CLAUSE_NUMBER = re.compile(r"^\s*\d+\.\d+\.\d+(?![-.\d])")
+_PRINTED_PAGE_NUMBER = re.compile(r"^\s*\d{1,4}\s*$")
+
 
 @dataclass(frozen=True, slots=True)
 class MinerUV24Adaptation:
@@ -64,6 +69,7 @@ def adapt_to_v24(
     )
     table_assembly = assemble_mineru_tables(result)
     formula_assembly = assemble_mineru_formulas(result)
+    printed_page_offset = _infer_printed_page_offset(result)
     tables: list[LogicalTable] = list(table_assembly.tables)
     pages: list[Page] = []
     omitted: list[dict[str, object]] = []
@@ -87,10 +93,16 @@ def adapt_to_v24(
                 str(element.source_index),
                 element.raw_type,
             )
+            printed_page_basis = _printed_page_number_basis(element, printed_page_offset)
+            if printed_page_basis is not None:
+                omission = _omission(element, "printed_page_number_filtered")
+                omission["filter_basis"] = printed_page_basis
+                omitted.append(omission)
+                continue
             if (
                 element.page_number,
                 element.source_index,
-            ) in formula_assembly.consumed_body:
+            ) in formula_assembly.consumed_body | table_assembly.consumed_body:
                 continue
             if element.raw_type == "table":
                 placement = table_assembly.placements.get(
@@ -189,9 +201,15 @@ def adapt_to_v24(
             if not element.text:
                 omitted.append(_omission(element, "no_mappable_text_payload"))
                 continue
+            title_candidate = element.raw_type in {
+                "title",
+                "paragraph_title",
+                "document_title",
+                "doc_title",
+            }
             block_type = (
                 BlockType.TITLE
-                if element.raw_type in {"title", "paragraph_title", "document_title", "doc_title"}
+                if title_candidate and _CLAUSE_NUMBER.match(element.text) is None
                 else BlockType.BODY
             )
             blocks.append(
@@ -264,6 +282,40 @@ def _omission(element: MinerUElement, reason: str) -> dict[str, object]:
         "raw_type": element.raw_type,
         "reason": reason,
     }
+
+
+def _printed_page_number_basis(element: MinerUElement, inferred_offset: int | None) -> str | None:
+    """Require footer geometry plus an engine label or batch-level numeric sequence."""
+
+    if (
+        not element.text
+        or _PRINTED_PAGE_NUMBER.fullmatch(element.text) is None
+        or element.bbox is None
+        or element.bbox.y_min < 0.82
+    ):
+        return None
+    if element.raw_type == "page_number":
+        return "mineru_page_number_region_and_footer_geometry"
+    if inferred_offset is not None and element.page_number - int(element.text) == inferred_offset:
+        return "footer_geometry_and_contiguous_printed_page_sequence"
+    return None
+
+
+def _infer_printed_page_offset(result: MinerUParseResult) -> int | None:
+    offsets = Counter(
+        element.page_number - int(element.text)
+        for page in result.pages
+        for element in page.elements
+        if element.raw_type == "page_number"
+        and element.text
+        and _PRINTED_PAGE_NUMBER.fullmatch(element.text)
+        and element.bbox is not None
+        and element.bbox.y_min >= 0.82
+    )
+    if not offsets:
+        return None
+    offset, count = offsets.most_common(1)[0]
+    return offset if count >= 2 else None
 
 
 def _stable_id(prefix: str, *parts: str) -> str:

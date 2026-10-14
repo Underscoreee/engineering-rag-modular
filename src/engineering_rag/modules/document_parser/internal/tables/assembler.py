@@ -14,7 +14,10 @@ from engineering_rag.contracts.documents import (
     RecognitionStatus,
     TableFragment,
 )
-from engineering_rag.modules.document_parser.internal.mineru.models import MinerUParseResult
+from engineering_rag.modules.document_parser.internal.mineru.models import (
+    MinerUElement,
+    MinerUParseResult,
+)
 
 from .continuation_matcher import decide_continuation
 from .header_normalizer import (
@@ -27,6 +30,7 @@ from .models import (
     ContinuationDecision,
     TableAssemblyResult,
     TableFragmentCandidate,
+    TableNoteEvidence,
     TablePlacement,
     TableSidecar,
 )
@@ -37,13 +41,16 @@ TABLE_ASSEMBLER_VERSION = "1.3.0"
 _CAPTION = re.compile(
     r"^\s*(?P<prefix>续表|表)\s*(?P<number>\d+(?:\.\d+)*(?:-\d+)?)\s*(?P<title>.*?)\s*$"
 )
+_ADJACENT_NOTE = re.compile(r"^\s*(?:注\s*[:：]?\s*)?(?P<number>\d+)\s*(?P<text>.+?)\s*$")
 
 
 def assemble_mineru_tables(result: MinerUParseResult) -> TableAssemblyResult:
     candidates: list[TableFragmentCandidate] = []
+    note_evidence_by_candidate: dict[tuple[int, int], list[TableNoteEvidence]] = {}
+    consumed_body: set[tuple[int, int]] = set()
     omitted: list[dict[str, object]] = []
     for page in result.pages:
-        for element in page.elements:
+        for position, element in enumerate(page.elements):
             if element.raw_type != "table":
                 continue
             if element.bbox is None:
@@ -72,27 +79,38 @@ def assemble_mineru_tables(result: MinerUParseResult) -> TableAssemblyResult:
             diagnostics = [*grid.diagnostics, f"header_basis:{header_basis}"]
             if not header_paths:
                 diagnostics.append("columns unavailable because header paths are incomplete")
-            candidates.append(
-                TableFragmentCandidate(
-                    page_number=element.page_number,
-                    source_index=element.source_index,
-                    block_id=stable_block_id(
-                        result.source_sha256,
-                        element.page_number,
-                        element.source_index,
-                    ),
-                    caption=element.table_caption,
-                    table_number=number,
-                    title=title,
-                    is_continuation=continuation,
-                    raw_html=element.table_html,
-                    raw_footnotes=element.table_footnotes,
-                    grid=grid,
-                    header_row_count=header_rows,
-                    header_paths=header_paths,
-                    diagnostics=diagnostics,
-                )
+            candidate = TableFragmentCandidate(
+                page_number=element.page_number,
+                source_index=element.source_index,
+                block_id=stable_block_id(
+                    result.source_sha256,
+                    element.page_number,
+                    element.source_index,
+                ),
+                caption=element.table_caption,
+                table_number=number,
+                title=title,
+                is_continuation=continuation,
+                raw_html=element.table_html,
+                raw_footnotes=list(element.table_footnotes),
+                grid=grid,
+                header_row_count=header_rows,
+                header_paths=header_paths,
+                diagnostics=diagnostics,
             )
+            candidates.append(candidate)
+            adjacent = _collect_adjacent_notes(
+                result.source_sha256,
+                page.elements,
+                position,
+                candidate.raw_footnotes,
+            )
+            if adjacent:
+                candidate.raw_footnotes.extend(item.raw_text for item in adjacent)
+                note_evidence_by_candidate[(page.page_number, element.source_index)] = adjacent
+                consumed_body.update(
+                    (item.source_page_number, item.source_index) for item in adjacent
+                )
     groups, decisions = _group_fragments(candidates)
     tables: list[LogicalTable] = []
     placements: dict[tuple[int, int], TablePlacement] = {}
@@ -104,6 +122,13 @@ def assemble_mineru_tables(result: MinerUParseResult) -> TableAssemblyResult:
             fragments,
             decisions.get(id(fragments), []),
         )
+        sidecar.note_evidence = [
+            evidence.model_copy(update={"consumed_by_table_id": table_id})
+            for fragment in fragments
+            for evidence in note_evidence_by_candidate.get(
+                (fragment.page_number, fragment.source_index), []
+            )
+        ]
         tables.append(table)
         sidecars.append(sidecar)
         for index, fragment in enumerate(fragments):
@@ -116,8 +141,54 @@ def assemble_mineru_tables(result: MinerUParseResult) -> TableAssemblyResult:
         tables=tables,
         placements=placements,
         sidecars=sidecars,
+        consumed_body=consumed_body,
         omitted=omitted,
     )
+
+
+def _collect_adjacent_notes(
+    source_sha256: str,
+    elements: list[MinerUElement],
+    table_position: int,
+    embedded_notes: list[str],
+) -> list[TableNoteEvidence]:
+    """Consume only a consecutive numbered-note run immediately after a table."""
+
+    existing_numbers = [
+        int(match.group("number"))
+        for value in embedded_notes
+        if (match := _ADJACENT_NOTE.match(value)) is not None
+    ]
+    expected = max(existing_numbers, default=0) + 1
+    evidence: list[TableNoteEvidence] = []
+    for element in elements[table_position + 1 :]:
+        raw_type = element.raw_type
+        text = element.text
+        bbox = element.bbox
+        if raw_type == "page_number":
+            break
+        if raw_type != "text" or not text or bbox is None:
+            break
+        match = _ADJACENT_NOTE.match(text)
+        if match is None or int(match.group("number")) != expected:
+            break
+        page_number = element.page_number
+        source_index = element.source_index
+        evidence.append(
+            TableNoteEvidence(
+                source_page_number=page_number,
+                source_index=source_index,
+                source_block_id=_stable_id(
+                    "block", source_sha256, str(page_number), str(source_index), "text"
+                ),
+                source_bbox=bbox,
+                raw_text=text,
+                note_number=expected,
+                consumed_by_table_id="pending",
+            )
+        )
+        expected += 1
+    return evidence
 
 
 def parse_caption(caption: str | None) -> tuple[str | None, str | None, bool]:

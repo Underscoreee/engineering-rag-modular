@@ -7,6 +7,13 @@ import os
 from pathlib import Path
 
 from .models import RunState
+from .path_safety import (
+    UnsafeArtifactPathError,
+    contained_artifact,
+    lexical_absolute,
+    read_regular_file,
+    reject_symlink_components,
+)
 
 
 class CheckpointMismatchError(RuntimeError):
@@ -15,8 +22,10 @@ class CheckpointMismatchError(RuntimeError):
 
 class CheckpointStore:
     def __init__(self, run_dir: Path) -> None:
-        self.run_dir = run_dir.resolve()
+        self.run_dir = lexical_absolute(run_dir)
+        reject_symlink_components(self.run_dir)
         self.run_dir.mkdir(parents=True, exist_ok=True)
+        reject_symlink_components(self.run_dir)
         self.path = self.run_dir / "run_manifest.json"
 
     def save(self, state: RunState) -> None:
@@ -35,9 +44,11 @@ class CheckpointStore:
         expected_config_sha256: str,
         expected_model_signature: str,
     ) -> RunState:
-        if self.path.is_symlink() or not self.path.is_file():
-            raise CheckpointMismatchError("checkpoint is missing or unsafe")
-        state = RunState.model_validate_json(self.path.read_text(encoding="utf-8"))
+        try:
+            payload = read_regular_file(self.path, max_bytes=16 * 1024 * 1024)
+        except (FileNotFoundError, UnsafeArtifactPathError) as exc:
+            raise CheckpointMismatchError("checkpoint is missing or unsafe") from exc
+        state = RunState.model_validate_json(payload)
         mismatches = []
         if state.source.sha256 != expected_source_sha256:
             mismatches.append("source_sha256")
@@ -68,17 +79,15 @@ class CheckpointStore:
         return state
 
     def _resolve_artifact(self, relative: str) -> Path:
-        path = (self.run_dir / relative).resolve()
-        if self.run_dir not in path.parents:
-            raise CheckpointMismatchError("checkpoint artifact escapes run directory")
-        if path.is_symlink() or not path.is_file():
-            raise CheckpointMismatchError(f"checkpoint artifact is missing or unsafe: {relative}")
+        try:
+            path = contained_artifact(self.run_dir, relative)
+            read_regular_file(path)
+        except (FileNotFoundError, UnsafeArtifactPathError) as exc:
+            raise CheckpointMismatchError(
+                f"checkpoint artifact is missing or unsafe: {relative}"
+            ) from exc
         return path
 
 
 def _sha256(path: Path) -> str:
-    digest = hashlib.sha256()
-    with path.open("rb") as stream:
-        for chunk in iter(lambda: stream.read(1024 * 1024), b""):
-            digest.update(chunk)
-    return digest.hexdigest()
+    return hashlib.sha256(read_regular_file(path)).hexdigest()

@@ -16,6 +16,14 @@ from engineering_rag.modules.document_parser.internal.e2e import (
     SourceIdentity,
 )
 from engineering_rag.modules.document_parser.internal.e2e.models import RunStatus
+from engineering_rag.modules.document_parser.internal.e2e.path_safety import (
+    UnsafeArtifactPathError,
+    trusted_artifact,
+)
+from engineering_rag.modules.document_parser.internal.e2e.run_directory import RunDirectoryLease
+from engineering_rag.modules.document_parser.internal.mineru.compat.sitecustomize import (
+    _has_zero_crop_dimension,
+)
 from engineering_rag.modules.document_parser.internal.mineru.runner import (
     MinerUExecutionError,
     run_local,
@@ -64,6 +72,13 @@ def test_corrupt_zip_is_rejected(tmp_path: Path) -> None:
         safe_extract_zip(archive, tmp_path / "output")
 
 
+def test_mineru_4012_compatibility_filter_only_rejects_zero_area_boxes() -> None:
+    assert _has_zero_crop_dimension([[143.0, 58.0], [143.0, 58.0], [143.0, 76.0], [143.0, 76.0]])
+    assert not _has_zero_crop_dimension(
+        [[143.0, 58.0], [144.0, 58.0], [144.0, 76.0], [143.0, 76.0]]
+    )
+
+
 def test_checkpoint_replace_failure_keeps_last_committed_snapshot(
     monkeypatch: pytest.MonkeyPatch, tmp_path: Path
 ) -> None:
@@ -82,6 +97,27 @@ def test_checkpoint_replace_failure_keeps_last_committed_snapshot(
     with pytest.raises(OSError, match="disk commit failure"):
         store.save(_state(RunStatus.RUNNING))
     assert store.path.read_bytes() == original
+
+
+def test_run_directory_is_immutable_and_has_one_writer(tmp_path: Path) -> None:
+    run_dir = tmp_path / "run"
+    with RunDirectoryLease(run_dir, resume=False):
+        with pytest.raises(FileExistsError, match="immutable|resume"):
+            RunDirectoryLease(run_dir, resume=False)
+        (run_dir / "run_manifest.json").write_text("{}", encoding="utf-8")
+        with pytest.raises(RuntimeError, match="active writer"):
+            RunDirectoryLease(run_dir, resume=True)
+    with RunDirectoryLease(run_dir, resume=True) as resumed:
+        assert resumed == run_dir.absolute()
+
+
+def test_trusted_input_root_rejects_regular_file_outside_boundary(tmp_path: Path) -> None:
+    trusted = tmp_path / "trusted"
+    trusted.mkdir()
+    external = tmp_path / "external.json"
+    external.write_text("{}", encoding="utf-8")
+    with pytest.raises(UnsafeArtifactPathError, match="outside its trusted root"):
+        trusted_artifact(trusted, external)
 
 
 def _state(status: RunStatus) -> RunState:
