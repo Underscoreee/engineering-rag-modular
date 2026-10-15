@@ -37,11 +37,12 @@ from .models import (
 from .notes import parse_table_notes
 from .raw_html_parser import TableHtmlError, parse_html_table
 
-TABLE_ASSEMBLER_VERSION = "1.3.0"
+TABLE_ASSEMBLER_VERSION = "1.3.1"
 _CAPTION = re.compile(
     r"^\s*(?P<prefix>续表|表)\s*(?P<number>\d+(?:\.\d+)*(?:-\d+)?)\s*(?P<title>.*?)\s*$"
 )
 _ADJACENT_NOTE = re.compile(r"^\s*(?:注\s*[:：]?\s*)?(?P<number>\d+)\s*(?P<text>.+?)\s*$")
+_CLAUSE_BOUNDARY = re.compile(r"^\s*\d+\s*\.\s*\d+\s*\.\s*\d+(?![-.\d])")
 
 
 def assemble_mineru_tables(result: MinerUParseResult) -> TableAssemblyResult:
@@ -168,6 +169,8 @@ def _collect_adjacent_notes(
         if raw_type == "page_number":
             break
         if raw_type != "text" or not text or bbox is None:
+            break
+        if _CLAUSE_BOUNDARY.match(text):
             break
         match = _ADJACENT_NOTE.match(text)
         if match is None or int(match.group("number")) != expected:

@@ -123,12 +123,17 @@ def test_formula_symbols_and_note_continue_across_page_until_next_clause() -> No
     assert "4.1.4条及第4.2.3条的规定取值" in items[r"f_c、f_s"]
     assert items[r"a_k"] == "几何参数的标准值"
     assert [block.ocr.text for block in adaptation.document.pages[1].blocks] == [
-        "3.3.3 新条文不得被消费。"
+        r"注：公式（3.3.2-1）中的\gamma_0S为内力设计值。",
+        "3.3.3 新条文不得被消费。",
     ]
     sidecar = adaptation.formula_sidecars[0]
     assert sidecar.printed_notes[0].source_page_number == 25
     assert sidecar.printed_notes[0].target_formula_group_id == sidecar.formula_group_id
-    assert any(component.source_page_number == 25 for component in sidecar.semantic_components)
+    assert sidecar.printed_notes[0].projection_disposition == "retained_as_body"
+    assert (
+        sidecar.printed_notes[0].projection_block_id
+        == adaptation.document.pages[1].blocks[0].block_id
+    )
 
 
 def test_table_collects_sequential_adjacent_notes_without_crossing_next_clause() -> None:
@@ -148,6 +153,56 @@ def test_table_collects_sequential_adjacent_notes_without_crossing_next_clause()
         "3.4.4 新条文不得归入表注。",
     ]
     assert [item.source_index for item in adaptation.table_sidecars[0].note_evidence] == [1, 2]
+
+
+def test_three_level_clause_boundary_wins_over_next_expected_table_note() -> None:
+    adaptation = _adapt(
+        _result(
+            _page(
+                45,
+                _table(0, "表5.2.4 翼缘计算宽度", ["注：1 第一条；", "2 第二条；"]),
+                _text(1, "3 第三条；"),
+                _text(2, "4 第四条。"),
+                _text(3, "5.2.5 当地基与结构相互作用时，应考虑其影响。"),
+                _text(4, "5.3.1 后续条文。"),
+            )
+        )
+    )
+
+    table = adaptation.document.tables[0]
+    assert [note.number for note in table.notes or []] == [1, 2, 3, 4]
+    assert [block.ocr.text for block in adaptation.document.pages[0].blocks] == [
+        "表5.2.4 翼缘计算宽度",
+        "5.2.5 当地基与结构相互作用时，应考虑其影响。",
+        "5.3.1 后续条文。",
+    ]
+
+
+def test_formula_leadin_before_next_equation_is_not_appended_to_previous_symbol() -> None:
+    adaptation = _adapt(
+        _result(
+            _page(
+                41,
+                _text(0, "4.2.6 普通钢筋和预应力筋疲劳验算。"),
+                _text(1, "普通钢筋疲劳应力比值应按下列公式计算："),
+                _equation(2, r"\rho_s^f=\sigma_{s,min}^f/\sigma_{s,max}^f\tag{4.2.6-1}"),
+                _text(3, "式中：\\sigma_s——普通钢筋应力。"),
+                _text(4, "预应力筋疲劳应力比值应按下列公式计算："),
+                _equation(5, r"\rho_p^f=\sigma_{p,min}^f/\sigma_{p,max}^f\tag{4.2.6-2}"),
+                _text(6, "式中：\\sigma_p——预应力筋应力。"),
+            )
+        )
+    )
+
+    first_formula = adaptation.document.pages[0].blocks[2].ocr.formula_group
+    assert first_formula is not None and first_formula.symbol_explanations is not None
+    assert first_formula.symbol_explanations.items[0].description == "普通钢筋应力"
+    assert adaptation.document.pages[0].blocks[3].ocr.text == (
+        "预应力筋疲劳应力比值应按下列公式计算："
+    )
+    second_sidecar = adaptation.formula_sidecars[1]
+    assert second_sidecar.body_relations[0].semantic_role == "formula_leadin"
+    assert second_sidecar.body_relations[0].projection_disposition == "retained_as_body"
 
 
 def _adapt(result: MinerUParseResult):  # type: ignore[no-untyped-def]

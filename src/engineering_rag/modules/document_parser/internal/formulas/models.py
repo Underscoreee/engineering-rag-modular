@@ -126,8 +126,24 @@ class FormulaPrintedNoteEvidence(_PrivateModel):
     raw_text: str = Field(min_length=1)
     raw_bbox: MinerUBbox
     target_formula_group_id: str = Field(min_length=1)
+    target_formula_ids: list[str] = Field(default_factory=list)
     referenced_equation_numbers: list[str] = Field(default_factory=list)
+    projection_block_id: str = Field(min_length=1)
+    projection_disposition: Literal["retained_as_body"] = "retained_as_body"
     review_status: Literal["unverified", "needs_review"] = "unverified"
+
+
+class FormulaBodyRelationEvidence(_PrivateModel):
+    source_page_number: int = Field(ge=1)
+    source_index: int = Field(ge=0)
+    source_block_id: str = Field(min_length=1)
+    raw_text: str = Field(min_length=1)
+    raw_bbox: MinerUBbox
+    target_formula_group_id: str = Field(min_length=1)
+    target_formula_ids: list[str] = Field(default_factory=list)
+    semantic_role: Literal["formula_leadin"]
+    projection_disposition: Literal["retained_as_body"] = "retained_as_body"
+    diagnostics: list[str] = Field(default_factory=list)
 
 
 class FormulaPlacement(_PrivateModel):
@@ -151,6 +167,7 @@ class FormulaSidecar(_PrivateModel):
     explanation_scope_formula_ids: list[str] = Field(default_factory=list)
     semantic_components: list[FormulaSemanticComponent] = Field(default_factory=list)
     printed_notes: list[FormulaPrintedNoteEvidence] = Field(default_factory=list)
+    body_relations: list[FormulaBodyRelationEvidence] = Field(default_factory=list)
     lineage: list[FormulaGroupLineage] = Field(default_factory=list)
     grouping_basis: str
     diagnostics: list[str] = Field(default_factory=list)

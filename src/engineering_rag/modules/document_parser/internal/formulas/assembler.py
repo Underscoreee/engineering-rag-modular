@@ -24,6 +24,7 @@ from engineering_rag.modules.document_parser.internal.mineru.models import (
 from .models import (
     FormulaApplicabilityLink,
     FormulaAssemblyResult,
+    FormulaBodyRelationEvidence,
     FormulaEquationCandidate,
     FormulaGroupLineage,
     FormulaPlacement,
@@ -36,7 +37,7 @@ from .models import (
 from .number_matcher import evidence_from_latex, match_number
 from .symbol_explanations import collect_symbol_explanations, is_symbol_start
 
-FORMULA_ASSEMBLER_VERSION = "1.4.2"
+FORMULA_ASSEMBLER_VERSION = "1.4.3"
 MAX_LATEX_BYTES = 64 * 1024
 MAX_FORMULAS_PER_PAGE = 128
 _PAGE_50_VISUAL_CORRECTION = (
@@ -137,13 +138,11 @@ def assemble_mineru_formulas(result: MinerUParseResult) -> FormulaAssemblyResult
                 else []
             )
             printed_notes: list[FormulaPrintedNoteEvidence] = []
-            extra_components: list[FormulaSemanticComponent] = []
             if symbols is not None and coverage and coverage[-1].cross_page_incomplete:
                 (
                     symbols,
                     cross_page_coverage,
                     printed_notes,
-                    extra_components,
                     cross_page_consumed,
                 ) = _extend_cross_page_formula_semantics(
                     result,
@@ -152,6 +151,7 @@ def assemble_mineru_formulas(result: MinerUParseResult) -> FormulaAssemblyResult
                     symbols,
                     coverage[-1],
                     pages_by_number,
+                    equations,
                 )
                 coverage.extend(cross_page_coverage)
                 consumed_body.update(cross_page_consumed)
@@ -192,7 +192,13 @@ def assemble_mineru_formulas(result: MinerUParseResult) -> FormulaAssemblyResult
                 linked_conditions,
                 coverage,
             )
-            components.extend(extra_components)
+            body_relations = _body_relations_for_group(
+                result,
+                page.elements,
+                candidate_positions,
+                group_id,
+                equations,
+            )
             sidecars.append(
                 FormulaSidecar(
                     block_id=block_id,
@@ -207,6 +213,7 @@ def assemble_mineru_formulas(result: MinerUParseResult) -> FormulaAssemblyResult
                     ),
                     semantic_components=components,
                     printed_notes=printed_notes,
+                    body_relations=body_relations,
                     lineage=[
                         FormulaGroupLineage(
                             old_block_id=candidate.source_block_id,
@@ -261,22 +268,21 @@ def _extend_cross_page_formula_semantics(
     symbols: SymbolExplanations,
     incomplete: FormulaSemanticCoverage,
     pages_by_number: dict[int, MinerUPage],
+    equations: list[Equation],
 ) -> tuple[
     SymbolExplanations,
     list[FormulaSemanticCoverage],
     list[FormulaPrintedNoteEvidence],
-    list[FormulaSemanticComponent],
     set[tuple[int, int]],
 ]:
     """Conservatively consume leading next-page symbol semantics until a clause boundary."""
 
     next_page = pages_by_number.get(page_number + 1)
     if next_page is None or not symbols.items:
-        return symbols, [], [], [], set()
+        return symbols, [], [], set()
     elements = next_page.elements
     coverage: list[FormulaSemanticCoverage] = []
     notes: list[FormulaPrintedNoteEvidence] = []
-    components: list[FormulaSemanticComponent] = []
     consumed: set[tuple[int, int]] = set()
     needs_continuation = True
     for element in elements:
@@ -306,6 +312,7 @@ def _extend_cross_page_formula_semantics(
             continue
         note_match = _FORMULA_NOTE.match(raw_text)
         if note_match is not None:
+            referenced_number = note_match.group("number")
             note = FormulaPrintedNoteEvidence(
                 source_page_number=element.page_number,
                 source_index=element.source_index,
@@ -313,13 +320,15 @@ def _extend_cross_page_formula_semantics(
                 raw_text=raw_text,
                 raw_bbox=element.bbox,
                 target_formula_group_id=group_id,
-                referenced_equation_numbers=[note_match.group("number")],
+                target_formula_ids=[
+                    equation.formula_id
+                    for equation in equations
+                    if equation.equation_number == referenced_number
+                ],
+                referenced_equation_numbers=[referenced_number],
+                projection_block_id=source_block_id,
             )
             notes.append(note)
-            components.append(
-                _cross_page_component(element, source_block_id, group_id, "printed_note")
-            )
-            consumed.add((element.page_number, element.source_index))
             continue
         if not _is_cross_page_symbol_candidate(element):
             break
@@ -331,7 +340,47 @@ def _extend_cross_page_formula_semantics(
         item_indices = list(range(first_new_index, len(symbols.items)))
         coverage.append(_cross_page_coverage(element, source_block_id, group_id, item_indices))
         consumed.add((element.page_number, element.source_index))
-    return symbols, coverage, notes, components, consumed
+    return symbols, coverage, notes, consumed
+
+
+def _body_relations_for_group(
+    result: MinerUParseResult,
+    elements: list[MinerUElement],
+    candidate_positions: list[int],
+    group_id: str,
+    equations: list[Equation],
+) -> list[FormulaBodyRelationEvidence]:
+    """Link an adjacent retained lead-in to the formula it introduces."""
+
+    relations: list[FormulaBodyRelationEvidence] = []
+    for position, equation in zip(candidate_positions, equations, strict=True):
+        if position == 0:
+            continue
+        source = elements[position - 1]
+        text = (source.text or "").strip()
+        if (
+            source.raw_type != "text"
+            or source.bbox is None
+            or re.search(r"应\s*按\s*下列公式计算\s*[:：]\s*$", text) is None
+        ):
+            continue
+        source_block_id = stable_text_block_id(
+            result.source_sha256, source.page_number, source.source_index
+        )
+        relations.append(
+            FormulaBodyRelationEvidence(
+                source_page_number=source.page_number,
+                source_index=source.source_index,
+                source_block_id=source_block_id,
+                raw_text=text,
+                raw_bbox=source.bbox,
+                target_formula_group_id=group_id,
+                target_formula_ids=[equation.formula_id],
+                semantic_role="formula_leadin",
+                diagnostics=["retained as authoritative Body immediately before adjacent equation"],
+            )
+        )
+    return relations
 
 
 def _reconcile_symbol_prime_ocr(
@@ -400,30 +449,6 @@ def _cross_page_coverage(
         duplicate_disposition="consumed",
         review_status="unverified",
         reason="contiguous next-page formula semantic source fully consumed",
-    )
-
-
-def _cross_page_component(
-    element: MinerUElement,
-    source_block_id: str,
-    group_id: str,
-    role: str,
-) -> FormulaSemanticComponent:
-    assert element.text is not None and element.bbox is not None
-    return FormulaSemanticComponent(
-        source_id=_stable_id("formula-source", source_block_id, role),
-        original_block_id=source_block_id,
-        source_page_number=element.page_number,
-        source_index=element.source_index,
-        raw_text=element.text,
-        raw_bbox=element.bbox,
-        original_status=RecognitionStatus.UNVERIFIED,
-        consumed_text_ranges=[(0, len(element.text))],
-        target_formula_group_id=group_id,
-        semantic_role=role,
-        component_bbox=element.bbox,
-        review_status="unverified",
-        diagnostics=["contiguous next-page source consumed by formula group"],
     )
 
 

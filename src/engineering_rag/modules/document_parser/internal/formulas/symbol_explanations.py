@@ -14,6 +14,7 @@ _PLAIN_ITEM = re.compile(r"\s*([^；。]+?)\s*(?:——|--|—)\s*(.+?)(?:；|�
 _SINGLE_PLAIN_ITEM = re.compile(r"^\s*([^；。]{1,80}?)\s*(?:——|--|—)\s*(.+?)\s*$")
 _LEADING_SYMBOL = re.compile(r"^\s*([A-Za-zΑ-ωα-ω][A-Za-z0-9_]*)\s+(.+?)(?:；|。|$)")
 _STRUCTURAL_BOUNDARY = re.compile(r"^\s*(?:\d+(?:\.\d+)+|\d+\s+\S)")
+_FORMULA_LEADIN = re.compile(r"应\s*按\s*下列公式计算\s*[:：]\s*$")
 
 
 def is_symbol_start(element: MinerUElement) -> bool:
@@ -37,6 +38,11 @@ def collect_symbol_explanations(
     position = start
     while position < len(elements):
         element = elements[position]
+        if position > start and _is_formula_leadin_before_equation(elements, position):
+            diagnostics.append(
+                f"formula lead-in block {element.source_index} retained before next equation"
+            )
+            break
         if position > start and _is_boundary(element):
             break
         if element.raw_type != "text":
@@ -229,3 +235,16 @@ def _is_boundary(element: MinerUElement) -> bool:
     if element.raw_type in {"equation", "title", "paragraph_title", "page_number", "table"}:
         return True
     return bool(element.text and _STRUCTURAL_BOUNDARY.match(element.text))
+
+
+def _is_formula_leadin_before_equation(elements: list[MinerUElement], position: int) -> bool:
+    """Stop symbol continuation only with lexical and adjacent-formula evidence."""
+
+    element = elements[position]
+    if (
+        element.raw_type != "text"
+        or not element.text
+        or _FORMULA_LEADIN.search(element.text.strip()) is None
+    ):
+        return False
+    return position + 1 < len(elements) and elements[position + 1].raw_type == "equation"
