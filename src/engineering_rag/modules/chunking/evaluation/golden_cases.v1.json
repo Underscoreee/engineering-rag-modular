@@ -1,0 +1,188 @@
+{
+  "schema_version": "1.0",
+  "input_document_fixture": "examples/document.example.json",
+  "description": "虚构 Document V2.4 输入的可读 Chunk V1 边界与身份断言；expected_chunk_batch 是完整运行结果的稳定字段投影。",
+  "cases": [
+    {
+      "case_id": "single_clause",
+      "fixture_variant": "base",
+      "config": {"strategy_id": "clause-first-v1", "max_tokens": 800},
+      "selector": {"clause_id": "n-4.2.2", "content_type": "clause"},
+      "expected_chunk_batch": {
+        "document_id": "doc-synthetic-v24",
+        "chunking_version": "clause-first-1.0.0",
+        "strategy_id": "clause-first-v1",
+        "chunks": [{
+          "chunk_id": "chunk-2cb22b6d97cc52c7b93b501f51180e31",
+          "logical_chunk_id": "logical-chunk-e701f0a9df3c531a94051815499040b0",
+          "source_block_ids": ["body-2"],
+          "page_start": 3,
+          "page_end": 3,
+          "is_explanation": false,
+          "is_mandatory": null
+        }]
+      }
+    },
+    {
+      "case_id": "cross_page_clause",
+      "fixture_variant": "base",
+      "config": {"strategy_id": "clause-first-v1", "max_tokens": 800},
+      "selector": {"clause_id": "n-4.2.1", "content_type": "clause"},
+      "expected_chunk_batch": {
+        "document_id": "doc-synthetic-v24",
+        "chunking_version": "clause-first-1.0.0",
+        "strategy_id": "clause-first-v1",
+        "chunks": [{
+          "chunk_id": "chunk-874c8b4f81f95e0790a293641e3cc77f",
+          "logical_chunk_id": "logical-chunk-5c29862da1cf5c60aadef42c66caf5db",
+          "source_block_ids": ["body-1", "formula-intro"],
+          "page_start": 1,
+          "page_end": 2,
+          "is_explanation": false,
+          "is_mandatory": true
+        }]
+      }
+    },
+    {
+      "case_id": "explanation_clause",
+      "fixture_variant": "base",
+      "config": {"strategy_id": "clause-first-v1", "max_tokens": 800},
+      "selector": {"clause_id": "e-4.2.1", "content_type": "clause"},
+      "expected_chunk_batch": {
+        "document_id": "doc-synthetic-v24",
+        "chunking_version": "clause-first-1.0.0",
+        "strategy_id": "clause-first-v1",
+        "chunks": [{
+          "chunk_id": "chunk-104f9faef2d254169f21fe3dcf8e7e12",
+          "logical_chunk_id": "logical-chunk-6b006900d2af535186068574422cf0a1",
+          "source_block_ids": ["explain-body"],
+          "page_start": 4,
+          "page_end": 4,
+          "is_explanation": true,
+          "is_mandatory": null
+        }]
+      }
+    },
+    {
+      "case_id": "clause_with_table",
+      "fixture_variant": "base",
+      "config": {"strategy_id": "clause-first-v1", "max_tokens": 800},
+      "selector": {"table_id": "table-a"},
+      "expected_chunk_batch": {
+        "document_id": "doc-synthetic-v24",
+        "chunking_version": "clause-first-1.0.0",
+        "strategy_id": "clause-first-v1",
+        "chunks": [{
+          "chunk_id": "chunk-7634ff1b478b5464a66d860f0a48685b",
+          "logical_chunk_id": "logical-chunk-5c29862da1cf5c60aadef42c66caf5db",
+          "source_block_ids": ["table-a-1", "table-a-2"],
+          "page_start": 1,
+          "page_end": 2,
+          "table_id": "table-a",
+          "is_explanation": false,
+          "is_mandatory": true
+        }]
+      }
+    },
+    {
+      "case_id": "clause_with_formula",
+      "fixture_variant": "base",
+      "config": {"strategy_id": "clause-first-v1", "max_tokens": 800},
+      "selector": {"formula_ids": ["f-norm-421-1", "f-norm-421-2"]},
+      "expected_chunk_batch": {
+        "document_id": "doc-synthetic-v24",
+        "chunking_version": "clause-first-1.0.0",
+        "strategy_id": "clause-first-v1",
+        "chunks": [{
+          "chunk_id": "chunk-23f4531dd199524f9e91973d34fae25b",
+          "logical_chunk_id": "logical-chunk-5c29862da1cf5c60aadef42c66caf5db",
+          "source_block_ids": ["formula-1"],
+          "page_start": 2,
+          "page_end": 2,
+          "formula_ids": ["f-norm-421-1", "f-norm-421-2"],
+          "is_explanation": false,
+          "is_mandatory": true
+        }]
+      }
+    },
+    {
+      "case_id": "long_clause",
+      "fixture_variant": "base",
+      "config": {"strategy_id": "clause-first-v1", "max_tokens": 40},
+      "selector": {"clause_id": "n-4.2.1", "content_type": "clause"},
+      "expected_chunk_batch": {
+        "document_id": "doc-synthetic-v24",
+        "chunking_version": "clause-first-1.0.0",
+        "strategy_id": "clause-first-v1",
+        "chunks": [
+          {
+            "chunk_id": "chunk-098c05d731065c52b80ad502d7def4cb",
+            "logical_chunk_id": "logical-chunk-e66d23f8db7855a1a308adc0dfcb17d5",
+            "source_block_ids": ["body-1"],
+            "page_start": 1,
+            "page_end": 1,
+            "is_explanation": false,
+            "is_mandatory": true
+          },
+          {
+            "chunk_id": "chunk-8ef969d485ea56db8b0d4e96b668c1ca",
+            "logical_chunk_id": "logical-chunk-e66d23f8db7855a1a308adc0dfcb17d5",
+            "source_block_ids": ["formula-intro"],
+            "page_start": 2,
+            "page_end": 2,
+            "is_explanation": false,
+            "is_mandatory": true
+          }
+        ]
+      }
+    },
+    {
+      "case_id": "orphan_body",
+      "fixture_variant": "orphan_body",
+      "config": {"strategy_id": "clause-first-v1", "max_tokens": 800},
+      "selector": {"content_type": "paragraph"},
+      "expected_chunk_batch": {
+        "document_id": "doc-synthetic-v24",
+        "chunking_version": "clause-first-1.0.0",
+        "strategy_id": "clause-first-v1",
+        "chunks": [{
+          "chunk_id": "chunk-26b5153d2643583ea808fed6dac6d7f4",
+          "logical_chunk_id": "logical-chunk-4a53ce7ab51b57a7b0c5da91df24a21f",
+          "source_block_ids": ["orphan-body"],
+          "page_start": 3,
+          "page_end": 3,
+          "is_explanation": false,
+          "is_mandatory": null
+        }]
+      }
+    },
+    {
+      "case_id": "header_footer",
+      "fixture_variant": "header_footer",
+      "config": {"strategy_id": "clause-first-v1", "max_tokens": 800},
+      "selector": {"forbidden_source_block_ids": ["header-0", "header-1", "footer-0", "footer-1"]},
+      "expected_chunk_batch": {
+        "document_id": "doc-synthetic-v24",
+        "chunking_version": "clause-first-1.0.0",
+        "strategy_id": "clause-first-v1",
+        "chunks": []
+      }
+    },
+    {
+      "case_id": "mixed_content",
+      "fixture_variant": "base",
+      "config": {"strategy_id": "clause-first-v1", "max_tokens": 800},
+      "selector": {"clause_id": "n-4.2.2"},
+      "expected_chunk_batch": {
+        "document_id": "doc-synthetic-v24",
+        "chunking_version": "clause-first-1.0.0",
+        "strategy_id": "clause-first-v1",
+        "chunks": [
+          {"content_type": "clause", "source_block_ids": ["body-2"]},
+          {"content_type": "table", "source_block_ids": ["table-b-1"], "table_id": "table-b"},
+          {"content_type": "figure", "source_block_ids": ["image-1"], "figure_id": "synthetic-figure"}
+        ]
+      }
+    }
+  ]
+}

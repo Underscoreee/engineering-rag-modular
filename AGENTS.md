@@ -6,7 +6,7 @@
 
 开发面向工程建设规范、标准、图集等 PDF 的 RAG 系统。核心质量要求：**结构准确、条文可追溯、标准版本可区分、引用可靠、检索评估可复现、模块可独立迭代**。
 
-**当前阶段：Document Schema V2.4 已于 2026-10-11 正式冻结（FROZEN）；Architecture Task 1.1～1.5 已完成。Task 1.6 的全链路编排、批次恢复、真实代表页回放与质量评估工具已完成，当前结论为 PARTIAL，等待维护者验收：原 PDF 代表集 20/21 页真实推理成功，物理页 24 因 MinerU `Unsupported warp settings` 失败，且尚无人工核验 Golden Dataset。441 页全本未获授权、未运行。**
+**当前阶段：Document Schema V2.4 已于 2026-10-11 正式冻结（FROZEN）；Document Parser Task 1.1～1.6 已形成可回放的 V2.4 输出。Task 2 已实现独立的 Clause-first Chunking 与 Chunk V1 契约，等待维护者验收。Parser 既有结论仍为 PARTIAL：原 PDF 代表集 20/21 页真实推理成功，物理页 24 因 MinerU `Unsupported warp settings` 失败，且尚无人工核验 Parser Golden Dataset；该问题不由 Chunking 修复。**
 
 这是从零开始的新项目，**不存在任何需要保留、迁移、兼容或引用的旧 Task 1～5 代码**。不得假设旧工程路径、模型或算法仍存在。
 

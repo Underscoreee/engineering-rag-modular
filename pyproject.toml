@@ -26,7 +26,10 @@ packages = ["src/engineering_rag"]
 [tool.pytest.ini_options]
 addopts = "--strict-markers --strict-config"
 testpaths = ["tests", "src/engineering_rag/modules"]
-markers = ["real_mineru: local replay tests requiring saved MinerU/PDF artifacts"]
+markers = [
+    "real_mineru: local replay tests requiring saved MinerU/PDF artifacts",
+    "real_chunking: local regression tests requiring a saved real Document V2.4 artifact",
+]
 
 [tool.ruff]
 target-version = "py311"

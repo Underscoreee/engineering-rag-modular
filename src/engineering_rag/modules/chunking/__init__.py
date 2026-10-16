@@ -1,5 +1,19 @@
 """Chunking public package."""
 
-from .api import ChunkBatch, ChunkingConfig, ChunkingService, Document
+from .api import (
+    Chunk,
+    ChunkBatch,
+    ChunkingConfig,
+    ChunkingService,
+    Document,
+    create_chunking_service,
+)
 
-__all__ = ["ChunkBatch", "ChunkingConfig", "ChunkingService", "Document"]
+__all__ = [
+    "Chunk",
+    "ChunkBatch",
+    "ChunkingConfig",
+    "ChunkingService",
+    "Document",
+    "create_chunking_service",
+]

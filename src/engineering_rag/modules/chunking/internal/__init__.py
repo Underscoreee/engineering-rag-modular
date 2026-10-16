@@ -1,1 +1,1 @@
-"""Reserved for a future chunking implementation."""
+"""Private Clause-first Chunk V1 implementation."""

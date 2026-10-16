@@ -52,3 +52,17 @@ Task 0.1 的 `2.4` 是未发布候选，当时没有发布标签或外部消费�
 Document Schema V2.4 没有公共 `figure_number`、`figure_caption` 或多子图字段，冻结期间不新增这些字段。Document Parser 将一个逻辑 Figure 投射为一个 `BlockType.IMAGE`：完整印刷图题保存于既有 `PageBlock.ocr.text`，图像或逻辑聚合物通过既有 `PageBlock.asset` 引用，图形 bbox 明确排除图题。结构化 `figure_number`、`figure_caption`、多图片段、图内文字和逐来源消费记录保存在 Parser 私有 sidecar。
 
 多个子图仍只产生一个公共 Image Block。V2.4 单一 `asset` 槽位引用确定性的逻辑 Figure manifest，所有原始图片资产及其哈希继续保存在私有 sidecar；不引入公共 `subfigure` 模型。图题和已确认的图内标签被 Figure 消费后不得重复成为 Body、Formula 或 Clause 内容。未来如需公共的多资产 Figure 语义，必须升级 Schema 版本并提供显式迁移机制。
+
+## ADR-CH-001：Clause-first Chunk V1 — Adopted
+
+Chunking 只消费冻结的 Document V2.4 公共视图，不导入 Parser 私有实现。规范 Clause 是
+普通文本的首要逻辑边界，页面不是边界；正文与条文说明严格隔离。`content_units` 是装配
+权威来源，Section/Chapter 只进入 context header。Table 和 FormulaGroup 作为不可拆的
+原子子 Chunk，纯图片不生成虚构描述；body/explanation_body 上未归属 Clause 的有效正文
+保留为 paragraph Chunk。
+
+Chunk V1 固定 `overlap_tokens=0`。只有超长 Clause 才依次按内容单元/自然段、句子、token
+window 产生多个物理 Chunk；它们共享 `logical_chunk_id`，但拥有不同 `chunk_id`。
+Table/Formula 超限不破坏结构，只设置 overflow 标志。ID 由 Document 身份、语义作用域、
+来源身份、完整配置摘要和实现版本确定性派生；相同输入重复运行的顺序、身份和内容必须
+一致。Chunking 无 I/O 副作用，不调用 OCR、Embedding、检索或 LLM。

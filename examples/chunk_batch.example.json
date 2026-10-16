@@ -4,42 +4,71 @@
   "chunks": [
     {
       "schema_version": "1.0",
-      "chunk_id": "chunk-physical-001",
-      "logical_chunk_id": "logical-clause-4.2.1",
+      "chunk_id": "chunk-demo-normative-001",
+      "logical_chunk_id": "logical-demo-normative-421",
       "document_id": "doc-demo-2026-ed1",
       "content": "示例构件宜留出演示检修空间。",
-      "context_header": "4 虚构构造 / 4.2.1",
-      "content_type": "text",
+      "context_header": "《虚构工程示例规范》（DEMO 100-2026）\n4 虚构构造\n4.2.1",
+      "embedding_text": "《虚构工程示例规范》（DEMO 100-2026）\n4 虚构构造\n4.2.1\n\n示例构件宜留出演示检修空间。",
+      "token_count": 35,
+      "content_type": "clause",
       "page_start": 2,
       "page_end": 3,
-      "source_refs": [{"document_id": "doc-demo-2026-ed1", "page_number": 2, "block_id": "block-clause-start"}],
-      "standard": {"standard_name": "虚构工程示例规范", "standard_code": "DEMO 100-2026", "edition": "2026演示版"},
+      "source_refs": [
+        {"document_id": "doc-demo-2026-ed1", "page_number": 2, "block_id": "block-clause-start"},
+        {"document_id": "doc-demo-2026-ed1", "page_number": 3, "block_id": "block-clause-end"}
+      ],
+      "source_block_ids": ["block-clause-start", "block-clause-end"],
+      "standard": {
+        "standard_name": "虚构工程示例规范",
+        "standard_code": "DEMO 100-2026",
+        "edition": "2026演示版"
+      },
+      "section_path": ["4 虚构构造"],
       "section_id": "section-4",
       "clause_id": "clause-norm-4.2.1",
       "clause_number": "4.2.1",
       "is_explanation": false,
       "is_mandatory": null,
-      "related_asset_ids": ["asset-demo-table"]
+      "formula_ids": [],
+      "related_asset_ids": [],
+      "chunking_version": "clause-first-1.0.0",
+      "exceeds_max_tokens": false
     },
     {
       "schema_version": "1.0",
-      "chunk_id": "chunk-physical-002",
-      "logical_chunk_id": "logical-explanation-4.2.1",
+      "chunk_id": "chunk-demo-explanation-001",
+      "logical_chunk_id": "logical-demo-explanation-421",
       "document_id": "doc-demo-2026-ed1",
       "content": "本说明为虚构文本，用于解释演示空间的设置目的。",
-      "content_type": "text",
+      "context_header": "《虚构工程示例规范》（DEMO 100-2026）\n条文说明\n4 虚构构造\n4.2.1",
+      "embedding_text": "《虚构工程示例规范》（DEMO 100-2026）\n条文说明\n4 虚构构造\n4.2.1\n\n本说明为虚构文本，用于解释演示空间的设置目的。",
+      "token_count": 49,
+      "content_type": "clause",
       "page_start": 4,
       "page_end": 4,
-      "source_refs": [{"document_id": "doc-demo-2026-ed1", "page_number": 4, "block_id": "block-explanation"}],
-      "standard": {"standard_name": "虚构工程示例规范", "standard_code": "DEMO 100-2026", "edition": "2026演示版"},
+      "source_refs": [
+        {"document_id": "doc-demo-2026-ed1", "page_number": 4, "block_id": "block-explanation"}
+      ],
+      "source_block_ids": ["block-explanation"],
+      "standard": {
+        "standard_name": "虚构工程示例规范",
+        "standard_code": "DEMO 100-2026",
+        "edition": "2026演示版"
+      },
+      "section_path": ["4 虚构构造"],
       "section_id": "section-explain-4",
       "clause_id": "clause-explain-4.2.1",
       "clause_number": "4.2.1",
       "is_explanation": true,
-      "is_mandatory": null
+      "is_mandatory": null,
+      "formula_ids": [],
+      "related_asset_ids": [],
+      "chunking_version": "clause-first-1.0.0",
+      "exceeds_max_tokens": false
     }
   ],
-  "chunking_version": "interface-example-0",
-  "strategy_id": "demo-by-clause"
+  "chunking_version": "clause-first-1.0.0",
+  "strategy_id": "clause-first-v1",
+  "source_document_artifact": null
 }
-

@@ -1,6 +1,6 @@
 # Engineering RAG
 
-面向工程规范、建设标准与图集 PDF 的模块化单体 RAG 项目。**Document Schema V2.4 已于 2026-10-11 正式冻结（FROZEN）**。Architecture Task 1.1～1.5 已完成 PDF/OCR、MinerU 私有适配、复杂表格、公式与章节/条文结构化；Task 1.6 增加可恢复的端到端批次编排、严格来源合并、真实代表页回放和人工 Golden Dataset 评估入口。机器结果仍是待核验的部分解析候选。Chunking、检索、LLM 与外部存储后端尚未实现。
+面向工程规范、建设标准与图集 PDF 的模块化单体 RAG 项目。**Document Schema V2.4 已于 2026-10-11 正式冻结（FROZEN）**。Document Parser 已完成 PDF/OCR、MinerU 私有适配、复杂表格、公式、章节/条文结构化与可恢复的端到端编排；机器结果仍是待核验的部分解析候选。Task 2 已实现独立的 Clause-first Chunking 和 Chunk V1。检索、LLM 与外部存储后端尚未实现。
 
 ## 安装与检查
 
@@ -36,7 +36,7 @@ python -m pytest src/engineering_rag/modules/query/tests -q
 python -m pytest src/engineering_rag/modules/generation/tests -q
 ```
 
-`examples/document.example.json` 是虚构的完整 V2.4 示例；`examples/document.partial.example.json` 是虚构的未完成 OCR 示例；`examples/artifact_manifest.example.json` 是仅供静态校验的虚构快照清单，不要求 URI 实际存在。另三份 Chunk/检索/答案 JSON 仍使用既有契约。`references/GB50010_2015_document.v2.4.partial.json` 是只读的 441 页目录及少量人工区域，不能当成全文 OCR；正式模型不会自动接受其 `2.4-proposal`。
+`examples/document.example.json` 是虚构的完整 V2.4 示例；`examples/document.partial.example.json` 是虚构的未完成 OCR 示例；`examples/chunk_batch.example.json` 是可由 Chunk V1 校验的虚构批次；`examples/artifact_manifest.example.json` 是仅供静态校验的虚构快照清单，不要求 URI 实际存在。`references/GB50010_2015_document.v2.4.partial.json` 是只读的 441 页目录及少量人工区域，不能当成全文 OCR；正式模型不会自动接受其 `2.4-proposal`。
 
 字段说明见 [data-contracts.md](docs/data-contracts.md)，身份规则见 [id-policy.md](docs/id-policy.md)，快照与迁移见 [artifact-policy.md](docs/artifact-policy.md)，版本差异见 [schema-changelog.md](docs/schema-changelog.md)。[schema-freeze-checklist.md](docs/schema-freeze-checklist.md) 是唯一权威冻结验收表，[schema-v2.4-freeze-record.md](docs/schema-v2.4-freeze-record.md) 是正式冻结记录。V2.4 冻结后的破坏性变更必须升级 Schema 版本并提供显式迁移机制。
 

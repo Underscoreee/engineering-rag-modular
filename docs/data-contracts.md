@@ -2,6 +2,24 @@
 
 `engineering_rag.contracts` 是唯一公共模型来源。Document Schema V2.4 已于 2026-10-11 冻结。所有 DTO 使用 Pydantic v2 和 `extra='forbid'`；`Document.schema_version` 只接受 `"2.4"`。`2.4-proposal`、V2.3 和 Task 0.1 候选 JSON 不会静默迁移。示例内容均为虚构测试文本。冻结后的破坏性变更必须升级 Schema 版本并提供显式迁移机制。
 
+## Chunk V1
+
+`ChunkingService.chunk(Document, ChunkingConfig) -> ChunkBatch` 消费冻结的 Document
+V2.4，输出 `schema_version="1.0"` 的 Chunk V1。`ChunkingConfig.max_tokens` 默认为
+800 且可配置，`overlap_tokens` 在 V1 固定为 0，未定义的 `options` 会被当前 Clause-first
+实现拒绝。
+
+`Chunk` 分离物理 `chunk_id` 与逻辑 `logical_chunk_id`，并携带 `content`、独立的
+`context_header`、派生 `embedding_text`、`token_count`、`content_type`、页范围、有序
+`source_refs/source_block_ids`、嵌套 `standard`、Section/Clause 身份、正文/说明及强制性
+三态、父子关系、Table/Figure/Formula 身份、实现版本与超限标志。Table、FormulaGroup 是
+不可拆的原子 Chunk；超过预算时保持结构并标记 `exceeds_max_tokens=true`。超长 Clause 的
+物理片段共享一个 `logical_chunk_id`，无 overlap。完整行为见
+`modules/chunking/INTERFACE.md`，合法虚构示例见 `examples/chunk_batch.example.json`。
+
+Chunk V1 的确立没有修改 Document V2.4 字段或验证语义。改变 Chunk 公共字段需要升级
+Chunk Schema；仅改变确定性切分/身份结果也必须升级 `chunking_version`。
+
 ## Document 顶层与页面
 
 `Document` 必填 `document_id`、文档级 `bbox_coordinate_system={pdf_points,top_left}`、`source_file`、`standard`、`page_count` 和 `processing`，并包含 `pages[]/sections[]/tables[]/clauses`。`document_id` 与 standard code、edition、Parser 版本及 Artifact 版本含义不同。
