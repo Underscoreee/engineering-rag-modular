@@ -1,63 +1,347 @@
-# Document Parser 接口（Document V2.4 FROZEN / Task 1.6）
+# Document Parser 模块接口
 
-## 职责与非职责
+> 状态：实现可用；输出契约为 **Document Schema V2.4 FROZEN**。跨模块代码只应依赖
+> `engineering_rag.contracts` 中的 Protocol 和 Schema，不应导入本模块的 `internal/`。
 
-Parser 最终负责从源 PDF 识别物理页类型、Block、Section、正文/说明 Clause，以及跨页表格的逻辑聚合，输出合法 V2.4 `Document`。Task 1.1 提供安全 PDF 读取与基础 OCR；Task 1.2 新增可选、本地、进程隔离的 MinerU 4.x 私有适配路径；Task 1.3 增加复杂表格恢复；Task 1.4 增加行间公式、印刷编号、保守分组和“式中”符号解释结构化；Task 1.5 在 Parser 私有层增加证据驱动的页面分区、Section/Clause、跨页内容引用及正文—条文说明关联。数学求解、Chunking、检索和 LLM 仍不在职责内；Parser 不调用 Chunking，不写检索索引，也不凭措辞判定强制性。
+## 1. 模块职责
 
-## 公开路径与签名
+Document Parser 把工程规范 PDF 转换为可追溯的 `Document`：
 
-`engineering_rag.modules.document_parser.api` 重导出 `engineering_rag.contracts.protocols.DocumentParser`：
+- 读取 PDF、校验来源身份并取得物理页尺寸；
+- 从 PDF 文字层或中文 OCR 生成带 bbox 和阅读顺序的 `PageBlock`；
+- 可选调用本地 MinerU 4.x，恢复标题、正文、表格、公式和图片候选；
+- 可选建立页面类型、Section、正文 Clause、条文说明 Clause 及内容引用；
+- 保留页码、Block、表格片段、公式和图片的来源关系；
+- 对不完整、未核验或无法安全归属的内容保持 partial/unverified，不编造结果。
+
+本模块不负责 Chunking、索引写入、检索、Embedding、Rerank、查询改写或 LLM 生成；
+Parser 不主动调用其他业务模块。`is_mandatory` 也不会仅凭“应/必须”等措辞自动判定。
+
+## 2. 稳定公共接口
+
+唯一跨模块能力协议定义在 `engineering_rag.contracts.protocols`：
 
 ```python
 class DocumentParser(Protocol):
     def parse(self, request: ParseRequest) -> Document: ...
 ```
 
-生产入口：
+推荐的依赖方式：
+
+```python
+from engineering_rag.contracts.documents import Document, ParseRequest
+from engineering_rag.contracts.protocols import DocumentParser
+
+
+def ingest(parser: DocumentParser, request: ParseRequest) -> Document:
+    return parser.parse(request)
+```
+
+组合根可使用模块工厂创建当前实现：
 
 ```python
 from engineering_rag.modules.document_parser.api import create_document_parser
 
-parser = create_document_parser(file_store, ocr_backend="rapidocr")
+parser = create_document_parser(file_store)
+```
+
+公共路径如下：
+
+| 路径 | 用途 | 稳定性 |
+| --- | --- | --- |
+| `engineering_rag.contracts.protocols.DocumentParser` | 跨模块依赖注入 | 公共契约 |
+| `engineering_rag.contracts.documents.ParseRequest` | 解析请求 | 公共契约 |
+| `engineering_rag.contracts.documents.Document` | 解析结果 | V2.4 Frozen |
+| `engineering_rag.modules.document_parser.api.create_document_parser` | 当前实现的组合工厂 | 模块公开 API |
+| `engineering_rag.modules.document_parser.api.PyMuPdfDocumentParser` | 当前具体实现 | 可替换实现；业务模块不应据此耦合 |
+
+`internal/` 下的 MinerU DTO、Sidecar、语义装配器和 E2E 模型都是私有实现，不能作为其他模块的类型契约。
+
+## 3. 最小调用示例
+
+### 3.1 基础文字层 / RapidOCR
+
+```python
+from engineering_rag.contracts.common import FileRef
+from engineering_rag.contracts.documents import ParseConfig, ParseRequest, StandardMetadata
+from engineering_rag.modules.document_parser.api import create_document_parser
+
+parser = create_document_parser(file_store, document_engine="baseline")
+request = ParseRequest(
+    source_file=FileRef(
+        file_id="file-gb-demo",
+        uri="filestore://standards/demo.pdf",
+        mime_type="application/pdf",
+        sha256="0" * 64,  # 应填写 FileStore 中真实的 SHA-256
+        size_bytes=123456,
+    ),
+    supplied_standard=StandardMetadata(
+        standard_name="演示工程标准",
+        standard_code="DEMO 100-2026",
+        edition="2026年版",
+        language="zh-CN",
+    ),
+    config=ParseConfig(
+        config_id="baseline-v1",
+        options={
+            "page_selection": "1-3,8",
+            "on_page_error": "continue",
+        },
+    ),
+)
 document = parser.parse(request)
 ```
 
-MinerU 是可选私有后端，通过 `create_document_parser(..., document_engine="mineru", mineru_executable=..., mineru_home=...)` 注入；请求还必须显式设置 `config.options.document_engine="mineru"`。工厂和具体类的构造不会打开文件、加载模型或联网。MinerU 推理使用本地 `mineru-kit parse`，不调用外部解析 API。公开 Protocol 的方法签名没有变化。
+基础路径优先使用足够完整的 PDF 文字层；文字不足或 `force_ocr=True` 时，将页面渲染后交给
+RapidOCR。该路径只生成 provisional `body` Block，不生成 Section、Clause、结构化表格或公式。
 
-`ParseRequest.source_file: FileRef` 必填；`supplied_standard`、`config`、`trace` 可空。返回值必须是 `schema_version="2.4"` 的完整或部分 Document。表格的完整结构仅在顶层 `tables[]`；Page Block 只保存物理片段。公式的权威内容在公式 Block；Clause ContentUnit 只引用 Block/Table/Formula/Asset。正文证据只有经过外部人工或权威流程核验后才能写入 `mandatory_evidence`。
+### 3.2 本地 MinerU 4.x 与语义结构
 
-## 校验、错误和部分成功
+```python
+from pathlib import Path
 
-Pydantic 字段错误或悬空引用抛 `ValidationError`。Task 1.1 对缺失标准元数据、资源读取失败、非 PDF、损坏/加密 PDF、非法页码、资源上限、OCR 缺失和非法 bbox 提供明确异常；`on_page_error=continue` 时把页保留为 `not_processed` 并写入冻结 `ContractError` warnings。输出始终为 `processing.partial=true`、`is_complete_document_ocr=false`；未选页的空 blocks 不等于空白。OCR 与文本层 Block 均为 `unverified`，Page 为 `partially_transcribed`。
+from engineering_rag.contracts.documents import ParseConfig, ParseRequest
+from engineering_rag.modules.document_parser.api import create_document_parser
 
-`ParseConfig.options` 当前支持：`page_selection`（如 `1,16,24` 或 `1-3`）、`dpi`（72～400）、`ocr_backend`、`on_page_error`、`force_ocr`、`min_text_layer_chars`、`max_pdf_bytes`、`max_selected_pages`、`max_page_pixels`，以及私有 MinerU 选项 `document_engine`、`engine_timeout_seconds`、`engine_output_dir`、`mineru_tier`、`mineru_bundle`、`semantic_structure`、`semantic_explanation_cover_page`。`mineru_bundle=true` 要求本地引擎同时保存 ZIP、MiddleJson、Markdown 与模型结构结果；它不改变公共返回类型。未知选项会被拒绝。未显式选页且页数超过上限时拒绝执行，避免无界处理大 PDF。语义装配默认关闭；显式启用时才在同一次 `parse()` 内生成 Section/Clause。仅选取说明正文、未包含说明封面时，应同时传入从同一文档已核验的说明封面物理页锚点，否则不应假定正文/说明分组。
+parser = create_document_parser(
+    file_store,
+    document_engine="mineru",
+    mineru_executable=Path(".local/mineru-runtime/.venv/bin/mineru-kit"),
+    mineru_home=Path(".local/mineru-runtime/state"),
+)
+request = ParseRequest(
+    source_file=source_file,
+    supplied_standard=standard,
+    config=ParseConfig(
+        config_id="mineru-semantic-v1",
+        options={
+            "document_engine": "mineru",
+            "page_selection": "49-50",
+            "engine_output_dir": "data/parser-runs/example",
+            "mineru_bundle": True,
+            "semantic_structure": True,
+        },
+    ),
+)
+document = parser.parse(request)
+```
 
-MinerU 路径严格读取 `docvortex.middle` 2.0，要求 producer 为 MinerU 4.x，并将源 `page_idx` 加一恢复原 PDF 物理页码。MiddleJson 归一化 bbox 按该页 PDF point 尺寸映射到 `pdf_points/top_left`；缺失或非法 bbox 的元素只留在 raw sidecar/诊断中，不伪造位置。命令超时、非零退出、协议版本不兼容和不安全 ZIP 都是显式失败。成功输出仍为 `partial=true`、全部识别候选为 `unverified`。
+MinerU 必须在工厂参数和 `ParseConfig.options.document_engine` 中都显式选择：前者注入后端，
+后者选择本次请求的执行路径。MinerU 在隔离环境中以本地子进程运行，不调用外部解析 API。
 
-MinerU 表格 HTML 只由有资源上限的本地解析器读取，不执行脚本、不请求外部资源；嵌套/多个表、非法跨度和超限输入显式失败。原始物理格位写入 `RawTableGrid`，跨行/跨列覆盖位不会复制工程值；派生 `columns`/`data` 保留字符串、空值、单位、符号和精度。只有显式编号表注进入 `notes`，未编号表注保留在 sidecar 和诊断。自动跨页合并同时要求原始物理页相邻、显式续表标识、表号一致和列签名相容；证据不足或冲突时不合并。续页重复表头保留在 raw grid/sidecar，但不进入派生数据行。
+## 4. 输入契约
 
-MinerU 公式只接受原生 `equation` block；正文行内数学仍属于 Body。每个公式由源文件、原始物理页和源 block index 生成稳定 ID，不依赖 LaTeX 文本。只有公式原生 `\\tag{...}` 或具备右侧对齐证据的 number region 才能形成 `printed` 编号；正文引用、条文号和单位括号不作为编号。无可靠编号保持 `unknown + null`，机器流程不会产生 `confirmed_absent` 或 `verified`。多条公式仅在共享后续“式中”证据时合组，否则单公式单组。原始公式图片、单式 bbox、编号证据、符号来源和疑点保留在私有 sidecar；路径穿越、外链、缺 bbox、超限 LaTeX 和不支持协议显式诊断或拒绝。
+### 4.1 `ParseRequest`
 
-MinerU Figure 优先复用原生 image body、image caption 与图片资产；图题独立成块时，以“图 + 多级编号 + 图名”为锚点，向上聚合连续图片片段及有几何包含证据的无编号图内表达式。正式编号公式、正文、条文标题、表格、其他图题和页面边界终止聚合。一个图题只产生一个 Image Block，bbox 包含全部子图和已确认图内标签但排除图题；完整图题保存于 `ocr.text`。V2.4 未提供独立图号/图名及多资产字段，结构化图号、图名、所有图片资产、图内文字和来源消费账本仅保存在 Parser 私有 sidecar，具体投射决策见 ADR-DP-001。
+| 字段 | 公共类型 | 当前实现语义 |
+| --- | --- | --- |
+| `source_file` | `FileRef` | 必填；由注入的 `FileStore.read()` 提供二进制流 |
+| `supplied_standard` | `StandardMetadata \| None` | Schema 允许空，但当前实现要求必填，不从文件名猜测标准身份 |
+| `config` | `ParseConfig \| None` | 可空；空值采用默认配置 |
+| `trace` | `TraceContext \| None` | 契约预留；当前 Parser 尚未消费该字段 |
 
-若 `FileRef.size_bytes` 或 `sha256` 已声明，Parser 在流式复制时核对实际字节数与增量 SHA-256；不一致抛私有 `SourceIntegrityError`，未声明字段维持可选语义。原生文字层 bbox 经 PyMuPDF `rotation_matrix` 转到可视页面坐标，并与 CropBox 可视区域求交；部分裁切和完全不可见块写入私有诊断。`diagnostics.json` 的 OCR 页面包含 confidence count/min/max/mean 摘要，但 confidence 不会把 Block 提升为 `verified`。
+若 `FileRef.sha256` 或 `size_bytes` 有值，Parser 会在流式复制源文件时核对真实内容；不一致则失败。
+物理页码从 1 开始，`page_selection` 也使用 PDF 物理页码。
 
-Task 1.5 语义层先判页面分区，再识别 Title Block 中的章/节，并仅从 Body Block 段首的三段式条文号建立 Clause。分项号、表号、公式号、正文引用和页码不会创建 Clause。跨页仅在物理页连续、内容组一致且存在已确认前置 Clause 时延续；孤立续页、缺父 Section、来源冲突均进入私有 pending sidecar。跨页表格以一个 table ContentUnit 引用全部 fragments；完整公式组以一个 formula ContentUnit 引用组内全部公式 ID。说明条文只在当前 Document 存在唯一同号正文条文时建立 `explains_clause_id`。`is_mandatory` 默认保持 null。
+### 4.2 `ParseConfig.options`
 
-`plain_text` 只调用冻结的 `derive_clause_plain_text()` 生成；选页边界或来源不完整时保留三字段为 null 并写 review warning。静态 DTO 校验只证明声明之间自洽，不能证明页面分类、条文、表格或公式识别完整且准确。真实质量必须由带来源、版次和人工复核状态的 Golden Dataset 评估；本阶段不伪造准确率。
+未知键、错误类型和越界值都会被拒绝。
 
-## 副作用、幂等、排序与依赖
+| 选项 | 默认值 | 约束与作用 |
+| --- | --- | --- |
+| `page_selection` | `None`（等价于 `all`） | 字符串，如 `1,16,24`、`1-3,8` 或 `all` |
+| `max_selected_pages` | `20` | 正整数；选择页数超过此值时拒绝执行 |
+| `max_pdf_bytes` | `268435456` | 正整数；源 PDF 大小上限，两个引擎均适用 |
+| `document_engine` | `baseline` | `baseline` 或 `mineru` |
+| `dpi` | `200.0` | 72～400；baseline 页面渲染分辨率 |
+| `ocr_backend` | `auto` | baseline 使用；须匹配注入的识别器，工厂当前支持 `rapidocr` |
+| `force_ocr` | `False` | baseline 使用；忽略文字层并执行整页 OCR |
+| `min_text_layer_chars` | `50` | baseline 使用；低于阈值时改用整页 OCR |
+| `max_page_pixels` | `40000000` | baseline 使用；单页栅格像素上限 |
+| `on_page_error` | `raise` | baseline 使用；`raise` 或 `continue` |
+| `engine_timeout_seconds` | `900` | MinerU 子进程超时，正整数 |
+| `engine_output_dir` | `None` | MinerU raw/log 输出目录；空值使用自动清理的临时目录 |
+| `mineru_tier` | `basic` | `basic`、`standard` 或 `advanced` |
+| `mineru_bundle` | `False` | 保存并安全解压 MinerU ZIP bundle |
+| `semantic_structure` | `False` | MinerU 使用；启用 PageType、Section 和 Clause 装配 |
+| `semantic_explanation_cover_page` | `None` | 已人工核验的条文说明封面物理页锚点，必须为正整数 |
 
-`parse` 只通过注入的 `FileStore.read` 读取源文件，不写索引。源流按块复制到自动清理的临时目录；只处理选页。Document ID 基于 File 身份和标准版次，Block/Table/Formula/FormulaGroup ID 基于来源哈希、物理页和源锚点，均不使用 OCR 文本哈希。相同 raw 重放不会重复公式 Block，LaTeX 修正不改变身份。基础路径 reading order 是确定性几何启发式；MinerU 路径按原始 block 顺序建立唯一 reading order。实现仅依赖 contracts、自身 internal 和注入的 FileStore Protocol；导入 API 不接触外部服务。指定 `engine_output_dir` 时会保存本地 raw/log sidecar；否则使用自动清理的临时目录。
+默认会选择全部页面，但仍受 `max_selected_pages=20` 限制。大文档应由编排器分批调用，或者由维护者
+明确提高限制；不要在普通请求中无界执行全本推理。
 
-## Task 1.6 私有编排与副产物
+## 5. 当前两条执行路径
 
-`scripts/run_document_parser_e2e.py` 是私有组合入口，模式必须显式为 `live_mineru`、`replay_saved_raw` 或 `synthetic`。它以不超过 20 页的批次调用现有 Parser，保护跨页表格组，核验 PDF SHA/大小/页数、标准版次、坐标系、Schema 版本和全部稳定 ID，再进行一次全局语义装配。checkpoint 使用原子替换；`--resume` 只有在来源、配置、模型签名和成功批次产物哈希均匹配时才复用。失败批次保持 `failed` 并可重试，绝不转写为成功。
+### 5.1 `baseline`
 
-运行目录包含每批原始 MinerU bundle/log、normalized JSON、partial Document、最终 V2.4 Document、私有 sidecar、lineage、pending、overlay、Golden 候选、指标、错误目录与资源统计。无人工复核元数据时准确率指标统一为 `not_evaluated`。该脚本不是新的公共 Protocol；`DocumentParser.parse` 签名不变。真实产物断言由 `ENGINEERING_RAG_RUN_REAL_MINERU=1` 显式启用。
+1. `FileStore.read()` 打开源流，并在受限临时目录中复制 PDF。
+2. PyMuPDF 检查 PDF、密码保护、页数、CropBox、旋转和资源限制。
+3. 每个选中页面优先读取原生文字层；文字不足时以指定 DPI 渲染并调用 RapidOCR。
+4. OCR 像素 bbox 转为 `pdf_points/top_left`，Block 按几何位置形成确定性阅读顺序。
+5. 返回包含全部物理页的 partial Document；未选页为 `not_processed` 且 `blocks=[]`。
 
-## 接口示例与版本
+该路径不会把文本猜成 Title、Table、Formula 或 Image，所有可用文本暂映射为未核验 Body。
 
-Python API 版本 1；Document 持久化 Schema 为 **2.4 FROZEN**。Task 1.6 只增加 Parser 私有编排与评估模型，公共 Schema/Protocol 未变。页面、条文、公式和表格机器结果均为 `unverified` 候选，整体仍为 partial Document。旧版及 `2.4-proposal` 必须显式迁移和核验，破坏性变更另立版本和 ADR。
+### 5.2 `mineru`
 
-常规安装与独立测试：`python -m pip install -e '.[dev,parser-ocr]'`，然后运行 `python -m pytest src/engineering_rag/modules/document_parser/tests -q`。MinerU 使用独立虚拟环境和 `requirements/mineru-task1-2.txt`，不会成为主项目导入依赖。
+1. 先用 PyMuPDF 校验和暂存源 PDF，再调用本地 `mineru-kit parse`。
+2. 只接受 `docvortex.middle/2.0` 且 producer 为 MinerU 4.x 的 MiddleJson。
+3. 将 normalized top-left bbox 映射为各页 PDF points，保留原物理页号和源 index。
+4. 对 MinerU 候选执行保守的表格、公式、Figure 和文本映射。
+5. `semantic_structure=True` 时，再建立 PageType、Section、Clause、ContentUnit 和 `plain_text` 缓存。
+6. 返回只包含已选择/实际输出页面的 partial Document；因此不能假设
+   `len(document.pages) == document.page_count`。
+
+当前 MinerU 后处理能力：
+
+| 对象 | 行为 |
+| --- | --- |
+| 文本与标题 | 三级条文号保持 Body；Title 还必须满足页面水平居中几何门槛；页脚印刷页码有证据时过滤 |
+| 表格 | 安全解析 MinerU HTML；恢复 rowspan/colspan、多级表头、原始网格、数据行和连续编号表注 |
+| 跨页表格 | 仅在物理页相邻、显式“续表”、表号一致且列结构相容时合并为一个 `LogicalTable` |
+| 公式 | 为每式生成稳定 `formula_id`；保留 LaTeX、可靠印刷编号、适用条件和共享“式中”解释 |
+| 跨页公式语义 | 可保守接续下一页符号说明和公式印刷注释；遇到新条文或证据不足即停止并保留诊断 |
+| Figure | 优先使用 MinerU image/asset；按图题聚合多图片段和可证明属于图内的无编号表达式 |
+| 语义结构 | 证据驱动地识别页面区域、章/节、跨页 Clause、分项、正文与条文说明关系 |
+
+所有机器识别内容仍是 `unverified`。缺失 bbox、不安全资产、不能可靠归属的元素不会被伪造；公共
+Document 中无法表达的证据留在 Parser 私有 Sidecar，E2E 工具会将其落盘。
+
+## 6. 输出及下游消费规则
+
+`Document` 同时提供物理视图和语义视图：
+
+| 数据 | 权威用途 |
+| --- | --- |
+| `page_count` | 源 PDF 总物理页数，不等于本次返回的 `pages` 数量 |
+| `pages[].blocks` | 页面布局、bbox、阅读顺序和物理来源 |
+| `sections` | 正文/条文说明各自的章节树 |
+| `clauses.normative` | 规范正文条文 |
+| `clauses.explanations` | 条文说明；可靠时通过 `explains_clause_id` 指向正文条文 |
+| `tables[]` | 逻辑表格的唯一权威表示；Page Table Block 只是物理片段引用 |
+| Formula Block | `FormulaGroup`、独立 Equation、稳定公式 ID 和符号解释的权威表示 |
+| Image Block | Figure caption、bbox 和 `ArtifactRef`；结构化图号/多资产证据目前仅在私有 Sidecar |
+| `processing` | Parser 身份、partial 状态和公共 warnings |
+
+下游模块必须遵守以下规则：
+
+- 按 `page_number` 和 `reading_order` 排序，不依赖列表碰巧已有的顺序。
+- bbox 单位固定为 PDF points，原点固定为左上；不要与 OCR 像素坐标混用。
+- Clause 内容应按 `content_units.order` 读取，并通过 `source_block_ids`、`table_id`、
+  `formula_ids`、`asset_id` 解引用，不复制出第二份权威内容。
+- `clause_content.plain_text` 是由冻结的 `derive_clause_plain_text()` 生成的缓存；为 `None` 表示
+  来源边界或依赖不完整，不能当成空条文。
+- `is_mandatory=None` 表示未判定。只有可核验的 `mandatory_evidence` 才能支持强制性结论。
+- `recognition_status=unverified`、`content_extraction_status=partially_transcribed` 和 warnings
+  必须传递给评估、Chunking 或人工复核流程，不能静默提升为 verified。
+- 每次持久化或跨进程传输前，可用
+  `Document.model_validate_json(document.model_dump_json())` 做完整引用与 JSON 往返校验。
+
+## 7. 错误与部分成功
+
+当前公共 Protocol 没有单独的错误 Result，也没有冻结的 Parser 异常层级。跨模块调用方不应导入
+`internal` 异常类；应把 `parse()` 抛出的配置、I/O、PDF、OCR、MinerU 或 Pydantic 异常视为本次
+解析失败，并由编排器记录、重试或终止。
+
+常见失败包括：
+
+- `supplied_standard` 缺失、未知配置键、非法页码或超过资源限制；
+- `FileStore.read()` 失败，或声明的 SHA-256/大小与实际源文件不一致；
+- 空文件、非 PDF、损坏 PDF、加密 PDF；
+- OCR 未安装、OCR bbox 越界或识别结果格式非法；
+- MinerU 不可用、非 4.x、超时、非零退出、协议不兼容或 ZIP/路径不安全；
+- 最终 V2.4 引用、ID、bbox、表格或 Clause 完整性校验失败。
+
+只有 baseline 的 `on_page_error="continue"` 提供页级部分成功：失败页保留为 `not_processed`，
+并写入 `processing.warnings`。MinerU 单次 `parse()` 当前是整批成功或抛异常；大任务的失败重试由
+E2E 编排负责。
+
+无论使用哪条路径，当前实现都返回：
+
+```text
+processing.partial = true
+processing.is_complete_document_ocr = false
+```
+
+这表示输出可用于后续处理和人工复核，但不能声明整份标准已完整、准确识别。
+
+## 8. 副作用、幂等性与并发
+
+- `parse()` 只通过注入的 `FileStore.read()` 读取源文件，不写检索索引或调用其他业务模块。
+- PDF 会复制到自动清理的临时目录；配置 `engine_output_dir` 时，MinerU raw、bundle 和日志会持久写入该目录。
+- MinerU 通过无 shell 的本地子进程执行；导入模块或创建 Parser 时不会加载模型、联网或启动进程。
+- Document/Block/Table/Formula/Clause ID 基于来源身份、标准版次和源锚点确定，不依赖 OCR 文本内容。
+- 相同源文件、标准身份、引擎版本和配置应产生相同身份与顺序；OCR/模型版本变化仍可能改变识别内容。
+- `PyMuPdfDocumentParser` 会更新 `last_diagnostics`、`last_mineru_result` 和
+  `last_semantic_result`，同一实例不应并发执行多个 `parse()`；并发任务应使用独立实例。
+- 这些 `last_*` 属性及 Sidecar 都不是公共跨模块契约，业务协作应以返回的 `Document` 为准。
+
+## 9. 大文档 E2E 工具（非公共 API）
+
+`scripts/run_document_parser_e2e.py` 用于本地评估和批次编排，不替代 `DocumentParser` Protocol。
+它支持：
+
+- `live_mineru`：真实本地 MinerU 推理；
+- `replay_saved_raw`：重放可信的已保存 normalized 产物，不执行推理；
+- `synthetic`：仅用于测试夹具；
+- 最多 20 页/批的计划、来源一致性校验、Checkpoint、`--resume`、失败记录；
+- `--show-progress` 按实际成功页数显示进度；
+- 最终 Document、Sidecar、lineage、pending、Overlay、QA 和资源统计产物。
+
+示例：
+
+```bash
+python scripts/run_document_parser_e2e.py \
+  --mode live_mineru \
+  --pdf standard.pdf \
+  --pages 1-20 \
+  --output data/parser-runs/example \
+  --run-id example \
+  --show-progress
+```
+
+未带 `--resume` 时既有运行目录不可覆盖；恢复时会重新核对来源、配置、模型签名和成功批次产物。
+完整文档执行还要求维护者显式批准。其他业务模块不应读取 E2E 私有 Manifest 代替公共 `Document`。
+
+## 10. 版本与兼容策略
+
+- 持久化 Schema：`Document.schema_version == "2.4"`，状态为 **FROZEN**。
+- 当前公共能力签名：`parse(ParseRequest) -> Document`。
+- Parser 实现版本、MinerU 版本、Artifact 版本、标准 edition/revision 和 Document Schema 版本彼此独立。
+- V2.4 的破坏性变更必须升级 Schema 版本并提供显式迁移；不得在 Parser Sidecar 中悄悄改变公共字段语义。
+- `2.4-proposal` 或其他旧结构不能直接当作 V2.4 使用，必须经过迁移和重新校验。
+
+## 11. 安装与测试
+
+基础 PDF 能力：
+
+```bash
+python -m pip install -e '.[dev,parser]'
+```
+
+RapidOCR 能力：
+
+```bash
+python -m pip install -e '.[dev,parser-ocr]'
+```
+
+MinerU 使用独立环境及 `requirements/mineru-task1-2.lock`，不是主项目导入依赖。
+
+模块独立测试：
+
+```bash
+python -m pytest src/engineering_rag/modules/document_parser/tests -q
+```
+
+保存真实产物回归测试：
+
+```bash
+ENGINEERING_RAG_RUN_REAL_MINERU=1 python -m pytest tests/integration -q
+```
+
+全仓校验：
+
+```bash
+python -m pytest -q
+ruff check .
+ruff format --check .
+```
