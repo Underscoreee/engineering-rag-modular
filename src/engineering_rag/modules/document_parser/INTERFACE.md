@@ -38,6 +38,8 @@ MinerU 表格 HTML 只由有资源上限的本地解析器读取，不执行脚�
 
 MinerU 公式只接受原生 `equation` block；正文行内数学仍属于 Body。每个公式由源文件、原始物理页和源 block index 生成稳定 ID，不依赖 LaTeX 文本。只有公式原生 `\\tag{...}` 或具备右侧对齐证据的 number region 才能形成 `printed` 编号；正文引用、条文号和单位括号不作为编号。无可靠编号保持 `unknown + null`，机器流程不会产生 `confirmed_absent` 或 `verified`。多条公式仅在共享后续“式中”证据时合组，否则单公式单组。原始公式图片、单式 bbox、编号证据、符号来源和疑点保留在私有 sidecar；路径穿越、外链、缺 bbox、超限 LaTeX 和不支持协议显式诊断或拒绝。
 
+MinerU Figure 优先复用原生 image body、image caption 与图片资产；图题独立成块时，以“图 + 多级编号 + 图名”为锚点，向上聚合连续图片片段及有几何包含证据的无编号图内表达式。正式编号公式、正文、条文标题、表格、其他图题和页面边界终止聚合。一个图题只产生一个 Image Block，bbox 包含全部子图和已确认图内标签但排除图题；完整图题保存于 `ocr.text`。V2.4 未提供独立图号/图名及多资产字段，结构化图号、图名、所有图片资产、图内文字和来源消费账本仅保存在 Parser 私有 sidecar，具体投射决策见 ADR-DP-001。
+
 若 `FileRef.size_bytes` 或 `sha256` 已声明，Parser 在流式复制时核对实际字节数与增量 SHA-256；不一致抛私有 `SourceIntegrityError`，未声明字段维持可选语义。原生文字层 bbox 经 PyMuPDF `rotation_matrix` 转到可视页面坐标，并与 CropBox 可视区域求交；部分裁切和完全不可见块写入私有诊断。`diagnostics.json` 的 OCR 页面包含 confidence count/min/max/mean 摘要，但 confidence 不会把 Block 提升为 `verified`。
 
 Task 1.5 语义层先判页面分区，再识别 Title Block 中的章/节，并仅从 Body Block 段首的三段式条文号建立 Clause。分项号、表号、公式号、正文引用和页码不会创建 Clause。跨页仅在物理页连续、内容组一致且存在已确认前置 Clause 时延续；孤立续页、缺父 Section、来源冲突均进入私有 pending sidecar。跨页表格以一个 table ContentUnit 引用全部 fragments；完整公式组以一个 formula ContentUnit 引用组内全部公式 ID。说明条文只在当前 Document 存在唯一同号正文条文时建立 `explains_clause_id`。`is_mandatory` 默认保持 null。

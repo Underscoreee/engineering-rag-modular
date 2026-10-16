@@ -51,7 +51,12 @@ _CLAUSE_BOUNDARY = re.compile(r"^\s*\d+\.\d+\.\d+(?![-.\d条])")
 _FORMULA_NOTE = re.compile(r"^\s*注\s*[:：].*公式[（(](?P<number>\d+(?:\.\d+)+(?:-\d+)?)[）)]")
 
 
-def assemble_mineru_formulas(result: MinerUParseResult) -> FormulaAssemblyResult:
+def assemble_mineru_formulas(
+    result: MinerUParseResult,
+    *,
+    excluded_source_keys: set[tuple[int, int]] | None = None,
+) -> FormulaAssemblyResult:
+    excluded_source_keys = excluded_source_keys or set()
     placements: dict[tuple[int, int], FormulaPlacement] = {}
     consumed: set[tuple[int, int]] = set()
     consumed_body: set[tuple[int, int]] = set()
@@ -60,7 +65,11 @@ def assemble_mineru_formulas(result: MinerUParseResult) -> FormulaAssemblyResult
     omitted: list[dict[str, object]] = []
     pages_by_number = {page.page_number: page for page in result.pages}
     for page in result.pages:
-        formula_count = sum(element.raw_type == "equation" for element in page.elements)
+        formula_count = sum(
+            element.raw_type == "equation"
+            and (element.page_number, element.source_index) not in excluded_source_keys
+            for element in page.elements
+        )
         if formula_count > MAX_FORMULAS_PER_PAGE:
             omitted.append(
                 {
@@ -76,6 +85,8 @@ def assemble_mineru_formulas(result: MinerUParseResult) -> FormulaAssemblyResult
             candidate_positions: list[int] = []
             for position in indexes:
                 element = page.elements[position]
+                if (element.page_number, element.source_index) in excluded_source_keys:
+                    continue
                 candidate, reason = _candidate(result, element)
                 if candidate is None:
                     omitted.append(

@@ -46,3 +46,9 @@ Task 0.1 的 `2.4` 是未发布候选，当时没有发布标签或外部消费�
 维护者于 2026-10-11 批准 Architecture Task 0.2 修复验收并授权正式冻结。ADR-001～ADR-007 均保持 **Adopted**，Document Schema V2.4 状态为 **FROZEN**；冻结证据与 Git 标识见 `schema-v2.4-freeze-record.md`。
 
 冻结后不得在 `2.4` 下修改已验收的 Pydantic Schema、公共 Protocol 或数据验证语义。兼容的文档澄清与测试增强可以在不改变契约行为的前提下进行；任何破坏性字段、校验或接口变更必须升级 Schema 版本，新增 ADR，并提供显式迁移机制。ADR-003 所述 Parser 技术评估仍是后续独立任务，不因本次冻结自动开始。
+
+## ADR-DP-001：V2.4 Figure 投射与私有元数据 — Adopted
+
+Document Schema V2.4 没有公共 `figure_number`、`figure_caption` 或多子图字段，冻结期间不新增这些字段。Document Parser 将一个逻辑 Figure 投射为一个 `BlockType.IMAGE`：完整印刷图题保存于既有 `PageBlock.ocr.text`，图像或逻辑聚合物通过既有 `PageBlock.asset` 引用，图形 bbox 明确排除图题。结构化 `figure_number`、`figure_caption`、多图片段、图内文字和逐来源消费记录保存在 Parser 私有 sidecar。
+
+多个子图仍只产生一个公共 Image Block。V2.4 单一 `asset` 槽位引用确定性的逻辑 Figure manifest，所有原始图片资产及其哈希继续保存在私有 sidecar；不引入公共 `subfigure` 模型。图题和已确认的图内标签被 Figure 消费后不得重复成为 Body、Formula 或 Clause 内容。未来如需公共的多资产 Figure 语义，必须升级 Schema 版本并提供显式迁移机制。

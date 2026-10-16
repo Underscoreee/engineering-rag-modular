@@ -120,6 +120,9 @@ def _normalize_element(
     table_html: str | None = None
     table_caption: str | None = None
     table_footnotes: list[str] = []
+    image_paths: list[str] = []
+    image_caption: str | None = None
+    image_caption_bbox: MinerUBbox | None = None
     content = block.get("content")
     if raw_type == "equation" and isinstance(content, str):
         latex = content.strip() or None
@@ -135,6 +138,18 @@ def _normalize_element(
             elif child_type == "table_footnote" and child_text:
                 table_footnotes.append(child_text)
         text = table_caption
+    elif raw_type in {"image", "figure"} and isinstance(content, list):
+        for item in content:
+            child = _mapping(item, "image content")
+            child_type = child.get("type")
+            if child_type == "image_body":
+                image_path = child.get("image_path")
+                if isinstance(image_path, str) and image_path:
+                    image_paths.append(image_path)
+            elif child_type == "image_caption":
+                image_caption = _content_text(child.get("content")) or None
+                image_caption_bbox = _bbox(child.get("bbox"), diagnostics)
+        text = image_caption
     else:
         text = _content_text(content) or None
     if bbox is None:
@@ -150,6 +165,9 @@ def _normalize_element(
         table_html=table_html,
         table_caption=table_caption,
         table_footnotes=table_footnotes,
+        image_paths=image_paths,
+        image_caption=image_caption,
+        image_caption_bbox=image_caption_bbox,
         raw=dict(block),
         diagnostics=diagnostics,
     )

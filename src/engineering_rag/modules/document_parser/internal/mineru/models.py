@@ -34,6 +34,9 @@ class MinerUElement(_PrivateModel):
     table_html: str | None = None
     table_caption: str | None = None
     table_footnotes: list[str] = Field(default_factory=list)
+    image_paths: list[str] = Field(default_factory=list)
+    image_caption: str | None = None
+    image_caption_bbox: MinerUBbox | None = None
     raw: dict[str, object]
     diagnostics: list[str] = Field(default_factory=list)
 

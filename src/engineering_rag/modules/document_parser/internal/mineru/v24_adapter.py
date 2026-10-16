@@ -27,6 +27,10 @@ from engineering_rag.contracts.documents import (
     TableFragment,
     TableFragmentStatus,
 )
+from engineering_rag.modules.document_parser.internal.figures.assembler import (
+    assemble_mineru_figures,
+)
+from engineering_rag.modules.document_parser.internal.figures.models import FigureSidecar
 from engineering_rag.modules.document_parser.internal.formulas.assembler import (
     FORMULA_ASSEMBLER_VERSION,
     assemble_mineru_formulas,
@@ -55,6 +59,8 @@ class MinerUV24Adaptation:
     formula_sidecars: list[FormulaSidecar]
     formula_dedup_coverage: list[FormulaSemanticCoverage]
     formula_diagnostics: list[dict[str, object]]
+    figure_sidecars: list[FigureSidecar]
+    figure_diagnostics: list[dict[str, object]]
 
 
 def adapt_to_v24(
@@ -67,8 +73,11 @@ def adapt_to_v24(
     document_id = _stable_id(
         "doc", source_file.file_id, standard.standard_code, standard.edition or ""
     )
+    figure_assembly = assemble_mineru_figures(result)
     table_assembly = assemble_mineru_tables(result)
-    formula_assembly = assemble_mineru_formulas(result)
+    formula_assembly = assemble_mineru_formulas(
+        result, excluded_source_keys=figure_assembly.consumed
+    )
     printed_page_offset = _infer_printed_page_offset(result)
     tables: list[LogicalTable] = list(table_assembly.tables)
     pages: list[Page] = []
@@ -98,6 +107,32 @@ def adapt_to_v24(
                 omission = _omission(element, "printed_page_number_filtered")
                 omission["filter_basis"] = printed_page_basis
                 omitted.append(omission)
+                continue
+            figure_placement = figure_assembly.placements.get(
+                (element.page_number, element.source_index)
+            )
+            if figure_placement is not None:
+                figure_bbox = BoundingBox(
+                    x_min=figure_placement.bbox.x_min * parsed_page.width_points,
+                    y_min=figure_placement.bbox.y_min * parsed_page.height_points,
+                    x_max=figure_placement.bbox.x_max * parsed_page.width_points,
+                    y_max=figure_placement.bbox.y_max * parsed_page.height_points,
+                )
+                blocks.append(
+                    PageBlock(
+                        block_id=figure_placement.block_id,
+                        block_type=BlockType.IMAGE,
+                        bbox=figure_bbox,
+                        reading_order=len(blocks),
+                        ocr=OcrContent(text=figure_placement.caption),
+                        asset=figure_placement.asset,
+                        recognition_status=RecognitionStatus.UNVERIFIED,
+                        bbox_status=BboxStatus.UNVERIFIED,
+                        extraction_method=(f"mineru:{result.producer_version}+figure:1.0.0"),
+                    )
+                )
+                continue
+            if (element.page_number, element.source_index) in figure_assembly.consumed:
                 continue
             if (
                 element.page_number,
@@ -235,7 +270,14 @@ def adapt_to_v24(
                 blocks=blocks,
             )
         )
-    all_omitted = _unique_omissions([*omitted, *table_assembly.omitted, *formula_assembly.omitted])
+    all_omitted = _unique_omissions(
+        [
+            *omitted,
+            *table_assembly.omitted,
+            *formula_assembly.omitted,
+            *figure_assembly.omitted,
+        ]
+    )
     if all_omitted:
         warnings.append(
             ContractError(
@@ -272,6 +314,8 @@ def adapt_to_v24(
         formula_sidecars=formula_assembly.sidecars,
         formula_dedup_coverage=formula_assembly.dedup_coverage,
         formula_diagnostics=formula_assembly.omitted,
+        figure_sidecars=figure_assembly.sidecars,
+        figure_diagnostics=figure_assembly.omitted,
     )
 
 

@@ -244,6 +244,8 @@ def _run(args: argparse.Namespace, run_dir: Path, *, show_progress: bool = False
         "formula_sidecars": [],
         "formula_dedup_coverage": [],
         "formula_diagnostics": [],
+        "figure_sidecars": [],
+        "figure_diagnostics": [],
     }
     state.status = RunStatus.RUNNING
     state.updated_at = datetime.now(UTC)
@@ -568,6 +570,8 @@ def _adaptation_sidecars(adaptations: list[object]) -> dict[str, list[object]]:
         "formula_sidecars": [],
         "formula_dedup_coverage": [],
         "formula_diagnostics": [],
+        "figure_sidecars": [],
+        "figure_diagnostics": [],
     }
     for adaptation in adaptations:
         output["omitted_elements"].extend(adaptation.omitted_elements)
@@ -582,12 +586,16 @@ def _adaptation_sidecars(adaptations: list[object]) -> dict[str, list[object]]:
             item.model_dump(mode="json") for item in adaptation.formula_dedup_coverage
         )
         output["formula_diagnostics"].extend(adaptation.formula_diagnostics)
+        output["figure_sidecars"].extend(
+            item.model_dump(mode="json") for item in adaptation.figure_sidecars
+        )
+        output["figure_diagnostics"].extend(adaptation.figure_diagnostics)
     return output
 
 
 def _extend_sidecars(target: dict[str, list[object]], source: dict[str, list[object]]) -> None:
     for key in target:
-        target[key].extend(source[key])
+        target[key].extend(source.get(key, []))
 
 
 def _merge_saved_sidecars(target: dict[str, list[object]], path: Path) -> None:
@@ -764,7 +772,13 @@ def _render_overlays(pdf_path: Path, document: Document, output: Path) -> None:
     from PIL import Image, ImageDraw
 
     output.mkdir(parents=True, exist_ok=True)
-    colors = {"table": "#d97706", "formula": "#dc2626", "title": "#059669", "body": "#2563eb"}
+    colors = {
+        "table": "#d97706",
+        "formula": "#dc2626",
+        "title": "#059669",
+        "body": "#2563eb",
+        "image": "#7c3aed",
+    }
     with pymupdf.open(pdf_path) as pdf:
         for page in document.pages:
             pixmap = pdf[page.page_number - 1].get_pixmap(matrix=pymupdf.Matrix(1.5, 1.5))
