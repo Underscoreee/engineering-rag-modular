@@ -45,6 +45,7 @@ from engineering_rag.modules.document_parser.internal.tables.assembler import (
 from engineering_rag.modules.document_parser.internal.tables.models import TableSidecar
 
 from .models import MinerUElement, MinerUParseResult
+from .title_geometry import is_horizontally_centered
 
 _CLAUSE_NUMBER = re.compile(r"^\s*\d+\.\d+\.\d+(?![-.\d])")
 _PRINTED_PAGE_NUMBER = re.compile(r"^\s*\d{1,4}\s*$")
@@ -244,7 +245,11 @@ def adapt_to_v24(
             }
             block_type = (
                 BlockType.TITLE
-                if title_candidate and _CLAUSE_NUMBER.match(element.text) is None
+                if (
+                    title_candidate
+                    and _CLAUSE_NUMBER.match(element.text) is None
+                    and is_horizontally_centered(bbox, parsed_page.width_points)
+                )
                 else BlockType.BODY
             )
             blocks.append(
