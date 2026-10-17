@@ -66,3 +66,12 @@ window 产生多个物理 Chunk；它们共享 `logical_chunk_id`，但拥有不
 Table/Formula 超限不破坏结构，只设置 overflow 标志。ID 由 Document 身份、语义作用域、
 来源身份、完整配置摘要和实现版本确定性派生；相同输入重复运行的顺序、身份和内容必须
 一致。Chunking 无 I/O 副作用，不调用 OCR、Embedding、检索或 LLM。
+
+## ADR-KR-001：Elasticsearch BM25 关键词检索 — Adopted
+
+关键词检索以物理 `Chunk` 为 Elasticsearch 文档，`_id=chunk_id`，使用版本化严格 Mapping、
+可配置 Analyzer 和原生 BM25 `_score`。完整文档替换遵循“先成功写新快照、后清理陈旧
+Chunk”，部分 Bulk 失败不执行清理；增量写入由 `IndexRequest.replace_document=false`
+显式请求。默认检索单一私有 `search_text`，元数据过滤不参与评分，同分按 `chunk_id` 稳定
+排序。详细决策、契约限制和已知风险见
+[Task 3 Elasticsearch ADR](adr-task3-elasticsearch-keyword-retrieval.md)。

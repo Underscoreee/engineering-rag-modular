@@ -1,6 +1,6 @@
 # Engineering RAG
 
-面向工程规范、建设标准与图集 PDF 的模块化单体 RAG 项目。**Document Schema V2.4 已于 2026-10-11 正式冻结（FROZEN）**。Document Parser 已完成 PDF/OCR、MinerU 私有适配、复杂表格、公式、章节/条文结构化与可恢复的端到端编排；机器结果仍是待核验的部分解析候选。Task 2 已实现独立的 Clause-first Chunking 和 Chunk V1。检索、LLM 与外部存储后端尚未实现。
+面向工程规范、建设标准与图集 PDF 的模块化单体 RAG 项目。**Document Schema V2.4 已于 2026-10-11 正式冻结（FROZEN）**。Document Parser 已完成 PDF/OCR、MinerU 私有适配、复杂表格、公式、章节/条文结构化与可恢复的端到端编排；机器结果仍是待核验的部分解析候选。Task 2 已实现独立的 Clause-first Chunking 和 Chunk V1。Task 3 已实现可注入的 Elasticsearch BM25 关键词索引与检索；向量、混合检索和 LLM 尚未实现。
 
 ## 安装与检查
 
@@ -13,6 +13,16 @@ ruff check .
 ruff format --check .
 ```
 
+Elasticsearch 关键词检索另安装官方客户端：
+
+```bash
+python -m pip install -e '.[dev,keyword-retrieval]'
+python examples/keyword_retrieval_elasticsearch.py
+```
+
+运行时配置和真实集成测试见
+[`keyword_retrieval/INTERFACE.md`](src/engineering_rag/modules/keyword_retrieval/INTERFACE.md)。
+
 Task 1.1 Parser 与真实 CPU OCR：
 
 ```bash
@@ -22,7 +32,7 @@ python -m pytest src/engineering_rag/modules/document_parser/tests -q
 
 Task 1.2 MinerU 运行时独立安装在项目忽略的 `.local/mineru-runtime`，主环境不依赖 MinerU。固定入口依赖见 `requirements/mineru-task1-2.txt`；真实 PDF 和生成产物位于被 Git 忽略的 `data/eval/task1_2_mineru/`。执行器必须传入 PDF、案例清单、输出目录、可执行文件和模型目录，不会默认处理全部 441 页。
 
-源代码采用一个 `src/engineering_rag` 包。`contracts` 是唯一公共 Schema/Protocol 来源；七个业务模块只提供稳定 `api.py`，未来实现放各自 `internal/`；跨模块流程由 `infrastructure/orchestrator` 组合。
+源代码采用一个 `src/engineering_rag` 包。`contracts` 是唯一公共 Schema/Protocol 来源；七个业务模块通过稳定 `api.py` 暴露能力，具体实现留在各自 `internal/`；跨模块流程由 `infrastructure/orchestrator` 组合。
 
 ## 独立模块测试
 

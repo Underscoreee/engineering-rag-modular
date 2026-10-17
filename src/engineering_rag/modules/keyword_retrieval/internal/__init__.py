@@ -1,1 +1,1 @@
-"""Reserved for a future keyword retrieval implementation."""
+"""Private Elasticsearch keyword retrieval implementation."""

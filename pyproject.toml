@@ -19,6 +19,7 @@ parser-ocr = [
     "PyMuPDF>=1.24,<2",
     "rapidocr-onnxruntime>=1.4,<2",
 ]
+keyword-retrieval = ["elasticsearch>=8.15,<9"]
 
 [tool.hatch.build.targets.wheel]
 packages = ["src/engineering_rag"]
@@ -27,6 +28,7 @@ packages = ["src/engineering_rag"]
 addopts = "--strict-markers --strict-config"
 testpaths = ["tests", "src/engineering_rag/modules"]
 markers = [
+    "real_elasticsearch: integration tests requiring a configured Elasticsearch 8.x service",
     "real_mineru: local replay tests requiring saved MinerU/PDF artifacts",
     "real_chunking: local regression tests requiring a saved real Document V2.4 artifact",
 ]
