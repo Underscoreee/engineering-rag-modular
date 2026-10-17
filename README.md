@@ -1,6 +1,6 @@
 # Engineering RAG
 
-面向工程规范、建设标准与图集 PDF 的模块化单体 RAG 项目。**Document Schema V2.4 已于 2026-10-11 正式冻结（FROZEN）**。Document Parser 已完成 PDF/OCR、MinerU 私有适配、复杂表格、公式、章节/条文结构化与可恢复的端到端编排；机器结果仍是待核验的部分解析候选。Task 2 已实现独立的 Clause-first Chunking 和 Chunk V1。Task 3 已实现可注入的 Elasticsearch BM25 关键词索引与检索；向量、混合检索和 LLM 尚未实现。
+面向工程规范、建设标准与图集 PDF 的模块化单体 RAG 项目。**Document Schema V2.4 已于 2026-10-11 正式冻结（FROZEN）**。Document Parser 已完成 PDF/OCR、MinerU 私有适配、复杂表格、公式、章节/条文结构化与可恢复的端到端编排；机器结果仍是待核验的部分解析候选。Task 2 已实现独立的 Clause-first Chunking 和 Chunk V1。Task 3 已实现 Elasticsearch BM25；Task 4 已实现可注入的 Sentence-Transformers + Milvus 向量检索。混合检索和 LLM 尚未实现。
 
 ## 安装与检查
 
@@ -40,6 +40,22 @@ docker compose -f docker-compose.elasticsearch.yml stop
 `http://127.0.0.1:19200`。数据保存在命名卷 `engineering-rag-es-data` 中；`stop` 不删除卷。
 真实测试使用随机、独立索引并只清理该精确索引。普通单元测试不依赖 Docker；未设置 URL 时
 真实测试会明确跳过，跳过不能报告为通过。不要使用 `docker compose down -v` 清理环境。
+
+### 本地 Milvus 向量检索测试
+
+```bash
+python -m pip install -e '.[dev,vector-retrieval]'
+docker compose -f docker-compose.milvus.yml up -d
+curl -fsS http://127.0.0.1:9091/healthz
+MILVUS_URI=http://127.0.0.1:19530 \
+  python -m pytest -vv -rs tests/integration/test_vector_retrieval_integration.py
+docker compose -f docker-compose.milvus.yml stop
+```
+
+服务只绑定本机回环地址；Milvus、etcd 和 MinIO 数据位于命名卷，`stop` 不会删除数据。
+真实 BGE 模型 smoke、配置、Collection Schema 和限制见
+[`vector_retrieval/INTERFACE.md`](src/engineering_rag/modules/vector_retrieval/INTERFACE.md)。
+禁止使用 `docker compose down -v` 清理测试环境。
 
 Task 1.1 Parser 与真实 CPU OCR：
 

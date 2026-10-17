@@ -20,6 +20,10 @@ parser-ocr = [
     "rapidocr-onnxruntime>=1.4,<2",
 ]
 keyword-retrieval = ["elasticsearch>=8.15,<9"]
+vector-retrieval = [
+    "pymilvus>=2.5,<2.6",
+    "sentence-transformers>=3.3,<4",
+]
 
 [tool.hatch.build.targets.wheel]
 packages = ["src/engineering_rag"]
@@ -31,6 +35,8 @@ markers = [
     "real_elasticsearch: integration tests requiring a configured Elasticsearch 8.x service",
     "real_mineru: local replay tests requiring saved MinerU/PDF artifacts",
     "real_chunking: local regression tests requiring a saved real Document V2.4 artifact",
+    "real_milvus: integration tests requiring a configured Milvus 2.5 service",
+    "real_embedding: smoke tests requiring the configured Sentence-Transformers model",
 ]
 
 [tool.ruff]
