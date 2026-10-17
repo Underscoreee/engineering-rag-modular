@@ -230,7 +230,7 @@ class ClauseFirstChunker:
                             logical_id=logical_id,
                             ordinal=ordinal,
                             identity_label=f"formula:{block.formula_group_id}",
-                            content=render_formula(block.formula_group_id, group),
+                            content=render_formula(group),
                             content_type=ChunkContentType.FORMULA,
                             source_block_ids=[block_id],
                             context=context,

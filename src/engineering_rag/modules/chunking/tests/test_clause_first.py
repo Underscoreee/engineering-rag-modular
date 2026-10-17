@@ -122,7 +122,7 @@ def test_table_chunk_preserves_structure_and_parent_relation() -> None:
     payload = json.loads(table.content)
     assert table.parent_chunk_id == parent.chunk_id
     assert payload["columns"] and payload["data"] and payload["notes"]
-    assert payload["raw_grid"]["column_count"] == 3
+    assert set(payload) == {"table_number", "title", "columns", "data", "notes"}
 
 
 def test_cross_page_table_remains_one_atomic_chunk() -> None:
@@ -139,7 +139,7 @@ def test_formula_group_stays_atomic_with_all_equations_and_symbols() -> None:
     payload = json.loads(formula.content)
     assert formula.formula_ids == ["f-norm-421-1", "f-norm-421-2"]
     assert len(payload["equations"]) == 2
-    assert payload["symbol_explanations"]["items"][0]["symbol"] == "q"
+    assert payload["symbol_explanations"][0] == {"latex": "q", "content": "虚构量"}
 
 
 def test_long_clause_splits_without_overlap_and_keeps_logical_id() -> None:
@@ -165,7 +165,7 @@ def test_oversized_table_is_not_split_and_is_marked() -> None:
     assert len(tables) == 1
     assert tables[0].exceeds_max_tokens
     assert tables[0].token_count > 40
-    assert json.loads(tables[0].content)["raw_grid"] is not None
+    assert json.loads(tables[0].content)["data"] is not None
 
 
 def test_unclaimed_body_becomes_paragraph_chunk() -> None:

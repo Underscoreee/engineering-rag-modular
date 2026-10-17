@@ -17,6 +17,12 @@ V2.4，输出 `schema_version="1.0"` 的 Chunk V1。`ChunkingConfig.max_tokens` 
 物理片段共享一个 `logical_chunk_id`，无 overlap。完整行为见
 `modules/chunking/INTERFACE.md`，合法虚构示例见 `examples/chunk_batch.example.json`。
 
+Formula/Table 的 `content` 是面向 Embedding、BM25 与 LLM 的稳定语义 JSON，而不是
+Document 对象的完整转储：公式只含编号、LaTeX 和符号解释；表格只含表号、表题、语义列、
+业务数据与表注。识别状态、raw grid、单元格几何、内部 ID 与来源定位继续保留在 Document
+和 Chunk metadata/provenance。`embedding_text` 与 `token_count` 必须由该清洗后的
+`content` 派生。
+
 Chunk V1 的确立没有修改 Document V2.4 字段或验证语义。改变 Chunk 公共字段需要升级
 Chunk Schema；仅改变确定性切分/身份结果也必须升级 `chunking_version`。
 

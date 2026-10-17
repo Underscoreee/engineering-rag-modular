@@ -1,5 +1,6 @@
 """Opt-in Chunk V1 regression over the saved 441-page partial Document."""
 
+import json
 import os
 from collections import Counter
 from pathlib import Path
@@ -40,7 +41,22 @@ def test_task2_real_document_chunking_regression() -> None:
         "paragraph": 19,
     }
     assert sum(chunk.is_explanation for chunk in batch.chunks) == 452
-    assert sum(chunk.exceeds_max_tokens for chunk in batch.chunks) == 93
+    assert sum(chunk.exceeds_max_tokens for chunk in batch.chunks) == 27
+
+    for chunk in batch.chunks:
+        if chunk.content_type.value == "formula":
+            content = json.loads(chunk.content)
+            assert set(content) == {"equations", "symbol_explanations"}
+            assert all(
+                set(equation) == {"equation_number", "latex"} for equation in content["equations"]
+            )
+            assert content["symbol_explanations"] is None or all(
+                set(item) == {"latex", "content"} for item in content["symbol_explanations"]
+            )
+        elif chunk.content_type.value == "table":
+            content = json.loads(chunk.content)
+            assert set(content) == {"table_number", "title", "columns", "data", "notes"}
+            assert all(set(column) == {"key", "header_path"} for column in content["columns"])
 
     block_ids = {block.block_id for page in document.pages for block in page.blocks}
     assert all(set(chunk.source_block_ids).issubset(block_ids) for chunk in batch.chunks)

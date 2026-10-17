@@ -93,10 +93,12 @@ V1 的 token 数由内置、无第三方依赖的确定性估算器计算；它�
 - 跨页 Clause 保持同一 `logical_chunk_id`，页范围从真实 Block 来源计算。
 - 超过预算时依次按已有内容单元/自然段、句子、最后 token window 切分；不 overlap。
   物理 `chunk_id` 不同，`logical_chunk_id` 相同。
-- 顶层 `LogicalTable` 每个 `table_id` 只生成一个 table Chunk，结构化 JSON 完整保留
-  title、columns、data、notes、raw_grid 和识别状态；跨页 fragment 不再次拆分。
-- 一个 FormulaGroup 生成一个 formula Chunk，完整保留 Equation、条件文本、编号、
-  LaTeX 和符号解释；Chunking 不重识别公式。
+- 顶层 `LogicalTable` 每个 `table_id` 只生成一个 table Chunk，跨页 fragment 不再次
+  拆分。`content` 只序列化 `table_number/title/columns/data/notes`；`raw_grid`、识别状态、
+  单元格位置及来源定位继续保留在 Document 或 Chunk provenance，不进入检索正文。
+- 一个 FormulaGroup 生成一个 formula Chunk。`content` 只序列化各 Equation 的
+  `equation_number/latex` 及共享符号说明的 `latex/content`；Formula/Group ID、识别状态、
+  OCR text 等仍由 Document 和 Chunk metadata 追踪，Chunking 不重识别公式。
 - 表格或公式超过预算仍保持完整，并设置 `exceeds_max_tokens=true`。
 - 有可检索图题的 Image 可生成 figure Chunk；纯图片资产不编造描述。
 - 原子 Chunk 与其所属 Clause 共享 `logical_chunk_id`，并用 `parent_chunk_id` 指向第一
