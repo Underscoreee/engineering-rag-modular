@@ -146,3 +146,23 @@ ruff format --check .
 
 没有 `ELASTICSEARCH_URL` 时真实持久化测试明确跳过；单元测试使用注入式测试替身，不冒充
 真实 Elasticsearch 验证。
+
+### 本地 Docker 测试环境
+
+`docker-compose.elasticsearch.yml` 固定使用 Elasticsearch 8.19.0，单节点、512 MiB JVM
+堆、持久化命名卷和健康检查，只将端口绑定到 `127.0.0.1`。由于该测试配置关闭
+Elasticsearch Security，严禁对外暴露。真实集成测试也会拒绝非 localhost URL 或 URL 内
+凭证。
+
+```bash
+docker compose -f docker-compose.elasticsearch.yml config
+docker compose -f docker-compose.elasticsearch.yml up -d
+curl -fsS 'http://127.0.0.1:9200/_cluster/health?wait_for_status=yellow&timeout=60s'
+ELASTICSEARCH_URL=http://127.0.0.1:9200 \
+  python -m pytest -vv -rs tests/integration/test_keyword_retrieval_elasticsearch.py
+docker compose -f docker-compose.elasticsearch.yml stop
+```
+
+端口冲突时使用 `ELASTICSEARCH_PORT=19200 docker compose ... up -d`，测试 URL 同步设为
+`http://127.0.0.1:19200`。容器停止或普通 `down` 不会删除命名卷；禁止使用 `down -v`。
+测试索引带随机 UUID，结束时只删除本次创建的确切索引，不清空集群或其他数据。

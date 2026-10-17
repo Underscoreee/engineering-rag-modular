@@ -107,7 +107,18 @@ def validate_existing_mapping(
     if not isinstance(actual_properties, Mapping):
         raise KeywordIndexCompatibilityError(f"index {index_name!r} has no properties mapping")
     for field, expected in expected_properties.items():
-        if actual_properties.get(field) != expected:
+        if not _field_mapping_matches(expected, actual_properties.get(field)):
             raise KeywordIndexCompatibilityError(
                 f"index {index_name!r} field {field!r} has an incompatible mapping"
             )
+
+
+def _field_mapping_matches(expected: object, actual: object) -> bool:
+    """Accept Elasticsearch's omission of the implied ``object`` type only."""
+
+    if not isinstance(expected, Mapping) or not isinstance(actual, Mapping):
+        return actual == expected
+    normalized_actual = dict(actual)
+    if expected.get("type") == "object" and "type" not in normalized_actual:
+        normalized_actual["type"] = "object"
+    return normalized_actual == expected

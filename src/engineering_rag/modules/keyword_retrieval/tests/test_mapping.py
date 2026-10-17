@@ -41,3 +41,16 @@ def test_mapping_metadata_cannot_hide_an_incompatible_field() -> None:
             index_name="chunks",
             config=config,
         )
+
+
+def test_mapping_accepts_elasticsearch_implied_object_type_normalization() -> None:
+    config = ElasticsearchKeywordConfig()
+    mappings = build_index_definition(config)["mappings"]
+    del mappings["properties"]["standard"]["type"]
+    del mappings["properties"]["source_refs"]["type"]
+
+    validate_existing_mapping(
+        {"chunks": {"mappings": mappings}},
+        index_name="chunks",
+        config=config,
+    )

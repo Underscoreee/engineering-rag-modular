@@ -23,6 +23,24 @@ python examples/keyword_retrieval_elasticsearch.py
 运行时配置和真实集成测试见
 [`keyword_retrieval/INTERFACE.md`](src/engineering_rag/modules/keyword_retrieval/INTERFACE.md)。
 
+### 本地 Elasticsearch 集成测试
+
+仓库提供固定 Elasticsearch 8.19.0、仅绑定回环地址的测试环境。该配置关闭安全认证，**只能
+用于本机开发测试，不能对外暴露**：
+
+```bash
+docker compose -f docker-compose.elasticsearch.yml up -d
+curl -fsS http://127.0.0.1:9200/
+ELASTICSEARCH_URL=http://127.0.0.1:9200 \
+  python -m pytest -vv -rs tests/integration/test_keyword_retrieval_elasticsearch.py
+docker compose -f docker-compose.elasticsearch.yml stop
+```
+
+若 9200 已被占用，可在启动时使用 `ELASTICSEARCH_PORT=19200`，并将测试 URL 同步改为
+`http://127.0.0.1:19200`。数据保存在命名卷 `engineering-rag-es-data` 中；`stop` 不删除卷。
+真实测试使用随机、独立索引并只清理该精确索引。普通单元测试不依赖 Docker；未设置 URL 时
+真实测试会明确跳过，跳过不能报告为通过。不要使用 `docker compose down -v` 清理环境。
+
 Task 1.1 Parser 与真实 CPU OCR：
 
 ```bash
