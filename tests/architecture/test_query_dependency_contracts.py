@@ -27,18 +27,34 @@ def test_query_reexports_canonical_dependencies_and_protocols_only() -> None:
     assert list(inspect.signature(StandardMetadataCatalog.lookup).parameters) == ["self", "request"]
 
 
-def test_task6_1_only_implements_injected_understanding() -> None:
-    """Replace the completed 6.0.1 empty-directory gate with executable phase boundaries."""
+def test_task6_2_only_implements_injected_understanding_and_rewrite() -> None:
+    """Only the two authorized stage entries are allowed; later flows remain forbidden."""
     root = Path(api.__file__).parent
+    from engineering_rag.modules.query.internal.rewrite import QueryRewrite
     from engineering_rag.modules.query.internal.understanding import QueryUnderstanding
 
     assert callable(QueryUnderstanding.understand)
+    assert list(inspect.signature(QueryRewrite.rewrite).parameters) == [
+        "self",
+        "request",
+        "understanding",
+    ]
+    assert list(inspect.signature(QueryRewrite.__init__).parameters) == ["self", "llm", "config"]
     forbidden = {"plan", "execute", "rewrite", "expand", "hyde", "search"}
     for path in (root / "internal").rglob("*.py"):
         tree = ast.parse(path.read_text(encoding="utf-8"))
+        allowed_entries = [
+            method
+            for node in tree.body
+            if isinstance(node, ast.ClassDef)
+            and node.name == "QueryRewrite"
+            and path.name == "rewrite.py"
+            for method in node.body
+            if isinstance(method, ast.FunctionDef) and method.name == "rewrite"
+        ]
         for node in ast.walk(tree):
             if isinstance(node, ast.FunctionDef | ast.AsyncFunctionDef):
-                assert node.name not in forbidden, (path, node.name)
+                assert node.name not in forbidden or node in allowed_entries, (path, node.name)
             if isinstance(node, ast.Call) and isinstance(node.func, ast.Attribute):
                 regex_search = (
                     node.func.attr == "search"
@@ -46,6 +62,8 @@ def test_task6_1_only_implements_injected_understanding() -> None:
                     and node.func.value.id == "re"
                 )
                 assert node.func.attr not in forbidden or regex_search, (path, node.func.attr)
+                if path.name.startswith("rewrite"):
+                    assert node.func.attr not in {"understand", "lookup"}, (path, node.func.attr)
             if isinstance(node, ast.Import):
                 imports = [alias.name for alias in node.names]
             elif isinstance(node, ast.ImportFrom) and node.level == 0 and node.module:

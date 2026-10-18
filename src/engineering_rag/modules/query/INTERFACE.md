@@ -3,8 +3,8 @@
 ## 职责与非职责
 
 `plan()` 形成结构化检索计划；`execute()` 通过注入的 Hybrid Protocol 检索。
-Task 6.1 已实现独立的内部 Understanding（见下节）；公开入口仍只有 Protocol 与 DTO，
-没有可实例化的完整 QueryService 或工厂。Rewrite、Expansion、HyDE、plan/execute 均未实现。
+Task 6.1 Understanding 和 Task 6.2 Rewrite 已实现为独立内部能力（见下文）；公开入口仍只有
+Protocol 与 DTO，没有可实例化的完整 QueryService 或工厂。Expansion、HyDE、plan/execute 未实现。
 
 ## Task 6.1：内部 Understanding（已实现）
 
@@ -61,6 +61,71 @@ model_failure、unmatched_scope、ambiguous_scope、catalog_unavailable、scope_
 
 实际实现、保守策略及离线验收见
 [Task 6.1 说明](../../../../docs/task-6.1-query-understanding.md)。
+
+## Task 6.2：内部 Rewrite（已实现）
+
+仅供 Query 内部协作和独立测试，不是新的跨模块公共契约：
+
+```python
+from engineering_rag.modules.query.internal.rewrite import QueryRewrite
+from engineering_rag.modules.query.internal.rewrite_models import RewriteConfig
+
+# llm: 注入的 StructuredLLMClient；llm_config: 已批准的 StructuredLLMConfig。
+# request 与 understanding_result 必须对应同一次 Understanding，不能拼接不同请求的结果。
+rewriter = QueryRewrite(llm=llm, config=RewriteConfig(llm=llm_config))
+result = rewriter.rewrite(request, understanding_result)
+# result.original_question 原样保留；result.rewritten_query 为唯一主查询。
+# result.keyword_synonyms 允许为空；result.filters 是 Understanding.filters 的独立深拷贝。
+```
+
+真实签名：`rewrite(QueryRequest, UnderstandingResult) -> RewriteResult`。复用 Task 6.1 的实际
+结果类型，不重新理解、查目录或修改其输出。输入类型、已有 filters 的收窄关系、采用候选的
+原问题证据及明显的标准/版次/条文冲突先检查；冲突在调用模型前失败。Understanding 当前没有
+原始请求摘要，调用方仍须保证结果来自同一次请求，局部一致性检查不是跨请求身份认证。
+
+模型请求 stage=query_rewrite，携带原问题、有界带 role 历史、处理意图、既有验证范围、保护值、
+受信任规则与词表，使用私有 RewriteOutput 生成 Schema，再执行 response.validate_output。
+输出只允许 rewritten_query（非空白）和 keyword_synonyms（字符串候选列表），不能返回新过滤。
+获取性与探索性在这里执行相同的基础改写；不回答问题、不生成扩展、HyDE 或查询计划。
+
+安全门包括标准身份/名称/版次/修订、定位编号、数值精度与单位、变量/LaTeX/Unicode 数学符号、
+否定/规范强度/条件与比较词的有序保护；在问题中出现的已核验目录名称、别名等也受保护。
+除此之外，主查询必须能由原文逐字复制及经审核的局部 language_rules 构成。记录每个修改的
+原文字符区间、替换及 evidence_id；不允许仅凭模型声明保真，不允许重排技术对象或自由补词。
+默认规则仅处理少量口语与明确普通错字；可能正确但无法证明的自由改写也会拒绝。
+
+同义词默认不猜测（equivalent_terms=[]）。如需补充，注入经维护者审核的
+`EquivalentTerm(term, equivalent, evidence_id)`；模型建议必须与此词表精确匹配，且原词在
+当前问题中出现。丢弃空白、重复、未验证、上下位/仅相关候选及编号/答案/约束词，记录原因；
+最多保留 4 个、每个 64 字符，可配置。词表是可信配置，不是模型自称的置信度或权威目录；
+错误的人工等价断言不能靠此机制自动纠正，不应配置含歧义的跨场景同义词。
+
+不提供 keyword_query：已检查 Keyword 接收普通文本字符串，实际拼接由后续 Planning 决定；
+本阶段只输出主查询与审查后的少量同义词，不生成 DSL、不修改或调用任何检索模块。
+
+预算默认：原问题 8000 字符，历史最多 8 条/16000 字符，主查询 8000 字符，最多 2 次尝试
+（可设 1）。不截断当前问题或历史来伪称完整理解；超时/连接失败、Schema 纠正及安全纠正
+共享预算，最多一次额外尝试，其他供应商异常不重试。适配器负责真实调用的超时/token 限制，
+不得隐藏重试。安全对齐最多 50000 个状态，词表/规则/原始同义词候选也有数量上限。
+
+`RewriteError.code` 区分 input_budget、scope_conflict、invalid_output、unsafe_rewrite、
+model_failure；保留 __cause__ 和私有 attempts。耗尽预算必须失败，**不返回原问题伪装成功**。
+正常无须修改的问题可以由合法模型响应原样返回，仍必须通过全部校验；这不是异常回退。
+
+RewriteResult 还包括 processing_intent、完整保护区间、局部修改 lineage、同义词审查记录、
+模型尝试（状态/耗时/可空用量）、trace、提示/模型/配置版本及策略指纹；支持严格 JSON 往返。
+默认 INFO 日志只记录阶段、关联 ID、状态、预算次数、用量与版本，不写问题/历史/模型全文。
+私有结果和异常链仍可能包含敏感原文，应受控使用。无文件/数据库副作用、无真实 SDK，
+输入/Understanding/config 均隔离复制；注入客户端的生命周期由组合层管理。
+
+后续 Task 6.3 须另行启动，消费唯一 rewritten_query、可信 keyword_synonyms、处理意图及
+未变化的 filters，并继续保留原 QueryRequest/Understanding。完整策略、限制和实测结果见
+[Task 6.2 / ADR-Q-002](../../../../docs/task-6.2-query-rewrite.md)。独立测试：
+
+```bash
+python -m pytest src/engineering_rag/modules/query/tests/test_rewrite.py -q
+python -m pytest src/engineering_rag/modules/query/tests -q
+```
 
 ## 公开接口
 
