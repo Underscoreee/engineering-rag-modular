@@ -1,6 +1,6 @@
 # Engineering RAG
 
-面向工程规范、建设标准与图集 PDF 的模块化单体 RAG 项目。**Document Schema V2.4 已于 2026-10-11 正式冻结（FROZEN）**。Document Parser 已完成 PDF/OCR、MinerU 私有适配、复杂表格、公式、章节/条文结构化与可恢复的端到端编排；机器结果仍是待核验的部分解析候选。Task 2 已实现独立的 Clause-first Chunking 和 Chunk V1。Task 3 已实现 Elasticsearch BM25；Task 4 已实现可注入的 Sentence-Transformers + Milvus 向量检索。混合检索和 LLM 尚未实现。
+面向工程规范、建设标准与图集 PDF 的模块化单体 RAG 项目。**Document Schema V2.4 已于 2026-10-11 正式冻结（FROZEN）**。Document Parser 已完成 PDF/OCR、MinerU 私有适配、复杂表格、公式、章节/条文结构化与可恢复的端到端编排；机器结果仍是待核验的部分解析候选。Task 2 已实现独立的 Clause-first Chunking 和 Chunk V1。Task 3 已实现 Elasticsearch BM25；Task 4 已实现可注入的 Sentence-Transformers + Milvus 向量检索；Task 5 已实现 RRF 与分路 Min-Max 加权混合检索。Query、Rerank 和 Generation 尚未实现。
 
 ## 安装与检查
 
