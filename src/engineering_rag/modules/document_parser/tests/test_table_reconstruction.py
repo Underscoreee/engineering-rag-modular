@@ -40,10 +40,9 @@ from engineering_rag.modules.document_parser.internal.tables.raw_html_parser imp
     TableHtmlError,
     parse_html_table,
 )
+from engineering_rag.modules.document_parser.tests.path_helpers import case_file_path
 
-CASES = json.loads(
-    (Path(__file__).resolve().parents[5] / "TASK_1_3_TEST_CASES.json").read_text(encoding="utf-8")
-)
+CASES = json.loads(case_file_path(__file__, "TASK_1_3_TEST_CASES.json").read_text(encoding="utf-8"))
 SYNTHETIC = {item["case_id"]: item for item in CASES["synthetic_cases"]}
 
 

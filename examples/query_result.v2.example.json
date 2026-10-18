@@ -1,0 +1,28 @@
+{
+  "schema_version": "2.0",
+  "plan": {
+    "schema_version": "2.0",
+    "original_question": "虚构设备基础的检修空间有什么要求？",
+    "rewritten_queries": ["虚构设备基础检修空间要求"],
+    "hypothetical_document": null,
+    "intent": "requirement",
+    "processing_intent": "acquisition",
+    "retrieval_mode": "hybrid",
+    "hybrid_request": {
+      "keyword": {
+        "query": "虚构设备基础 检修空间",
+        "index_name": "fiction_keyword"
+      },
+      "vector": {
+        "query": "虚构设备基础的检修和维护空间要求",
+        "index_name": "fiction_vector"
+      },
+      "fusion_strategy": "rrf",
+      "keyword_weight": 0.5,
+      "vector_weight": 0.5,
+      "candidate_k": 50,
+      "top_k": 10
+    }
+  },
+  "evidence": []
+}

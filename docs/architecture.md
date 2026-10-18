@@ -22,3 +22,9 @@ flowchart BT
 
 在线数据流（未来实现）：`Question → Query.plan/execute → Hybrid(Keyword + Vector) → Evidence → Generation → AnswerResult`。Generation 只看到证据，不执行检索。Task 0 仅定义上述边界，不执行数据流。
 
+Task 6.0.1 已为 Query 准备独立 2.0 计划/结果（新增处理意图）和显式 V1 迁移，以及
+StructuredLLMClient、StandardMetadataCatalog 公共依赖契约。它们通过组合根注入；Query
+业务代码只依赖 contracts，不直接导入基础适配器。首版执行政策为 Hybrid-only 和显式范围
+异常。LLM/目录尚无生产适配器，plan/execute 尚未实现，详见
+[Query 前置 ADR](adr-task6-query-prerequisites.md)。
+

@@ -1,10 +1,11 @@
 """Query planning and execution result contracts."""
 
 from enum import StrEnum
+from typing import Literal
 
 from pydantic import Field, model_validator
 
-from .common import SCHEMA_VERSION, ContractModel, NonEmptyStr, TraceContext
+from .common import ContractModel, NonEmptyStr, TraceContext
 from .retrieval import HybridSearchRequest, RetrievalMode, RetrievalResult, SearchFilters
 
 
@@ -39,12 +40,23 @@ class QueryIntent(StrEnum):
     UNKNOWN = "unknown"
 
 
+QUERY_SCHEMA_VERSION = "2.0"
+
+
+class ProcessingIntent(StrEnum):
+    """Processing strategy, independent of the existing semantic QueryIntent."""
+
+    ACQUISITION = "acquisition"
+    EXPLORATORY = "exploratory"
+
+
 class RetrievalPlan(ContractModel):
-    schema_version: NonEmptyStr = SCHEMA_VERSION
+    schema_version: Literal["2.0"] = QUERY_SCHEMA_VERSION
     original_question: NonEmptyStr
     rewritten_queries: list[NonEmptyStr] = Field(default_factory=list)
     hypothetical_document: str | None = None
     intent: QueryIntent = QueryIntent.UNKNOWN
+    processing_intent: ProcessingIntent
     retrieval_mode: RetrievalMode
     hybrid_request: HybridSearchRequest | None = None
 
@@ -58,6 +70,6 @@ class RetrievalPlan(ContractModel):
 
 
 class QueryResult(ContractModel):
-    schema_version: NonEmptyStr = SCHEMA_VERSION
+    schema_version: Literal["2.0"] = QUERY_SCHEMA_VERSION
     plan: RetrievalPlan
     evidence: list[RetrievalResult] = Field(default_factory=list)

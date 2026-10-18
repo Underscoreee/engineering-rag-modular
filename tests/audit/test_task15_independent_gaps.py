@@ -12,6 +12,7 @@ from engineering_rag.modules.document_parser.internal.semantic.block_splitter im
     TextSpanEvidence,
     split_body_block,
 )
+from engineering_rag.modules.document_parser.tests.path_helpers import repository_root
 from engineering_rag.modules.document_parser.tests.test_semantic_structure import (
     _body,
     _document,
@@ -66,9 +67,9 @@ def test_safe_split_requires_child_bbox_inside_original_block_bbox():
 
 def test_standalone_real_explanation_page_301_does_not_become_normative_body():
     """Without verified zone context, p301 explanation text must not be labelled normative."""
-    from pathlib import Path
-
-    path = Path("data/eval/task1_5_semantics/runs/final/GB-COMBINED/document.semantic.partial.json")
+    path = repository_root(__file__) / (
+        "data/eval/task1_5_semantics/runs/final/GB-COMBINED/document.semantic.partial.json"
+    )
     existing = Document.model_validate_json(path.read_text(encoding="utf-8"))
     payload = existing.model_dump(mode="json")
     source_page = next(item for item in payload["pages"] if item["page_number"] == 301)

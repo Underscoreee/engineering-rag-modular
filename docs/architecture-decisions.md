@@ -1,5 +1,14 @@
 # 架构决策记录
 
+## ADR-Q-001：Query 前置契约 — Adopted
+
+Task 6.0.1 保留语义 QueryIntent，新增独立 ProcessingIntent；RetrievalPlan/QueryResult
+局部升级为 2.0，提供必须显式给出处理意图的 V1 迁移。供应商无关 StructuredLLMClient
+与可信快照 StandardMetadataCatalog 只定义 DTO/Protocol 和校验边界；Query 首版采纳
+Hybrid-only、可信范围验证和异常式失败政策，业务逻辑留待 Task 6.1～6.4。
+Document V2.4、Chunk 与检索契约未变。详见
+[Query 前置 ADR](adr-task6-query-prerequisites.md)。
+
 ## 基线决策
 
 - **模块化单体（Adopted）**：一个安装包与部署单元，模块以 Python Protocol + Pydantic 契约进程内协作。

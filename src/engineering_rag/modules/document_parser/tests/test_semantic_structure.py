@@ -3,7 +3,6 @@
 from __future__ import annotations
 
 import json
-from pathlib import Path
 
 import pytest
 from pydantic import ValidationError
@@ -39,9 +38,10 @@ from engineering_rag.modules.document_parser.internal.semantic.block_splitter im
     TextSpanEvidence,
     split_body_block,
 )
+from engineering_rag.modules.document_parser.tests.path_helpers import case_file_path
 
 CONFIG = json.loads(
-    (Path(__file__).resolve().parents[5] / "TASK_1_5_TEST_CASES.json").read_text(encoding="utf-8")
+    case_file_path(__file__, "TASK_1_5_TEST_CASES.json").read_text(encoding="utf-8")
 )
 ALL_SYNTHETIC_CASES = {item["id"] for item in CONFIG["synthetic_cases"]}
 IMPLEMENTED_CASES = {f"S{number:02d}" for number in range(1, 37)}

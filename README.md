@@ -70,6 +70,12 @@ Task 1.2 MinerU 运行时独立安装在项目忽略的 `.local/mineru-runtime`�
 
 ## 独立模块测试
 
+Task 6.0.1 已准备 Query 前置契约：保留语义意图，新增处理意图；RetrievalPlan/QueryResult
+局部升级为 2.0 并提供显式 V1 迁移。StructuredLLMClient 和 StandardMetadataCatalog 仅有
+公共 DTO/Protocol 与离线夹具，Query 的 plan/execute 和真实 LLM/目录尚未实现。
+详见 [前置 ADR](docs/adr-task6-query-prerequisites.md)与
+[Query 接口](src/engineering_rag/modules/query/INTERFACE.md)。Document V2.4 及检索/Chunk 契约不变。
+
 ```bash
 python -m pytest src/engineering_rag/modules/document_parser/tests -q
 python -m pytest src/engineering_rag/modules/chunking/tests -q

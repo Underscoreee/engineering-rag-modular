@@ -2,6 +2,24 @@
 
 `engineering_rag.contracts` 是唯一公共模型来源。Document Schema V2.4 已于 2026-10-11 冻结。所有 DTO 使用 Pydantic v2 和 `extra='forbid'`；`Document.schema_version` 只接受 `"2.4"`。`2.4-proposal`、V2.3 和 Task 0.1 候选 JSON 不会静默迁移。示例内容均为虚构测试文本。冻结后的破坏性变更必须升级 Schema 版本并提供显式迁移机制。
 
+## Query 2.0 与 Task 6.0.1 依赖契约
+
+Query 独立使用 `QUERY_SCHEMA_VERSION="2.0"`：RetrievalPlan 新增必填 processing_intent
+（acquisition/exploratory），保留原 QueryIntent 五类语义；QueryResult 因嵌套计划同步升为
+Literal 2.0，仍只返回 plan/evidence。QueryRequest、QueryOptions、检索模型、Chunk 与
+Document V2.4 未改；全局 SCHEMA_VERSION 仍为 1.0。
+
+旧计划/结果必须显式调用 migrate_retrieval_plan_v1 / migrate_query_result_v1，并提供处理
+意图，不从旧语义猜测。严格旧消费者不能直接读取新版 JSON。示例为
+examples/query_result.v2.example.json；迁移和兼容细节见
+[ADR-Q-001](adr-task6-query-prerequisites.md)。
+
+公共 llm.py 定义 StructuredLLMRequest/Response、StructuredLLMConfig、LLMTokenUsage；
+Response.data 是未验证传输对象，validate_output 绑定请求并用指定 Pydantic 模型严格校验，
+然后仍须业务层验证依据。未知用量允许 null。catalog.py 定义可信快照目录 Lookup/Record/Match，
+区分唯一、歧义、未匹配、不可用以及全局有效与当前双索引入库。LLM/目录 Protocol 均在
+protocols.py，仅声明能力；没有供应商 SDK、模型调用、生产目录或 Query 业务算法。
+
 ## Chunk V1
 
 `ChunkingService.chunk(Document, ChunkingConfig) -> ChunkBatch` 消费冻结的 Document

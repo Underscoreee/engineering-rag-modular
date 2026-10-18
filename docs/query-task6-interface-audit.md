@@ -3,6 +3,10 @@
 审查日期：2026-10-18。代码基线：`ce9335e`；开始时 `git status --short` 为空。
 本阶段仅交付设计文档。下文区分“当前实现”“已有声明”和“建议方案”，不启动 Task 6.1。
 
+> Task 6.0.1 更新（2026-10-18）：第 1～7 节保留为 **Task 6.0 历史审查快照**，
+> 其中“无 LLM/目录 Protocol”“计划 1.0”等描述不再是当前状态。当前契约与缺口处理结果见
+> 第 8 节及 [ADR-Q-001](adr-task6-query-prerequisites.md)。历史测试计数属于 6.0，不是 6.0.1。
+
 ## 1. 仓库事实与证据
 
 | 编号 | 实际文件 | 审查结论 |
@@ -138,3 +142,17 @@ Task 6.1 前的明确契约门槛；完整 Query 功能不能仅靠现有接口�
 Query 与 Generation 的各 1 项测试只验证 Protocol 声明，不能视为业务功能通过。
 本阶段没有启用真实数据库、MinerU、真实 Embedding 或 LLM 集成测试；完整 pytest 中的
 24 项跳过不能计为真实集成通过。没有改动业务源码、公共契约、依赖或已有文档，没有 Git 提交。
+
+## 8. Task 6.0.1 当前状态
+
+| 原缺口 | 实际处理结果 | 仍需后续工作 |
+| --- | --- | --- |
+| C1 双意图 | 保留 QueryIntent；新增 ProcessingIntent，RetrievalPlan.processing_intent 必填；计划/结果 Literal 2.0；显式迁移要求传入意图 | 意图识别业务与人工评估未实现 |
+| D1 LLM 边界 | contracts/llm.py DTO、StructuredLLMClient.generate Protocol、validate_output 纯校验与离线替身已提供 | 真实模型、SDK 适配器、数据传输政策未定 |
+| D2 标准目录 | contracts/catalog.py DTO、StandardMetadataCatalog.lookup Protocol；四种结果、目录快照、测试标记、入库范围绑定已提供 | 无生产目录/匹配器；不支持条文存在性验证 |
+| C2 单路模式 | 已采纳首版 Hybrid-only，保留 QueryOptions 三种值 | future service 明确拒绝 keyword/vector，执行逻辑未实现 |
+| C3 成功结果状态 | 已采纳异常式失败，QueryResult 不新增状态字段 | 后续 Query 以最小异常体系区分失败；2.0 升版仅因嵌套计划变化 |
+| D3/D4 观测/评估 | 未扩展 | 依然只有公共声明/已有领域工具，真实 Query Gold 未建设 |
+
+QueryService 方法和 QueryRequest 未变；无 RetrievalRequest，Hybrid/Keyword/Vector/Document
+契约未变。当前唯一新增公共依赖来自 contracts，不涉及跨模块内部导入或真实外部调用。

@@ -1,21 +1,23 @@
 # Task 6.0：Query 数据流与架构设计
 
 日期：2026-10-18。**本文是建议方案，Query 业务链尚未实现。** 实际接口证据与缺口编号见
-[接口审查](query-task6-interface-audit.md)。公共 Document V2.4、Query、检索契约均保持原样。
+[接口审查](query-task6-interface-audit.md)。Task 6.0.1 已按
+[ADR-Q-001](adr-task6-query-prerequisites.md) 落地 Query 2.0 和 LLM/目录依赖契约；
+Document V2.4 与检索契约保持原样。下文业务流依然属于后续实现设计。
 
 ## 1. 调用边界
 
 组合根创建 Keyword、Vector、Hybrid 后，仅将公共 `HybridRetrievalService` 注入 Query。
 Query 内不得导入三个模块的具体实现或 internal，不持有 Elasticsearch/Milvus 客户端。
-共享 LLM 与目录边界需要后续批准；以下图中的“拟议注入能力”不是现有 Protocol。
+共享 LLM 与目录边界已有公共 Protocol，真实适配器仍未实现；由组合根提供实例。
 
 ```mermaid
 flowchart LR
     O[组合根 / 未来 Orchestrator] --> Q[QueryService：目前只有声明]
     O --> H[已实现 HybridRetrievalService]
     Q -->|通过注入的公共 Protocol| H
-    Q -.->|拟议类型化依赖| L[LLM 适配器]
-    Q -.->|拟议可信快照/解析能力| C[标准目录]
+    Q -.->|StructuredLLMClient| L[未来 LLM 适配器]
+    Q -.->|StandardMetadataCatalog| C[未来可信目录]
     H --> K[KeywordRetrievalService]
     H --> V[VectorRetrievalService]
     K --> ES[Elasticsearch]
@@ -49,7 +51,8 @@ flowchart TD
     RES --> QR[现有 QueryResult：plan + evidence]
 ```
 
-图中两类 processing intent 目前不能写入公共 `RetrievalPlan.intent`，须先解决审查 C1。
+图中两类 processing intent 写入独立 `RetrievalPlan.processing_intent`，不写入语义 intent；
+计划及 QueryResult 已局部升为 2.0，C1 的契约门槛已解决。
 图描述目标链，不代表现有 QueryService 可以运行。
 
 ### plan 与 execute
@@ -60,7 +63,7 @@ flowchart TD
 当前 Protocol 没有 `execute(plan)`；外部先 plan 再 execute(request) 可能重新生成计划，
 不要宣称第二次必定执行首次 plan。如需直接执行已批准计划，应另行评审 API。
 
-首版推荐仅支持 `options.mode=hybrid`；keyword/vector 是合法 DTO 值但尚无可执行单路计划
+首版已采纳仅支持 `options.mode=hybrid`；keyword/vector 是合法 DTO 值但尚无可执行单路计划
 结构。调用它们应抛明确 unsupported 错误，不能默默改 mode 或用空分支冒充 Hybrid。
 
 ### 输入输出映射
@@ -71,7 +74,7 @@ flowchart TD
 | history | 内部理解/改写上下文 | 有界、保留 role；历史不成为检索证据，不覆盖当前显式范围 |
 | 主改写、去重扩展 | plan.rewritten_queries | 建议第 1 条为主改写，随后为扩展；阶段角色/来源另存内部诊断 |
 | HyDE | plan.hypothetical_document | 明确假设文本；禁入 evidence，不被 Generation 当引用 |
-| acquisition/exploratory | 当前无可直接映射的 intent 值 | 处理 C1 后才写公共意图；不伪映射 fact_lookup/explanation |
+| acquisition/exploratory | plan.processing_intent（必填） | 两类处理意图；原语义 intent 五类不变 |
 | 已验证 filters | plan.hybrid_request.keyword.filters 与 vector.filters | 两份深复制保持同一用户范围 |
 | options.top_k | plan.hybrid_request.top_k | 来自用户，超过部署上限报错，不静默缩小 |
 | 注入的规划配置 | candidate_k、fusion_strategy、两路 index_name、权重 | 所有字段来自可信配置，不接受 LLM 生成后端路由 |
@@ -125,6 +128,7 @@ hybrid_request = HybridSearchRequest(
 plan = RetrievalPlan(
     original_question="设备基础需要多少检修空间？",
     rewritten_queries=["设备基础周围的检修空间要求"],
+    processing_intent="acquisition",
     retrieval_mode="hybrid",
     hybrid_request=hybrid_request,
 )
@@ -132,7 +136,7 @@ assert plan.hybrid_request.keyword.query != plan.hybrid_request.vector.query
 assert RetrievalPlan.model_validate_json(plan.model_dump_json()) == plan
 ```
 
-此例未填新意图，合法使用当前默认 unknown 仅为 DTO 能力演示；不能作为将来两类意图的验收。
+此例显式提供处理意图，语义 intent 仍合法使用默认 unknown；它只是 DTO 能力演示，不包含意图算法。
 示例标准代码假设已由可信测试目录确认，真实运行不能照搬为过滤条件。
 
 默认建议采用 RRF，显式写 `fusion_strategy="rrf"`（当前模型字段无默认值），两权重 0.5/0.5。
@@ -164,10 +168,14 @@ candidate_k=50，最终 top_k 默认 10。不能靠子请求 top_k 实现不同�
 
 ## 5. LLM 依赖与有界执行建议
 
-当前仓库未提供统一 LLM Client。建议先批准一个类型化能力边界，由组合根注入模型适配器，
-Request 至少约束阶段、输入、输出 Schema、模型/提示版本、超时和 token 预算；Response 至少提供
-经验证 payload、模型版本、实际用量（未知时保留未知）和调用身份。此处不创建 Protocol/DTO，
-也不写可运行 Prompt。GenerationService 不承担该职责，Query 不应调用它生成“答案”。
+Task 6.0.1 已提供 StructuredLLMClient.generate 及 Request/Response/Config/Usage DTO。
+Request 约束 stage、input、output_schema、模型配置、超时、token 预算和 trace；Response
+data 必须经过 validate_output(request, OutputModel) 才能成为业务 DTO，之后还需范围/事实验证。
+模型适配器与可运行 Prompt 尚未实现。GenerationService 不承担该职责，Query 不调用它生成“答案”。
+
+StandardMetadataCatalog.lookup 已有四态结果、目录快照、知识库双索引范围与 is_test_fixture；
+调用方须 validate_for(request)。契约本次不提供条文存在性验证，相关需求必须另取证据能力，
+不能根据标准匹配就宣称条文已验证。实际生产目录尚未建设。
 
 | 阶段 | 建议调用次数 | 失败策略 |
 | --- | --- | --- |

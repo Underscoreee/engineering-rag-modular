@@ -38,9 +38,13 @@ from engineering_rag.modules.document_parser.internal.mineru.normalizer import (
     normalize_middle_json,
 )
 from engineering_rag.modules.document_parser.internal.mineru.v24_adapter import adapt_to_v24
+from engineering_rag.modules.document_parser.tests.path_helpers import (
+    case_file_path,
+    repository_root,
+)
 
-ROOT = Path(__file__).resolve().parents[5]
-SPEC = json.loads((ROOT / "TASK_1_4_TEST_CASES.json").read_text(encoding="utf-8"))
+ROOT = repository_root(__file__)
+SPEC = json.loads(case_file_path(__file__, "TASK_1_4_TEST_CASES.json").read_text(encoding="utf-8"))
 CASES = SPEC["synthetic_test_cases"]
 
 

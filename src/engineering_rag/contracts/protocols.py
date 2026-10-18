@@ -7,10 +7,12 @@ from typing import BinaryIO, Protocol, runtime_checkable
 
 from .answers import AnswerResult, GenerationRequest
 from .artifacts import ArtifactManifest, DocumentArtifact
+from .catalog import StandardMetadataLookup, StandardMetadataMatch
 from .chunks import ChunkBatch, ChunkingConfig
 from .common import ArtifactRef, FileRef, NonEmptyStr, TraceContext
 from .documents import Document, ParseRequest
 from .evaluation import EvaluationReport, EvaluationRequest
+from .llm import StructuredLLMRequest, StructuredLLMResponse
 from .queries import QueryRequest, QueryResult, RetrievalPlan
 from .retrieval import (
     DeleteResult,
@@ -57,6 +59,20 @@ class HybridRetrievalService(Protocol):
 class QueryService(Protocol):
     def plan(self, request: QueryRequest) -> RetrievalPlan: ...
     def execute(self, request: QueryRequest) -> QueryResult: ...
+
+
+@runtime_checkable
+class StructuredLLMClient(Protocol):
+    """Generate transport DTOs; callers must validate output before business use."""
+
+    def generate(self, request: StructuredLLMRequest) -> StructuredLLMResponse: ...
+
+
+@runtime_checkable
+class StandardMetadataCatalog(Protocol):
+    """Resolve metadata within a trusted, versioned knowledge-base snapshot."""
+
+    def lookup(self, request: StandardMetadataLookup) -> StandardMetadataMatch: ...
 
 
 @runtime_checkable
