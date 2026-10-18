@@ -10,7 +10,7 @@ services:
       ETCD_SNAPSHOT_COUNT: "50000"
     command: etcd -advertise-client-urls=http://127.0.0.1:2379 -listen-client-urls=http://0.0.0.0:2379 --data-dir=/etcd
     volumes:
-      - engineering-rag-milvus-etcd:/etcd
+      - engineering-rag-milvus-etcd-quay-20230320:/etcd
     healthcheck:
       test: ["CMD", "etcdctl", "endpoint", "health"]
       interval: 10s
@@ -18,15 +18,13 @@ services:
       retries: 15
 
   minio:
-    # The historical minio/minio tag in Milvus v2.5.4's upstream Compose is no
-    # longer distributed by Docker Hub. This pinned S3-compatible mirror keeps
-    # the same local-only test topology without using a floating tag.
-    image: bitnamilegacy/minio:2025.7.23-debian-12-r5
+    image: quay.io/minio/minio:RELEASE.2023-03-20T20-16-18Z
     environment:
       MINIO_ROOT_USER: minioadmin
       MINIO_ROOT_PASSWORD: minioadmin
     volumes:
-      - engineering-rag-milvus-minio:/bitnami/minio/data
+      - engineering-rag-milvus-minio-quay-20230320:/minio_data
+    command: minio server /minio_data --console-address ":9001"
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:9000/minio/health/live"]
       interval: 10s
@@ -43,7 +41,7 @@ services:
       MINIO_ADDRESS: minio:9000
       MINIO_REGION: us-east-1
     volumes:
-      - engineering-rag-milvus-data:/var/lib/milvus
+      - engineering-rag-milvus-data-quay-20230320:/var/lib/milvus
     ports:
       - "127.0.0.1:${MILVUS_PORT:-19530}:19530"
       - "127.0.0.1:${MILVUS_HEALTH_PORT:-9091}:9091"
@@ -60,9 +58,9 @@ services:
       start_period: 30s
 
 volumes:
-  engineering-rag-milvus-etcd:
-    name: engineering-rag-milvus-etcd
-  engineering-rag-milvus-minio:
-    name: engineering-rag-milvus-minio
-  engineering-rag-milvus-data:
-    name: engineering-rag-milvus-data
+  engineering-rag-milvus-etcd-quay-20230320:
+    name: engineering-rag-milvus-etcd-quay-20230320
+  engineering-rag-milvus-minio-quay-20230320:
+    name: engineering-rag-milvus-minio-quay-20230320
+  engineering-rag-milvus-data-quay-20230320:
+    name: engineering-rag-milvus-data-quay-20230320
