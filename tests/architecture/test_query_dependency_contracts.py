@@ -27,13 +27,25 @@ def test_query_reexports_canonical_dependencies_and_protocols_only() -> None:
     assert list(inspect.signature(StandardMetadataCatalog.lookup).parameters) == ["self", "request"]
 
 
-def test_task6_2_only_implements_injected_understanding_and_rewrite() -> None:
-    """Only the two authorized stage entries are allowed; later flows remain forbidden."""
+def test_task6_3_only_implements_injected_query_stages_not_retrieval() -> None:
+    """Authorized local stages remain isolated from planning and retrieval."""
     root = Path(api.__file__).parent
+    from engineering_rag.modules.query.internal.enhancement import QueryEnhancement
     from engineering_rag.modules.query.internal.rewrite import QueryRewrite
     from engineering_rag.modules.query.internal.understanding import QueryUnderstanding
 
     assert callable(QueryUnderstanding.understand)
+    assert list(inspect.signature(QueryEnhancement.enhance).parameters) == [
+        "self",
+        "request",
+        "understanding",
+        "rewrite",
+    ]
+    assert list(inspect.signature(QueryEnhancement.__init__).parameters) == [
+        "self",
+        "llm",
+        "config",
+    ]
     assert list(inspect.signature(QueryRewrite.rewrite).parameters) == [
         "self",
         "request",
@@ -64,6 +76,28 @@ def test_task6_2_only_implements_injected_understanding_and_rewrite() -> None:
                 assert node.func.attr not in forbidden or regex_search, (path, node.func.attr)
                 if path.name.startswith("rewrite"):
                     assert node.func.attr not in {"understand", "lookup"}, (path, node.func.attr)
+                if path.name.startswith("enhancement"):
+                    assert node.func.attr not in {
+                        "understand",
+                        "rewrite",
+                        "lookup",
+                        "embed_query",
+                        "embed_documents",
+                        "index",
+                    }, (path, node.func.attr)
+            if path.name.startswith("enhancement") and isinstance(node, ast.ImportFrom):
+                forbidden_types = {
+                    "HybridSearchRequest",
+                    "VectorSearchRequest",
+                    "KeywordSearchRequest",
+                    "RetrievalPlan",
+                    "RetrievalResult",
+                    "Document",
+                    "Chunk",
+                    "QueryUnderstanding",
+                    "QueryRewrite",
+                }
+                assert not {name.name for name in node.names} & forbidden_types, path
             if isinstance(node, ast.Import):
                 imports = [alias.name for alias in node.names]
             elif isinstance(node, ast.ImportFrom) and node.level == 0 and node.module:

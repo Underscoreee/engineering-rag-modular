@@ -3,8 +3,8 @@
 ## 职责与非职责
 
 `plan()` 形成结构化检索计划；`execute()` 通过注入的 Hybrid Protocol 检索。
-Task 6.1 Understanding 和 Task 6.2 Rewrite 已实现为独立内部能力（见下文）；公开入口仍只有
-Protocol 与 DTO，没有可实例化的完整 QueryService 或工厂。Expansion、HyDE、plan/execute 未实现。
+Task 6.1 Understanding、Task 6.2 Rewrite、Task 6.3 Expansion/HyDE 已实现为独立内部能力；
+公开入口仍只有 Protocol 与 DTO，没有完整 QueryService 或工厂，plan/execute 尚未实现。
 
 ## Task 6.1：内部 Understanding（已实现）
 
@@ -118,12 +118,81 @@ RewriteResult 还包括 processing_intent、完整保护区间、局部修改 li
 私有结果和异常链仍可能包含敏感原文，应受控使用。无文件/数据库副作用、无真实 SDK，
 输入/Understanding/config 均隔离复制；注入客户端的生命周期由组合层管理。
 
-后续 Task 6.3 须另行启动，消费唯一 rewritten_query、可信 keyword_synonyms、处理意图及
-未变化的 filters，并继续保留原 QueryRequest/Understanding。完整策略、限制和实测结果见
+Task 6.3 已按下节入口消费唯一 rewritten_query、可信 keyword_synonyms、处理意图及
+未变化的 filters，并继续保留原 QueryRequest/Understanding。Rewrite 策略、限制和实测结果见
 [Task 6.2 / ADR-Q-002](../../../../docs/task-6.2-query-rewrite.md)。独立测试：
 
 ```bash
 python -m pytest src/engineering_rag/modules/query/tests/test_rewrite.py -q
+python -m pytest src/engineering_rag/modules/query/tests -q
+```
+
+## Task 6.3：内部 Expansion / HyDE（已实现）
+
+```python
+from engineering_rag.modules.query.internal.enhancement import QueryEnhancement
+from engineering_rag.modules.query.internal.enhancement_models import EnhancementConfig
+
+# llm 为注入的 StructuredLLMClient；两份配置使用已有 StructuredLLMConfig。
+enhancer = QueryEnhancement(
+    llm=llm,
+    config=EnhancementConfig(expansion_llm=expansion_llm_config, hyde_llm=hyde_llm_config),
+)
+result = enhancer.enhance(request, understanding_result, rewrite_result)
+```
+
+真实内部签名：`enhance(QueryRequest, UnderstandingResult, RewriteResult) -> QueryEnhancementResult`。
+三个输入必须来自同一流程；检查原问题、处理意图、filters、trace、成功 Rewrite 状态及原文
+保护区间的一致性，不重跑理解/改写、不查目录。不序列化整份请求、历史或目录到模型输入。
+输入或上游关系错误抛 `EnhancementInputError`（invalid_upstream/input_budget），不是可选降级。
+不合法配置或关联集合在构造时以 ValueError/ValidationError 拒绝，不降级掩盖配置错误。
+
+| ProcessingIntent / 开关 | 实际调用与状态 |
+| --- | --- |
+| acquisition | 两阶段均零调用，skipped_by_intent；不依据关键词或问题长度重分类 |
+| exploratory + 开启 | 分别调用 query_expansion / query_hyde，各自 Schema、绑定与安全校验 |
+| exploratory + 关闭某阶段 | 对应阶段零调用，skipped_by_config，不视为失败 |
+| 某阶段失败 | 对应 failed，无伪造产物；另一阶段仍正常尝试，保留安全主查询/同义词 |
+
+ExpansionOutput 只允许 expanded_queries；HyDEOutput 只允许 hypothetical_document。
+两者均由 Pydantic 生成 Schema，并必须执行 response.validate_output；没有直接使用 data。
+默认每阶段一次正常调用，无重试。可配置 max_corrections=1，为两阶段共享一次额外纠正，
+包括超时/连接、Schema 和安全失败；全程最多三次调用，不能叠加独立重试。其他模型异常不重试。
+
+当前是**受控生成**：扩展逐字保留完整主查询，再以独立“检索关注”标签附加已审核的相关概念；
+HyDE 使用明确的假设/非证据框架，保留完整查询约束，可选择同一审核集合中的检索语境。
+默认提供设计、规范、比较三类通用检索视角，也可通过 RelatedContext(anchor, phrase, evidence_id)
+注入已审核的关联概念。它们不是同义词、事实或新增设计前提；词表本身是可信配置，非权威目录。
+新编号、取值、引用、条件改动、对象交换、非审核文本等均拒绝；自由长段落即使看似合理也可能
+被拒绝。不能仅凭这些离线安全门声称真实模型语义准确或召回提升。
+
+默认最多 3 条有效扩展、每条 2048 字符，HyDE 4096 字符/最多 3 个语境；原问题和主查询各
+8000 字符。只裁减超数量的候选并记录原因，不截断主查询或长候选来伪称保真。空扩展列表
+为 completed；重复主查询/重复候选稳定去重；全部实质候选不安全则 failed，部分拒绝或预算
+裁减标记 degraded。原始模型候选另有 16 条/每条 16000 字符的硬 Schema 上限。
+
+结果私有 schema_version=1.0，包含 original_question、rewritten_query、keyword_synonyms、
+processing_intent、filters 的独立副本、expanded_queries、可空 hypothetical_document、
+expansion_status/hyde_status、两个 StageReport、degraded、trace 与策略指纹。
+StageReport 包含模型/提示/配置版本、每次请求 ID/耗时/用量/错误类别及候选采用诊断；未知用量
+为 null。状态与产物有一致性校验，hypothesis_is_evidence 固定 false；支持 JSON 往返。
+模型失败类别为 timeout、connection、model_failure、invalid_output、unsafe_output；不写原始
+问题、历史或模型全文到普通日志，不把可选失败伪装成检索成功或检索失败。
+
+关键词基础只来自未变化的 rewritten_query 和 keyword_synonyms；增强材料保存在独立字段，
+不拼入 BM25、不改 filters、不转为 Document/Chunk/evidence/引用。没有 keyword_query、
+vector_query、Embedding 或任何实际检索调用。
+
+实际 VectorSearchRequest.query 是单字符串，HybridSearchRequest 只有一个 vector 子请求；
+RetrievalPlan.rewritten_queries 是计划数据列表，不是向量多查询能力。Task 6.4 须另行选择并
+测试有界单文本映射策略，例如有效 HyDE 优先、不可用时采用扩展、最后采用主查询；本阶段
+不选择策略、不拼接最终文本、不组装请求、不 fan-out，不修改 Vector 的 query_instruction。
+
+本入口仍只供 Query 内部集成。具体受控格式、信任边界和验收见
+[Task 6.3 / ADR-Q-003](../../../../docs/task-6.3-query-enhancement.md)。独立测试：
+
+```bash
+python -m pytest src/engineering_rag/modules/query/tests/test_enhancement.py -q
 python -m pytest src/engineering_rag/modules/query/tests -q
 ```
 
