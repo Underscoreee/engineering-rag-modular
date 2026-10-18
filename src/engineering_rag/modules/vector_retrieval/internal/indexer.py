@@ -37,7 +37,7 @@ def index_batch(
     indexed = 0
     for start in range(0, len(validated.chunks), config.write_batch_size):
         chunks = validated.chunks[start : start + config.write_batch_size]
-        texts = [chunk.embedding_text for chunk in chunks]
+        texts = [chunk.content for chunk in chunks]
         vectors = validate_vectors(
             provider.embed_documents(texts),
             expected_count=len(chunks),
