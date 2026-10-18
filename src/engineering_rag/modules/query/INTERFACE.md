@@ -4,7 +4,152 @@
 
 `plan()` 形成结构化检索计划；`execute()` 通过注入的 Hybrid Protocol 检索。
 Task 6.1 Understanding、Task 6.2 Rewrite、Task 6.3 Expansion/HyDE 已实现为独立内部能力；
-公开入口仍只有 Protocol 与 DTO，没有完整 QueryService 或工厂，plan/execute 尚未实现。
+Task 6.4 已通过公开工厂组合这些能力，实现完整 `QueryService.plan/execute`。
+本模块不创建模型 SDK、Embedding、数据库客户端，不实现 BM25、向量搜索、融合、Generation。
+
+## Task 6.4：公开服务与最小调用
+
+其他业务模块只导入 `engineering_rag.modules.query.api`；共享类型从 contracts 导入。
+真实签名为：
+
+```python
+def create_query_service(
+    *,
+    llm: StructuredLLMClient,
+    catalog: StandardMetadataCatalog,
+    hybrid_service: HybridRetrievalService,
+    config: QueryConfig,
+) -> DefaultQueryService: ...
+
+
+class QueryService(Protocol):
+    def plan(self, request: QueryRequest) -> RetrievalPlan: ...
+    def execute(self, request: QueryRequest) -> QueryResult: ...
+```
+
+工厂创建本模块既有三个阶段，仅接收公共依赖 Protocol；不会创建任何外部适配器。
+`DefaultQueryService` 也可直接注入本模块阶段（understanding/rewrite/enhancement）、
+hybrid_service 和 PlanningConfig，便于独立测试，不是第二套公共阶段 DTO。
+
+下面是可调用的组合函数；参数实例必须由组合根提供真实实现，示例本身不提供 LLM 或生产目录：
+
+```python
+from engineering_rag.contracts.catalog import CatalogIndexScope
+from engineering_rag.contracts.llm import StructuredLLMConfig
+from engineering_rag.contracts.protocols import (
+    HybridRetrievalService,
+    StandardMetadataCatalog,
+    StructuredLLMClient,
+)
+from engineering_rag.modules.query.api import (
+    EnhancementConfig,
+    PlanningConfig,
+    QueryConfig,
+    QueryRequest,
+    QueryService,
+    RewriteConfig,
+    UnderstandingConfig,
+    create_query_service,
+)
+
+
+def build_query(
+    llm: StructuredLLMClient,
+    catalog: StandardMetadataCatalog,
+    hybrid_service: HybridRetrievalService,
+    model: StructuredLLMConfig,
+    scope: CatalogIndexScope,
+) -> QueryService:
+    return create_query_service(
+        llm=llm,
+        catalog=catalog,
+        hybrid_service=hybrid_service,
+        config=QueryConfig(
+            understanding=UnderstandingConfig(llm=model, scope=scope),
+            rewrite=RewriteConfig(llm=model),
+            enhancement=EnhancementConfig(expansion_llm=model, hyde_llm=model),
+            planning=PlanningConfig(scope=scope),
+        ),
+    )
+
+
+# query = build_query(llm, catalog, hybrid_service, model_config, deployed_scope)
+# request = QueryRequest(question="设备基础的检修空间要求？")
+# plan = query.plan(request)        # 仅规划，有模型/目录调用，但无检索
+# result = query.execute(request)   # 内部新规划一次 + 一次 Hybrid.search
+# evidence = result.evidence       # 只有本次 Hybrid 的真实返回值
+```
+
+不要在需要“一次规划”的执行流程里先 plan 再 execute(request)：这是两次独立调用，
+会重新规划。现有公共契约没有 execute(plan) 或公开计划缓存。
+
+### 确定性映射
+
+`Understanding → Rewrite → Enhancement → build_plan`；每阶段调用入口一次。
+acquisition 仍调用 enhance 入口以取得合法跳过状态，但不会发起 Expansion/HyDE 模型调用。
+execute 调用一次自身 plan，再调用一次注入的 Hybrid.search，不执行其他检索或重试。
+
+| 目标 | 实际规则 |
+| --- | --- |
+| keyword.query | 主 rewritten_query 原样保留，按原顺序以换行附加已审核同义词；不含 HyDE/Expansion |
+| 同义词预算 | 默认最多 4 项、单项 64 字符；空白、重复、主查询已含项不再附加；只整项舍弃，不截词 |
+| vector.query / acquisition | 完整 rewritten_query |
+| vector.query / exploratory | completed 且未超预算的 HyDE 优先；否则按 Expansion 原顺序取首条有效、不同于主查询且未超预算的文本；否则主查询 |
+| 多扩展 | 只选一条，不拼接、不 fan-out、不按未定义分数选最佳、不做二次融合 |
+| 两路文本上限 | 默认各 8192 字符；主改写超任一路预算报错，增强超向量预算整项跳过；不截断保护条件 |
+| filters | 仅 Understanding 已核验结果，独立深复制到两路；检查调用方范围未扩大，后续阶段不得改变 |
+| rewritten_queries | 主改写在首位，随后全部已校验 Expansion，稳定去重；该列表不是多路检索请求 |
+| hypothetical_document | 已校验 HyDE 或 null；如因规划预算未被采用仍可保留，实际发送文本以 vector.query 为准 |
+| intent / processing_intent | Understanding 的 semantic_intent / processing_intent，互不推断 |
+| evidence | Hybrid 返回结果，保留身份、内容、标准、条文、页码、分数、顺序和 rank，不混入模型产物 |
+
+这些字符预算不是 Embedding tokenizer 预算；Vector 仍负责 query_instruction 与编码。
+Query 不重复加前缀，也不能保证长文本不会被实际 Embedding 模型截断；组合根应按模型设置
+更小且经过验证的预算。上游受控生成与词表策略仍按 6.2/6.3 执行，不重写其安全规则。
+
+### 配置、过滤与召回参数
+
+QueryConfig 复用 UnderstandingConfig、RewriteConfig、EnhancementConfig、PlanningConfig，
+必须显式提供四项；两处 scope 必须一致。配置在工厂/服务构造时校验并深复制，无导入副作用。
+这些配置及 LanguageRule、EquivalentTerm、RelatedContext 都可从 query.api 导入；不是新公共契约。
+
+PlanningConfig.scope 指定 keyword_index/vector_collection，索引不由 LLM 或查询文本选择。
+candidate_k 默认 50，同时写到两个子请求 top_k；Hybrid 也会覆盖它们为此共享值。
+用户唯一可映射的召回选项是 QueryOptions.top_k（默认 10），超 candidate_k 立即失败，
+不静默缩小或扩大候选数。keyword_candidate_limit=100、vector_candidate_limit=64 是部署声明的
+候选预算，默认兼容既有后端默认 max_top_k=100、Vector HNSW search_ef=64；candidate_k 必须
+不超过两者。Query 不检查真实后端配置，组合根须确认预算与实测服务一致。
+
+fusion_strategy 默认 FusionStrategy.RECIPROCAL_RANK_FUSION（rrf），权重仅 0.5/0.5；
+可配置 FusionStrategy.WEIGHTED_NORMALIZED，有限非负权重和必须为 1。
+内部严格配置的 Python 构造请使用枚举；JSON 读取可用公共枚举字符串。
+embedding_model_id 默认 null，按已有 Vector 请求传递；不设置 field_weights，保留 Keyword 默认行为。
+QueryOptions 没有候选数、权重或索引字段，因此这些参数来自可信配置，不私加公共选项。
+RRF 平滑常量仍由 Hybrid 的配置控制，Query 不实现融合或重新归一化。
+
+七项过滤字段保持现有语义：document_ids、standard_codes、editions、clause_numbers、
+content_types（同字段 OR、跨字段 AND）、is_explanation、is_mandatory（null 不筛选）。
+范围核验失败原样中止，不清空条件全库检索。catalog 的索引对必须等于真实检索索引对。
+
+### 失败、可观测性与生命周期
+
+QueryPlanningError.code 仅补充 unsupported_mode、invalid_parameters、invalid_upstream、
+invalid_result。非法配置/公共数据结构使用 Pydantic ValidationError；UnderstandingError、
+RewriteError、EnhancementInputError 与 Hybrid 原始异常不吞没、不包装成空结果。
+只有 6.3 返回的合法可选阶段降级可以继续；正常零命中才返回 evidence=[]。
+返回时重验公共结果；非有限分数、非 Hybrid 来源或注入服务修改提交请求均拒绝成功返回。
+
+使用现有标准 logging，记录 trace_id/task_id、运行 ID、阶段状态/耗时、增强状态、向量策略、
+candidate_k/top_k 和结果数；各模型阶段已有模型/Prompt/策略版本和可空实际 Token 用量日志。
+完整链路关联请传 QueryRequest.trace；未知用量仍为 null，不计算虚构费用。
+不默认记录问题、历史、增强或完整模型输入输出。公共结果无诊断字段，状态仅在私有产物/日志。
+
+plan 无检索、无索引/文件写入，但会调用注入模型和目录；execute 增加一次只读检索。
+无隐藏缓存、后台任务或检索重试；LLM 的有界重试仍由既有阶段预算控制。
+同一经过验证的阶段结果产生确定计划；模型随机性、运行 ID 与耗时不承诺确定性。
+服务无逐请求共享可变状态；客户端、目录、Hybrid 的关闭与线程安全由注入方负责，Query 不关闭它们。
+
+验收、限制和 ADR-Q-004 见 [Task 6.4 报告](../../../../docs/task-6.4-retrieval-planning.md)。
 
 ## Task 6.1：内部 Understanding（已实现）
 
@@ -100,7 +245,7 @@ result = rewriter.rewrite(request, understanding_result)
 最多保留 4 个、每个 64 字符，可配置。词表是可信配置，不是模型自称的置信度或权威目录；
 错误的人工等价断言不能靠此机制自动纠正，不应配置含歧义的跨场景同义词。
 
-不提供 keyword_query：已检查 Keyword 接收普通文本字符串，实际拼接由后续 Planning 决定；
+本阶段不提供 keyword_query：已检查 Keyword 接收普通文本字符串，实际拼接由 6.4 Planning 完成；
 本阶段只输出主查询与审查后的少量同义词，不生成 DSL、不修改或调用任何检索模块。
 
 预算默认：原问题 8000 字符，历史最多 8 条/16000 字符，主查询 8000 字符，最多 2 次尝试
@@ -184,9 +329,9 @@ StageReport 包含模型/提示/配置版本、每次请求 ID/耗时/用量/错
 vector_query、Embedding 或任何实际检索调用。
 
 实际 VectorSearchRequest.query 是单字符串，HybridSearchRequest 只有一个 vector 子请求；
-RetrievalPlan.rewritten_queries 是计划数据列表，不是向量多查询能力。Task 6.4 须另行选择并
-测试有界单文本映射策略，例如有效 HyDE 优先、不可用时采用扩展、最后采用主查询；本阶段
-不选择策略、不拼接最终文本、不组装请求、不 fan-out，不修改 Vector 的 query_instruction。
+RetrievalPlan.rewritten_queries 是计划数据列表，不是向量多查询能力。Task 6.4 已按上节选择并
+测试有界单文本策略；本增强阶段本身不拼接最终文本、不组装请求、不 fan-out，
+不修改 Vector 的 query_instruction。
 
 本入口仍只供 Query 内部集成。具体受控格式、信任边界和验收见
 [Task 6.3 / ADR-Q-003](../../../../docs/task-6.3-query-enhancement.md)。独立测试：
@@ -223,23 +368,24 @@ RRF 公共权重只允许 0.5/0.5，可变权重使用 weighted_normalized。详
 
 ## 失败与执行语义
 
-已采纳的首版执行政策：只支持 hybrid，其他 mode 在未来服务中明确报 unsupported，不能
-自动改 mode 或用零权重模拟。现有 DTO 没有删除单路值，也没有在本次提前实现模式判断。
+首版仅支持 hybrid；keyword/vector 是合法 DTO 值，但服务在模型调用前抛
+QueryPlanningError(unsupported_mode)，不自动改 mode 或用零权重模拟。
 
 LLM 只能抽取候选；格式与原文依据验证后，以可信目录匹配标准/版本/document_id。
 显式范围不得扩大；交集为空须报 scope conflict，不能传空数组解除限制。未匹配、歧义、
 目录不可用、输出非法、模型失败、Hybrid 失败均走明确异常，保留原因，不伪装空 evidence。
-Understanding 已使用上述最小异常体系；后续检索执行失败尚未实现。
+Understanding 已使用上述最小异常体系；检索执行错误原样传播。
 
-plan 不检索，但未来可以产生有预算的 LLM 调用；execute 只读检索，不写数据库。
+plan 不检索，但会产生有预算的 LLM 调用；execute 只读检索，不写数据库。
 相同模型输入不承诺逐字确定，需记录配置与提示版本。当前 Protocol 没有 execute(plan)，
 外部先 plan 再 execute(request) 可能重新规划。
 
 ## 依赖、版本与示例
 
-公共依赖唯一来源是 engineering_rag.contracts。query.api 重导出 QueryService、ProcessingIntent、
+跨模块依赖唯一来源是 engineering_rag.contracts。query.api 重导出 QueryService、ProcessingIntent、
 QueryIntent、QueryRequest/Result、RetrievalPlan、StructuredLLMClient、StandardMetadataCatalog
-以及两个迁移函数。Query 内不得导入其他业务模块的具体实现、internal 或数据库客户端。
+以及两个迁移函数，并暴露上述配置、DefaultQueryService 与 create_query_service。
+Query 内不得导入其他业务模块的具体实现、internal 或数据库客户端。
 
 新增依赖能力（均只有声明，没有真实适配器）：
 
@@ -283,7 +429,7 @@ decision = ProcessingIntent.ACQUISITION
 新读取器不自动接受 V1；更高/未知版本和混合新旧字段拒绝。
 
 ```python
-# 接口示例，query_service 为未来注入实现；当前不能实际调用。
+# query_service 使用上文工厂构造；以下调用真实存在。
 # plan = query_service.plan(request)  # 不检索
 # result = query_service.execute(request)
 ```

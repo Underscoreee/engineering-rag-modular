@@ -1,4 +1,4 @@
-"""Public dependency declarations remain vendor-free and do not implement Query flows."""
+"""Query stages and the authorized planner remain vendor-free and dependency-injected."""
 
 import ast
 import inspect
@@ -10,7 +10,7 @@ from engineering_rag.contracts import (
     StandardMetadataCatalog,
     StructuredLLMClient,
 )
-from engineering_rag.contracts.protocols import QueryService
+from engineering_rag.contracts.protocols import HybridRetrievalService, QueryService
 from engineering_rag.modules.query import api
 
 
@@ -27,8 +27,8 @@ def test_query_reexports_canonical_dependencies_and_protocols_only() -> None:
     assert list(inspect.signature(StandardMetadataCatalog.lookup).parameters) == ["self", "request"]
 
 
-def test_task6_3_only_implements_injected_query_stages_not_retrieval() -> None:
-    """Authorized local stages remain isolated from planning and retrieval."""
+def test_task6_4_orchestration_is_the_only_retrieval_caller() -> None:
+    """Local stages remain isolated; only the service may plan and call public Hybrid."""
     root = Path(api.__file__).parent
     from engineering_rag.modules.query.internal.enhancement import QueryEnhancement
     from engineering_rag.modules.query.internal.rewrite import QueryRewrite
@@ -52,6 +52,21 @@ def test_task6_3_only_implements_injected_query_stages_not_retrieval() -> None:
         "understanding",
     ]
     assert list(inspect.signature(QueryRewrite.__init__).parameters) == ["self", "llm", "config"]
+    assert list(inspect.signature(api.DefaultQueryService.plan).parameters) == ["self", "request"]
+    assert list(inspect.signature(api.DefaultQueryService.execute).parameters) == [
+        "self",
+        "request",
+    ]
+    assert (
+        inspect.signature(api.DefaultQueryService.__init__).parameters["hybrid_service"].annotation
+        is HybridRetrievalService
+    )
+    definitions = {
+        ("rewrite.py", "QueryRewrite", "rewrite"),
+        ("planning_models.py", "RewriteStage", "rewrite"),
+        ("service.py", "DefaultQueryService", "plan"),
+        ("service.py", "DefaultQueryService", "execute"),
+    }
     forbidden = {"plan", "execute", "rewrite", "expand", "hyde", "search"}
     for path in (root / "internal").rglob("*.py"):
         tree = ast.parse(path.read_text(encoding="utf-8"))
@@ -59,10 +74,9 @@ def test_task6_3_only_implements_injected_query_stages_not_retrieval() -> None:
             method
             for node in tree.body
             if isinstance(node, ast.ClassDef)
-            and node.name == "QueryRewrite"
-            and path.name == "rewrite.py"
             for method in node.body
-            if isinstance(method, ast.FunctionDef) and method.name == "rewrite"
+            if isinstance(method, ast.FunctionDef)
+            and (path.name, node.name, method.name) in definitions
         ]
         for node in ast.walk(tree):
             if isinstance(node, ast.FunctionDef | ast.AsyncFunctionDef):
@@ -73,7 +87,15 @@ def test_task6_3_only_implements_injected_query_stages_not_retrieval() -> None:
                     and isinstance(node.func.value, ast.Name)
                     and node.func.value.id == "re"
                 )
-                assert node.func.attr not in forbidden or regex_search, (path, node.func.attr)
+                service_call = path.name == "service.py" and ast.unparse(node.func) in {
+                    "self._rewrite.rewrite",
+                    "self.plan",
+                    "self._hybrid_service.search",
+                }
+                assert node.func.attr not in forbidden or regex_search or service_call, (
+                    path,
+                    node.func.attr,
+                )
                 if path.name.startswith("rewrite"):
                     assert node.func.attr not in {"understand", "lookup"}, (path, node.func.attr)
                 if path.name.startswith("enhancement"):
