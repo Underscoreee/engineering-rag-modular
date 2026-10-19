@@ -163,7 +163,7 @@ plan 无检索、无索引/文件写入，但会调用注入模型和目录；ex
 from engineering_rag.modules.query.internal.config import UnderstandingConfig
 from engineering_rag.modules.query.internal.understanding import QueryUnderstanding
 
-# llm、catalog 由组合层通过公共 Protocol 注入；没有默认真实适配器。
+# llm、catalog 由组合层通过公共 Protocol 注入；Query 不默认创建供应商或数据库客户端。
 # llm_config 是 StructuredLLMConfig；scope 是 CatalogIndexScope（可信部署配置）。
 understanding = QueryUnderstanding(
     llm=llm,
@@ -391,7 +391,7 @@ QueryIntent、QueryRequest/Result、RetrievalPlan、StructuredLLMClient、Standa
 以及两个迁移函数，并暴露上述配置、DefaultQueryService 与 create_query_service。
 Query 内不得导入其他业务模块的具体实现、internal 或数据库客户端。
 
-新增依赖能力（均只有声明，没有真实适配器）：
+依赖能力契约（Query 只依赖声明，不在模块内创建真实适配器）：
 
 ```python
 class StructuredLLMClient(Protocol):
@@ -406,7 +406,7 @@ LLM 请求携带 stage、JSON input、Pydantic 模型生成的 output_schema、�
 Token 预算和可空 trace；响应的 data 必须经 validate_output(request, OutputModel) 才能
 作为结构化业务 DTO 使用。OutputModel 必须 extra=forbid；未知用量为 null，不伪造零。
 ValidationError/ValueError 表示输出或绑定校验失败；未来适配器须明确传播调用/超时/连接错误。
-端点和密钥由未来适配器管理，不在 DTO 中；本模块没有 SDK、模型下载或直接网络调用。
+端点和密钥由基础设施适配器管理，不在 DTO 中；本模块没有 SDK、模型下载或直接网络调用。
 
 目录 Lookup 按标准代码/名称/别名、版次/修订或可信显式 ID 查询指定双索引范围，Match 返回
 unique/ambiguous/not_found/unavailable、catalog_id/snapshot_id 和 is_test_fixture。
@@ -449,5 +449,8 @@ python -m pytest tests/architecture -q
 ```
 
 合法虚构 JSON 见 examples/query_result.v2.example.json；不是实际 Query 执行结果。
-真实 LLM 供应商、适配器、数据传输政策、生产目录和目录更新方式均未实现/未决定。
+Task 6.6 已提供基础设施 OpenAI-compatible 适配器（DeepSeek 配置）、只读双后端语料校验目录和
+真实组合 CLI；它们不是 Query 的隐式默认依赖。目录只覆盖经核验的单文档快照，不是全局目录
+或自动刷新服务。调用方式、数据传输与真实验证状态见
+[Task 6.6](../../../../docs/task-6.6-real-query-smoke.md)。完整 LLM 链路仍需有效密钥后实际验收。
 

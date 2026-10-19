@@ -13,3 +13,18 @@ Task 1.2 提供以下有界、本地 MinerU 工具：
 - `run_document_parser_e2e.py`：Task 1.6 的 live/replay/synthetic 分离入口，提供有界批次、严格合并、checkpoint/resume、QA 与资源产物。
 
 这些工具不会上传 PDF，也不会默认分析整份文档。Task 1.6 入口会拒绝未明确批准的全本运行。MinerU 使用独立环境；常规项目测试无需安装它。
+
+## Query 检索 Smoke（Task 6.6）
+
+`query_retrieval_smoke.py` 通过公开工厂组合真实 LLM、Query、Hybrid、ES 和 Milvus。
+支持显式 `.env`、配置检查、只读 preflight、单次 `Query.execute()`、严格公共 JSON 和独立诊断。
+不创建或删除索引，不在失败时切换 Fake，不生成最终答案。
+
+```bash
+python scripts/query_retrieval_smoke.py --env-file .env --config-only
+python scripts/query_retrieval_smoke.py --help
+```
+
+完整真实语料命令、费用/凭证政策及实际验证结果见
+[运行说明](../docs/task-6.6-real-query-smoke.md)。两个 `_query_smoke_*.py` 是此 CLI 的组合辅助，
+不是新的公共 Query/Hybrid 协议。

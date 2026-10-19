@@ -1,6 +1,6 @@
 # Engineering RAG
 
-面向工程规范、建设标准与图集 PDF 的模块化单体 RAG 项目。**Document Schema V2.4 已于 2026-10-11 正式冻结（FROZEN）**。Document Parser 已完成 PDF/OCR、MinerU 私有适配、复杂表格、公式、章节/条文结构化与可恢复的端到端编排；机器结果仍是待核验的部分解析候选。Task 2 已实现独立的 Clause-first Chunking 和 Chunk V1。Task 3 已实现 Elasticsearch BM25；Task 4 已实现可注入的 Sentence-Transformers + Milvus 向量检索；Task 5 已实现 RRF 与分路 Min-Max 加权混合检索。Query、Rerank 和 Generation 尚未实现。
+面向工程规范、建设标准与图集 PDF 的模块化单体 RAG 项目。**Document Schema V2.4 已于 2026-10-11 正式冻结（FROZEN）**。Document Parser 已完成 PDF/OCR、MinerU 私有适配、复杂表格、公式、章节/条文结构化与可恢复的端到端编排；机器结果仍是待核验的部分解析候选。Task 2 已实现独立的 Clause-first Chunking 和 Chunk V1。Task 3 已实现 Elasticsearch BM25；Task 4 已实现可注入的 Sentence-Transformers + Milvus 向量检索；Task 5 已实现 RRF 与分路 Min-Max 加权混合检索。Task 6.1～6.4 已实现 Query 理解、改写、受控增强与检索规划。Task 6.6 提供真实 LLM 适配和只读检索 Smoke，完整真实链路仍需配置 API Key 后验证。Rerank 和 Generation 尚未实现。
 
 ## 安装与检查
 
@@ -69,6 +69,22 @@ Task 1.2 MinerU 运行时独立安装在项目忽略的 `.local/mineru-runtime`�
 源代码采用一个 `src/engineering_rag` 包。`contracts` 是唯一公共 Schema/Protocol 来源；七个业务模块通过稳定 `api.py` 暴露能力，具体实现留在各自 `internal/`；跨模块流程由 `infrastructure/orchestrator` 组合。
 
 ## 独立模块测试
+
+### Task 6.6：真实 DeepSeek → Query → Hybrid 检索
+
+配置示例见 [`.env.example`](.env.example)，复制为本地 `.env` 后仅在本机填写
+`ERAG_LLM_API_KEY`。`.env` 被 Git 忽略，CLI 不接收密钥参数。
+完整配置、只读 preflight、单查询命令和实际阻塞项见
+[Task 6.6 运行与验收说明](docs/task-6.6-real-query-smoke.md)。
+
+```bash
+python scripts/query_retrieval_smoke.py --env-file .env --config-only
+python -m pytest tests/infrastructure/llm tests/integration/test_query_retrieval_smoke.py \
+  tests/integration/test_query_smoke_backends.py -q
+```
+
+以上 pytest 是离线替身测试，不代表真实 API 或端到端通过。真实 CLI 不创建/删除索引，
+不把 API 或后端异常伪装成空证据，也不在无密钥时切换 Fake。
 
 Task 6.0.1 已准备 Query 前置契约：保留语义意图，新增处理意图；RetrievalPlan/QueryResult
 局部升级为 2.0 并提供显式 V1 迁移。StructuredLLMClient 和 StandardMetadataCatalog 仅有
