@@ -1,0 +1,31 @@
+{
+  "question": "这份虚构演示材料规定的检查间隔和适用范围是什么？",
+  "evidence": [
+    {
+      "schema_version": "2.0",
+      "chunk_id": "fictional-generation-chunk-1",
+      "logical_chunk_id": "fictional-generation-logical-1",
+      "document_id": "fictional-generation-document",
+      "content": "虚构演示文本，不是真实工程规范：检查间隔不应超过7天；本条不适用于水下构件。",
+      "standard": {
+        "standard_name": "虚构检修标准（非真实规范）",
+        "standard_code": "DEMO 000-2026",
+        "edition": "演示版"
+      },
+      "clause_id": "fictional-generation-clause-1",
+      "clause_number": "1.1.1",
+      "page_start": 2,
+      "page_end": 2,
+      "score": 0.5,
+      "rank": 1,
+      "retrieval_source": "hybrid",
+      "score_type": "rrf",
+      "index_name": "fictional-generation-index",
+      "is_explanation": false,
+      "is_mandatory": null,
+      "content_type": "clause"
+    }
+  ],
+  "history": [],
+  "trace": {"trace_id": "task7-1-fictional-example"}
+}

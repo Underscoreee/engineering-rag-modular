@@ -90,6 +90,10 @@ validated_output = response.validate_output(request, ApplicationOutputModel)
 且与 request.output_schema 一致。既有 Query 阶段已经执行此边界；适配器不导入其私有模型。
 JSON 语法有效不等于业务类型、来源或工程事实正确。
 
+Task 7.1 将固定传输提示中的“禁止 answer generation”澄清为“禁止 JSON 对象之外的文本”，
+允许 Generation 在业务 Schema 的 answer 字段中生成回答；仍不允许 JSON 外部散文。
+这不改变 HTTP、响应校验、Query 算法或重试策略，应用指令与不可信数据的分离保持不变。
+
 响应模型默认要求精确匹配。只有人工配置的响应别名白名单允许绑定到请求的逻辑模型 ID；
 实际模型字符串仍记录在 `calls[].actual_model`，避免隐藏模型切换。
 `model_revision` 仅从响应的同名字段取得；不把 system_fingerprint、请求期望值或别名猜作版本。

@@ -1,6 +1,25 @@
 # Engineering RAG
 
-面向工程规范、建设标准与图集 PDF 的模块化单体 RAG 项目。**Document Schema V2.4 已于 2026-10-11 正式冻结（FROZEN）**。Document Parser 已完成 PDF/OCR、MinerU 私有适配、复杂表格、公式、章节/条文结构化与可恢复的端到端编排；机器结果仍是待核验的部分解析候选。Task 2 已实现独立的 Clause-first Chunking 和 Chunk V1。Task 3 已实现 Elasticsearch BM25；Task 4 已实现可注入的 Sentence-Transformers + Milvus 向量检索；Task 5 已实现 RRF 与分路 Min-Max 加权混合检索。Task 6.1～6.4 已实现 Query 理解、改写、受控增强与检索规划。Task 6.6 提供真实 LLM 适配和只读检索 Smoke，完整真实链路仍需配置 API Key 后验证。Rerank 和 Generation 尚未实现。
+面向工程规范、建设标准与图集 PDF 的模块化单体 RAG 项目。**Document Schema V2.4 已于 2026-10-11 正式冻结（FROZEN）**。Document Parser 已完成 PDF/OCR、MinerU 私有适配、复杂表格、公式、章节/条文结构化与可恢复的端到端编排；机器结果仍是待核验的部分解析候选。Task 2 已实现独立的 Clause-first Chunking 和 Chunk V1。Task 3 已实现 Elasticsearch BM25；Task 4 已实现可注入的 Sentence-Transformers + Milvus 向量检索；Task 5 已实现 RRF 与分路 Min-Max 加权混合检索。Task 6.1～6.4 已实现 Query 理解、改写、受控增强与检索规划。Task 6.6 提供真实 LLM 适配和只读检索 Smoke，完整真实链路仍需配置 API Key 后验证。Task 7.1 已实现独立 Generation 上下文构建、结构化模型调用与最小引用映射；完整答案/引用校验仍待 Task 7.2，Rerank 尚未实现。
+
+## Generation（Task 7.1）
+
+使用既有 StructuredLLMClient 注入，接收 GenerationRequest，不主动检索。详见
+[模块接口](src/engineering_rag/modules/generation/INTERFACE.md) 与
+[上下文/引用 ADR](docs/adr-generation-context.md)。独立离线测试：
+
+```bash
+.venv/bin/python -m pytest src/engineering_rag/modules/generation/tests -q
+```
+
+虚构示例为 examples/generation_request.example.json。真实 API 示例 Smoke 可显式执行：
+
+```bash
+.venv/bin/python -m scripts.generation_smoke --env-file .env \
+  --output-dir data/eval/task7_1/runs/real-example-v1 --allow-real-api
+```
+
+该示例不是人工核验的真实规范证据，不能作为语义质量验收；命令会计费，不覆盖既有产物。
 
 ## 安装与检查
 
@@ -74,7 +93,8 @@ Task 1.2 MinerU 运行时独立安装在项目忽略的 `.local/mineru-runtime`�
 
 RetrievalResult 已升级为 2.0，透传 is_explanation/is_mandatory/content_type，未知为 null。
 新读取器支持旧 1.0 证据，旧严格消费者须同步升级；数据库无需迁移，检索算法不变。
-Generation 仍未实现。兼容策略见 [ADR-RR-001](docs/adr-retrieval-result-v2.md)。
+Task 7.0.1 当时未实现 Generation；后续 Task 7.1 已实现首阶段业务，见上文。
+兼容策略见 [ADR-RR-001](docs/adr-retrieval-result-v2.md)。
 
 ### Task 6.6：真实 DeepSeek → Query → Hybrid 检索
 

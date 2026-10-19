@@ -92,3 +92,10 @@ Chunk”，部分 Bulk 失败不执行清理；增量写入由 `IndexRequest.rep
 Keyword/Vector 读取真实存储字段，Hybrid 对未知补齐、对已知冲突显式失败，Query/Generation
 嵌套证据不丢字段。Document 2.4、Chunk、请求和所有检索/融合算法不变，无数据库迁移。
 历史产物保持只读，详细策略见 [ADR-RR-001](adr-retrieval-result-v2.md)。
+
+## ADR-GEN-001：Generation 上下文与最小引用 — Adopted
+
+Task 7.1 使用请求级证据注册表、稳定排名和整块字符预算，复用既有 StructuredLLMClient；
+输出校验后仅从真实输入证据映射来源。quoted_text=null，不冒充完整引文或逐句支持校验。
+维护者授权缺少人工核验真实证据时生成示例继续；真实 API 示例测试不等于规范质量验收。
+详细约束见 [ADR-GEN-001](adr-generation-context.md)。
