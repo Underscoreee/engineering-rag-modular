@@ -28,6 +28,11 @@ def test_every_public_example_round_trips() -> None:
         (EXAMPLES / "retrieval.example.json").read_text(encoding="utf-8")
     )
     assert adapter.validate_json(adapter.dump_json(evidence)) == evidence
+    current_evidence = adapter.validate_json(
+        (EXAMPLES / "retrieval.v2.example.json").read_text(encoding="utf-8")
+    )
+    assert all(item.schema_version == "2.0" for item in current_evidence)
+    assert adapter.validate_json(adapter.dump_json(current_evidence)) == current_evidence
     answer = AnswerResult.model_validate_json(
         (EXAMPLES / "answer.example.json").read_text(encoding="utf-8")
     )

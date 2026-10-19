@@ -364,7 +364,9 @@ hybrid_request。语义 QueryIntent 五类保持不变；ProcessingIntent 只接
 缺失、null 或 unknown 都拒绝，不能根据旧 intent 猜测。
 
 QueryResult 使用 Literal `schema_version="2.0"`，仍只有 plan 与 evidence；evidence 内
-RetrievalResult 保持检索 1.0。没有新增 warnings、clarification 或其他结果字段。
+RetrievalResult 在 Task 7.0.1 独立升级为 2.0，保留 is_explanation/is_mandatory/content_type。
+Query 外层仍为 2.0，没有新增 warnings、clarification 或其他结果字段；execute 和 JSON
+往返只透传来源属性，不重新推断，历史嵌套证据 1.0 按兼容读取政策保持属性未知。
 
 两路查询分别在 hybrid_request.keyword.query 与 vector.query；它们可不同，过滤按同一已验证
 范围复制。candidate_k 仍是每路共享召回数，Hybrid 覆盖子请求 top_k；最终 top_k 独立。
@@ -417,8 +419,10 @@ unique/ambiguous/not_found/unavailable、catalog_id/snapshot_id 和 is_test_fixt
 
 ## 版本与显式迁移
 
-QueryService 方法签名不变；计划/结果序列化升级到 2.0，QueryRequest、检索 1.0、Document
-Frozen 2.4 不变。旧严格消费者无法读取新字段，升级需协调调用方。
+QueryService 方法签名不变；计划/结果外层为 2.0，QueryRequest、Document Frozen 2.4 不变。
+Task 7.0.1 的嵌套 RetrievalResult 现为 2.0；旧 Query/Generation 严格消费者须随公共模型
+一并升级，不能仅看外层 QueryResult 版本判断兼容，见
+[检索结果版本 ADR](../../../../docs/adr-retrieval-result-v2.md)。
 
 ```python
 from engineering_rag.contracts import ProcessingIntent, migrate_query_result_v1
@@ -430,7 +434,8 @@ decision = ProcessingIntent.ACQUISITION
 
 另有 migrate_retrieval_plan_v1(payload, *, processing_intent)。缺少或非法处理意图时拒绝，
 不做自动推断；原语义意图、请求和证据保留。迁移函数只返回新模型，不覆写旧文件。
-新读取器不自动接受 V1；更高/未知版本和混合新旧字段拒绝。
+Query 外层新读取器不自动接受 V1；更高/未知版本和混合新旧字段拒绝。
+这不影响前述嵌套 RetrievalResult 1.0 的受控读取桥。
 
 ```python
 # query_service 使用上文工厂构造；以下调用真实存在。

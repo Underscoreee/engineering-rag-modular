@@ -32,6 +32,9 @@ OUTPUT_FIELDS = [
     "clause_number",
     "page_start",
     "page_end",
+    "is_explanation",
+    "mandatory_state",
+    "content_type",
 ]
 
 
@@ -129,6 +132,9 @@ def _to_result(hit: object, *, rank: int, index_name: str) -> RetrievalResult:
             retrieval_source="vector",
             score_type="cosine_similarity",
             index_name=index_name,
+            is_explanation=entity.get("is_explanation"),
+            is_mandatory=_mandatory_status(entity),
+            content_type=entity.get("content_type"),
         )
     except (KeyError, TypeError, ValueError) as exc:
         raise VectorResponseError("Milvus hit cannot form RetrievalResult") from exc
@@ -136,3 +142,12 @@ def _to_result(hit: object, *, rank: int, index_name: str) -> RetrievalResult:
 
 def _optional_string(value: object) -> str | None:
     return value if isinstance(value, str) and value else None
+
+
+def _mandatory_status(entity: Mapping[str, object]) -> bool | None:
+    if "mandatory_state" not in entity:
+        return None
+    value = entity["mandatory_state"]
+    if type(value) is not int or value not in (-1, 0, 1):
+        raise ValueError("mandatory_state must be an integer -1, 0 or 1")
+    return None if value == -1 else value == 1

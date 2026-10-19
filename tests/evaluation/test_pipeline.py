@@ -18,6 +18,7 @@ from engineering_rag.contracts.llm import (
     StructuredLLMRequest,
     StructuredLLMResponse,
 )
+from engineering_rag.contracts.retrieval import KeywordSearchRequest, RetrievalSource
 from engineering_rag.infrastructure.evaluation.api import (
     EvaluationRuntime,
     IndexSnapshot,
@@ -27,7 +28,10 @@ from engineering_rag.infrastructure.evaluation.internal.dataset import (
     DatasetValidationError,
     safe_read_json,
 )
-from engineering_rag.infrastructure.evaluation.internal.offline import create_offline_runtime
+from engineering_rag.infrastructure.evaluation.internal.offline import (
+    FixtureRetrieval,
+    create_offline_runtime,
+)
 from engineering_rag.infrastructure.evaluation.internal.run_models import RunConfig
 from engineering_rag.infrastructure.evaluation.internal.service import chunk_inventory_digest
 from engineering_rag.infrastructure.evaluation.internal.telemetry import ModelProbe, QueryEvents
@@ -75,6 +79,21 @@ def request(dataset: Fixture, mode: str = "offline_test", **options) -> Evaluati
 
 def runtime(dataset: Fixture, req: EvaluationRequest) -> EvaluationRuntime:
     return create_offline_runtime(dataset.load().batch, RunConfig.from_options(req.config))
+
+
+def test_offline_fixture_preserves_declared_chunk_source_metadata(dataset: Fixture) -> None:
+    batch = dataset.load().batch
+    backend = FixtureRetrieval(batch, RetrievalSource.KEYWORD)
+    hits = backend.search(
+        KeywordSearchRequest(query="虚构工程问题", index_name="fixture", top_k=len(batch.chunks))
+    )
+    assert len(hits) == len(batch.chunks)
+    for rank, (hit, chunk) in enumerate(zip(hits, batch.chunks, strict=True), 1):
+        assert hit.is_explanation is chunk.is_explanation
+        assert hit.is_mandatory is chunk.is_mandatory
+        assert hit.content_type == chunk.content_type
+        assert hit.chunk_id == chunk.chunk_id
+        assert hit.rank == rank and hit.score == 1.0 / rank
 
 
 def results(req: EvaluationRequest) -> tuple[dict[str, object], list[dict[str, object]]]:

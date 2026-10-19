@@ -9,6 +9,8 @@ from copy import deepcopy
 import pytest
 from pydantic import ValidationError
 
+from engineering_rag.contracts.answers import GenerationRequest
+from engineering_rag.contracts.chunks import ChunkContentType
 from engineering_rag.contracts.llm import (
     StructuredLLMConfig,
     StructuredLLMRequest,
@@ -245,3 +247,44 @@ def test_actual_hybrid_backend_failure_is_not_an_empty_query_result():
         query.execute(QueryRequest(question=QUESTION))
     assert caught.value is error
     assert len(keyword.requests) == len(vector.requests) == 1
+
+
+@pytest.mark.parametrize("explanation", [None, False, True])
+@pytest.mark.parametrize("mandatory", [None, False, True])
+def test_actual_execute_preserves_source_metadata_through_generation_input(explanation, mandatory):
+    """Actual local Query/Hybrid, offline model/backend doubles; NOT a real LLM test."""
+    from engineering_rag.contracts.queries import QueryResult
+
+    left = retrieval_result("shared", RetrievalSource.KEYWORD, 6.0).model_copy(
+        update={
+            "is_explanation": explanation,
+            "content_type": ChunkContentType.CLAUSE,
+        }
+    )
+    right = retrieval_result("shared", RetrievalSource.VECTOR, 0.9).model_copy(
+        update={
+            "is_mandatory": mandatory,
+        }
+    )
+    query = create_query_service(
+        llm=RoutingLLM(intent="acquisition"),
+        catalog=FixtureCatalog(),
+        hybrid_service=create_hybrid_retrieval_service(FakeBackend([left]), FakeBackend([right])),
+        config=config(),
+    )
+    result = query.execute(QueryRequest(question=QUESTION))
+    restored = QueryResult.model_validate_json(result.model_dump_json())
+    request = GenerationRequest.model_validate_json(
+        GenerationRequest(
+            question=restored.plan.original_question, evidence=restored.evidence
+        ).model_dump_json()
+    )
+    hit = request.evidence[0]
+    assert (hit.is_explanation, hit.is_mandatory, hit.content_type) == (
+        explanation,
+        mandatory,
+        ChunkContentType.CLAUSE,
+    )
+    assert hit == restored.evidence[0] == result.evidence[0]
+    assert hit.score == pytest.approx(1 / 61) and hit.rank == 1
+    assert hit.schema_version == "2.0"

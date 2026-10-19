@@ -70,6 +70,12 @@ Task 1.2 MinerU 运行时独立安装在项目忽略的 `.local/mineru-runtime`�
 
 ## 独立模块测试
 
+### Task 7.0.1：检索来源元数据
+
+RetrievalResult 已升级为 2.0，透传 is_explanation/is_mandatory/content_type，未知为 null。
+新读取器支持旧 1.0 证据，旧严格消费者须同步升级；数据库无需迁移，检索算法不变。
+Generation 仍未实现。兼容策略见 [ADR-RR-001](docs/adr-retrieval-result-v2.md)。
+
 ### Task 6.6：真实 DeepSeek → Query → Hybrid 检索
 
 配置示例见 [`.env.example`](.env.example)，复制为本地 `.env` 后仅在本机填写

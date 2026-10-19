@@ -51,7 +51,8 @@ def create_keyword_retrieval_service(
 ) -> ElasticsearchKeywordRetrievalService: ...
 ```
 
-公共请求/结果模型只来自 `engineering_rag.contracts`，本实现没有修改其字段或版本。
+公共请求/结果模型只来自 `engineering_rag.contracts`。Task 7.0.1 已批准将返回的
+`RetrievalResult` 升级为 2.0；请求、索引/删除结果、Chunk 和数据库 Mapping 的版本不变。
 
 ### `index()`
 
@@ -80,7 +81,11 @@ def create_keyword_retrieval_service(
 
 `RetrievalResult` 从命中 `_source` 和真实 `_score` 构造。索引内仍保存完整 Chunk 来源字段；
 但当前公共 `RetrievalResult` 没有 `source_refs/source_block_ids` 字段，因此返回值只能保留契约
-已有的页码、文档、标准和条文身份，详见 Task 3 ADR。
+已有的页码、文档、标准、条文身份与下述来源属性，不能传递上述未声明的细粒度引用。
+
+结果还从真实 `_source` 映射 `is_explanation/is_mandatory/content_type`：缺失或显式 null
+保持 null，不猜测为正文/非强制。布尔字段严格拒绝字符串、数字等类型，content_type 复用
+ChunkContentType；非法值抛 KeywordResponseError。此转换不改变查询、Analyzer 或分数。
 
 ### `delete_document()`
 
@@ -132,8 +137,10 @@ with create_keyword_retrieval_service() as service:
 
 ## 版本、测试和验证状态
 
-公共 Chunk/检索 Schema 版本仍为 `1.0`；私有 Mapping 版本为 `keyword-index-v1`。改变公共
-字段需升级公共 Schema；不兼容 Mapping 需新 Mapping 版本和显式迁移/重建索引。
+公共 Chunk、请求及 IndexResult/DeleteResult 仍为 `1.0`；RetrievalResult 为 `2.0`，
+私有 Mapping 仍为 `keyword-index-v1`，无需数据库迁移。旧 1.0 证据由新读取器归一化为 2.0，
+新增属性为 null；旧严格消费者必须升级。详细政策见
+[RetrievalResult V2 ADR](../../../../docs/adr-retrieval-result-v2.md)。
 
 ```bash
 python -m pytest src/engineering_rag/modules/keyword_retrieval/tests -q

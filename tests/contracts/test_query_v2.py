@@ -101,7 +101,7 @@ def test_explicit_migration_preserves_semantic_intent_requests_and_original_inpu
         StrictOldPlanReader.model_validate_json(migrated.model_dump_json())
 
 
-def test_result_migration_upgrades_nested_plan_but_preserves_retrieval_v1_evidence() -> None:
+def test_result_migration_upgrades_plan_and_legacy_evidence_without_inferring_metadata() -> None:
     evidence = {
         "schema_version": "1.0",
         "chunk_id": "fixture-chunk",
@@ -120,7 +120,11 @@ def test_result_migration_upgrades_nested_plan_but_preserves_retrieval_v1_eviden
     payload = {"schema_version": "1.0", "plan": legacy_plan(), "evidence": [evidence]}
     migrated = migrate_query_result_v1(payload, processing_intent=ProcessingIntent.ACQUISITION)
     assert migrated.schema_version == migrated.plan.schema_version == "2.0"
-    assert migrated.evidence[0].schema_version == "1.0"
+    assert migrated.evidence[0].schema_version == "2.0"
+    assert migrated.evidence[0].is_explanation is None
+    assert migrated.evidence[0].is_mandatory is None
+    assert migrated.evidence[0].content_type is None
+    assert evidence["schema_version"] == "1.0"  # Original archival input is unchanged.
     assert migrated.evidence == [RetrievalResult.model_validate(evidence)]
     assert QueryResult.model_validate_json(migrated.model_dump_json()) == migrated
 

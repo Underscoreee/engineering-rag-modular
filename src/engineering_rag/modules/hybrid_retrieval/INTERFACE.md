@@ -59,6 +59,11 @@ def create_hybrid_retrieval_service(
   等关键身份必须一致，否则抛 `CandidateConflictError`，不任意选择一份。
 - `score/rank/retrieval_source/score_type/index_name` 是分路检索差异，不作为身份冲突。
 
+Task 7.0.1 新增三个来源属性的空值合并规则：is_explanation、is_mandatory、content_type。
+两路已知且相同则保留；仅一路已知则采用该已知值（包括 false）；两路未知保持 null；
+两路已知且冲突则抛 CandidateConflictError，不能按分支先后覆盖。非法来源字段类型抛
+CandidateResultError。只替换内部候选的结果副本，不修改调用方对象，不改变任何分数或排名。
+
 ## RRF
 
 公共策略值为 `rrf`，默认且当前唯一合法公开权重为 0.5/0.5：
@@ -151,8 +156,10 @@ python examples/hybrid_retrieval.example.py
 
 ## 版本、测试与已知限制
 
-公共检索 Schema 为 `1.0`；模块实现版本为首个 Hybrid V1。相同请求和相同两路有序结果会
-产生确定输出。
+结果使用 `RetrievalResult 2.0`；检索请求仍为 1.0，融合算法仍为原 Hybrid V1。
+相同请求和相同两路有序结果产生确定输出，来源补齐不改变融合结果。
+历史证据 1.0 可被新模型读取为 2.0，缺失属性保持未知；旧严格消费者须升级，见
+[RetrievalResult V2 ADR](../../../../docs/adr-retrieval-result-v2.md)。
 
 ```bash
 python -m pytest src/engineering_rag/modules/hybrid_retrieval/tests -q

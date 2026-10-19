@@ -84,3 +84,11 @@ Chunk”，部分 Bulk 失败不执行清理；增量写入由 `IndexRequest.rep
 显式请求。默认检索单一私有 `search_text`，元数据过滤不参与评分，同分按 `chunk_id` 稳定
 排序。详细决策、契约限制和已知风险见
 [Task 3 Elasticsearch ADR](adr-task3-elasticsearch-keyword-retrieval.md)。
+
+## ADR-RR-001：RetrievalResult 2.0 来源元数据 — Adopted
+
+维护者授权 Task 7.0.1：在唯一公共证据模型增加严格三态的 is_explanation/is_mandatory
+及既有 ChunkContentType。新读取器可加载历史 1.0，默认只写出 2.0；旧严格消费者须同步升级。
+Keyword/Vector 读取真实存储字段，Hybrid 对未知补齐、对已知冲突显式失败，Query/Generation
+嵌套证据不丢字段。Document 2.4、Chunk、请求和所有检索/融合算法不变，无数据库迁移。
+历史产物保持只读，详细策略见 [ADR-RR-001](adr-retrieval-result-v2.md)。

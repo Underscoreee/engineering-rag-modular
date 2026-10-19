@@ -84,6 +84,12 @@ description。复用前还校验完整字段集合、向量维度和 `chunk_id` 
 返回真实相似度，按降序排列，`rank` 从 1 开始，`retrieval_source="vector"`、
 `score_type="cosine_similarity"`，不转换为 BM25 分数。
 
+Task 7.0.1 的结果契约为 `RetrievalResult 2.0`。`OUTPUT_FIELDS` 从既有 entity 读取
+`is_explanation/content_type/mandatory_state`；前两项缺失时为 null，类型/枚举非法时报错。
+mandatory_state 仅接受严格整数 -1/0/1，分别返回 null/false/true；缺字段表示未知，
+存在但为 null、bool、字符串、浮点或其他整数则抛 VectorResponseError，不使用 bool(state)。
+只增加结果投射，Collection Schema、查询过滤、Embedding、COSINE、top_k、排序均不变。
+
 `delete_document()` 只删除转义后的精确 `document_id`；Collection 不存在返回
 `index_existed=false`。配置、依赖、模型、向量、Collection 缺失/冲突、连接、后端与响应
 错误均明确区分，基础设施失败不会伪装为空命中。
@@ -118,4 +124,7 @@ docker compose -f docker-compose.milvus.yml stop
 
 Milvus、etcd、MinIO 使用命名卷；`stop` 不删除数据。测试 Collection 使用 UUID，只清理精确
 名称。禁止 `down -v`。服务关闭认证且仅绑定回环地址，只能用于本机测试。未启用的真实测试
-会 skip，不能报告为 PASS。公共 Chunk/检索 Schema 仍为 `1.0`。
+会 skip，不能报告为 PASS。Chunk、请求及索引/删除结果仍为 `1.0`，RetrievalResult 为 `2.0`。
+当前 Collection 已保存来源字段，无需迁移数据库；新读取器支持历史结果 JSON 1.0，
+旧严格消费者不支持新增字段，须协调升级。版本与持久化政策见
+[RetrievalResult V2 ADR](../../../../docs/adr-retrieval-result-v2.md)。

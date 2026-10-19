@@ -7,7 +7,7 @@
 Query 独立使用 `QUERY_SCHEMA_VERSION="2.0"`：RetrievalPlan 新增必填 processing_intent
 （acquisition/exploratory），保留原 QueryIntent 五类语义；QueryResult 因嵌套计划同步升为
 Literal 2.0，仍只返回 plan/evidence。QueryRequest、QueryOptions、检索模型、Chunk 与
-Document V2.4 未改；全局 SCHEMA_VERSION 仍为 1.0。
+Document V2.4 在 Task 6.0.1 未改；全局 SCHEMA_VERSION 仍为 1.0。
 
 旧计划/结果必须显式调用 migrate_retrieval_plan_v1 / migrate_query_result_v1，并提供处理
 意图，不从旧语义猜测。严格旧消费者不能直接读取新版 JSON。示例为
@@ -19,6 +19,24 @@ Response.data 是未验证传输对象，validate_output 绑定请求并用指�
 然后仍须业务层验证依据。未知用量允许 null。catalog.py 定义可信快照目录 Lookup/Record/Match，
 区分唯一、歧义、未匹配、不可用以及全局有效与当前双索引入库。LLM/目录 Protocol 均在
 protocols.py，仅声明能力；没有供应商 SDK、模型调用、生产目录或 Query 业务算法。
+
+## RetrievalResult 2.0（Task 7.0.1）
+
+唯一 RetrievalResult 新增 `is_explanation`、`is_mandatory`（严格 bool/null，默认 null）及
+`content_type`（复用 ChunkContentType/null）。未知不能当作 false，非法来源值显式报错。
+Elasticsearch 读取真实同名字段；Milvus 读取 is_explanation/content_type，严格整数
+mandatory_state 的 -1/0/1 分别映射 null/false/true，不使用 bool(-1)。无需重建数据库。
+
+默认写出版本 2.0；历史显式 1.0 且无新增字段的证据可由新读取器加载，缺失属性保持 null，
+序列化归一化为 2.0。原历史 JSON 不覆写；显式迁移使用 migrate_retrieval_result_v1。
+混合新旧字段、未知版本拒绝。旧 extra-forbid 消费者须同步升级，不能宣称旧消费者兼容。
+QueryResult 外层 2.0 和 GenerationRequest 形状不变，嵌套证据使用同一升级后的公共模型。
+IndexResult/DeleteResult、检索请求及 Chunk 仍为 1.0，Document 仍 Frozen 2.4。
+
+Hybrid 逐字段合并已知/未知属性，false 为已知；已知值冲突显式抛 CandidateConflictError，
+不改分数与排序。新旧示例分别见 examples/retrieval.v2.example.json 和只读的
+examples/retrieval.example.json；兼容、迁移及部署约束见
+[ADR-RR-001](adr-retrieval-result-v2.md)。
 
 ## Chunk V1
 

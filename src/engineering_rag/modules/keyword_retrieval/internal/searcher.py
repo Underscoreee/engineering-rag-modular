@@ -155,6 +155,9 @@ def _convert_hits(body: Mapping[str, object], *, index_name: str) -> list[Retrie
                     retrieval_source=RetrievalSource.KEYWORD,
                     score_type="bm25",
                     index_name=index_name,
+                    is_explanation=source.get("is_explanation"),
+                    is_mandatory=source.get("is_mandatory"),
+                    content_type=source.get("content_type"),
                 )
             )
         except (TypeError, ValueError) as exc:
