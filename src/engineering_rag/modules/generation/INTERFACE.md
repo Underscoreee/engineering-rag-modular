@@ -32,7 +32,8 @@ GenerationRequest（不变）：
   本次对应参数，不覆盖 provider/model/timeout 或上下文预算。
 - trace：可选 TraceContext，透传至模型并记录 trace_id。
 
-RetrievalResult 2.0 必填标准名称/document_id/pages 等来源信息缺失时拒绝；
+RetrievalResult 2.0 必填标准名称、标准代码/document_id/pages 等来源信息缺失时拒绝；
+标准名称和代码纯空白同样拒绝，在调用模型前返回 invalid_evidence。
 clause_id/number 允许 null，不补猜。is_explanation=true 是说明，false 非说明，null 未知；
 is_mandatory=true/false 是来源明确判定，null 不代表非强制。content_type 复用 ChunkContentType。
 历史 1.0 的受控读取与旧消费者升级要求见 [ADR-RR-001](../../../../docs/adr-retrieval-result-v2.md)。
@@ -209,3 +210,33 @@ Generation Protocol/请求/答案、RetrievalResult 2.0、Document Frozen 2.4、
 .venv/bin/ruff format --check .
 git diff --check
 ```
+
+## Task 7.3 组合验证（不是新公共 API）
+
+`scripts.rag_e2e_smoke` 通过上述公开工厂连接真实 Query → Hybrid → Generation。
+检索后端使用 ES/Milvus，ContextBuilder/Mapper/Validator 仍在 Generation 内部执行；
+没有让 Generation 主动检索。8 类 workflow probe 无人工标签，不能作为质量金标。
+
+```bash
+# 显式授权创建本次独有的新目标以及真实 API 计费；两目标存在任一个就拒绝写入。
+.venv/bin/python -m scripts.rag_e2e_smoke --env-file .env \
+  --corpus data/eval/task2/runs/GB50010-full-v6-semantic-cleanup/chunk_batch.v1.json \
+  --keyword-index test_task73_your_unique_run --vector-collection test_task73_your_unique_run \
+  --output-dir data/eval/task7_3/runs/your-unique-run --create-isolated
+
+# 重跑仅允许显式选择 test_task73_ 目标；完整校验双后端快照后只读复用，不再入库。
+# 进程级模型预算对照，不修改 .env 或任何检索算法；仍可能失败且实际调用计费。
+ERAG_LLM_MAX_OUTPUT_TOKENS=8192 ERAG_LLM_TIMEOUT_SECONDS=60 \
+.venv/bin/python -m scripts.rag_e2e_smoke --env-file .env \
+  --corpus data/eval/task2/runs/GB50010-full-v6-semantic-cleanup/chunk_batch.v1.json \
+  --keyword-index test_task73_your_unique_run --vector-collection test_task73_your_unique_run \
+  --output-dir data/eval/task7_3/runs/your-unique-recheck --reuse-isolated
+
+.venv/bin/python -m pytest tests/integration/test_rag_e2e_workflow.py -q
+```
+
+输出目录必须全新、非 symlink；不清理索引/Collection、不覆盖历史产物。凭证不落盘。
+保存实际召回/入 Prompt IDs、来源标记、Citation、模型/usage/耗时及失败阶段；不默认保存
+完整 Prompt 或供应商响应。全部样本失败/部分失败会以非零退出，不把单模块成功当 E2E 成功。
+人工复核示例沿用 Task 6.5 格式：`examples/generation_evaluation/task73-review/`。
+正式 Recall/MRR/nDCG/答案质量须待人工标注，详见 `docs/task-7.3-rag-validation.md`。

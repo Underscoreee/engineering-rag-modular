@@ -1,0 +1,26 @@
+{
+  "schema_version": "1.0",
+  "dataset_id": "task73-gb50010-review-example",
+  "dataset_version": "1.0-draft",
+  "description": "Task 7.3 自动生成的8类人工核查候选；不是金标，无qrels、无人工参考答案，禁止正式质量评分。",
+  "created_at": "2026-10-19T00:00:00Z",
+  "corpus_snapshot_id": "gb50010-full-v6-semantic-cleanup-49daa3d96006",
+  "corpus_sha256": "49daa3d96006149b62b5887f72082d27a23e37ce15aeb50349807680d800f162",
+  "chunking_version": "clause-first-1.0.0",
+  "document_schema_version": "2.4",
+  "query_schema_version": "2.0",
+  "chunk_schema_version": "1.0",
+  "annotation_guidelines_version": "1.0",
+  "query_count": 8,
+  "qrels_count": 0,
+  "is_test_fixture": false,
+  "source_document_id": "doc-dab4ba42814d5a878df723d32b346337",
+  "source_document_sha256": "907717f54f8b86b2643ae590f65da62c2ac3125a80809f8b96ca6168132ef160",
+  "source_pdf_sha256": "43048a647d595fc8e16545851491bab82d3df851b91fe227ba2f7f84f5b64682",
+  "files_sha256": {
+    "queries.jsonl": "608deec7b169501af51046b4483472eccbf98d60ecf105c404b6d111d7769d96",
+    "qrels.jsonl": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "review_log.jsonl": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "annotation_guidelines.md": "08e2ce94b294baf399dbb9c75065d1392bd26d828f97ede2d7876715f10938be"
+  }
+}

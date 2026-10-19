@@ -102,7 +102,11 @@ class ContextBuilder:
             unique[item.chunk_id] = item
         rows: list[JsonValue] = []
         for index, item in enumerate(unique.values(), 1):
-            if not item.content.strip() or not item.standard.standard_name.strip():
+            if (
+                not item.content.strip()
+                or not item.standard.standard_name.strip()
+                or not item.standard.standard_code.strip()
+            ):
                 raise GenerationError("invalid_evidence")
             evidence_id = f"E{index}"
             # IDs/edition and null source attributes are preserved, not inferred.
