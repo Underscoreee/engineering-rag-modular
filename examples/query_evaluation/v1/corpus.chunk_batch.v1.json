@@ -1,0 +1,317 @@
+{
+  "schema_version": "1.0",
+  "document_id": "document-demo-evaluation",
+  "chunks": [
+    {
+      "schema_version": "1.0",
+      "chunk_id": "chunk-demo-clearance",
+      "logical_chunk_id": "logical-demo-clearance",
+      "document_id": "document-demo-evaluation",
+      "content": "【虚构测试文本，不是规范要求】演示设备检修净距不小于 120 mm；该数值只用于约束保留测试。",
+      "context_header": "虚构设备设计演示规范｜正文｜1.1.1",
+      "embedding_text": "虚构设备设计演示规范｜正文｜1.1.1\n\n【虚构测试文本，不是规范要求】演示设备检修净距不小于 120 mm；该数值只用于约束保留测试。",
+      "token_count": 47,
+      "content_type": "clause",
+      "page_start": 1,
+      "page_end": 1,
+      "source_refs": [
+        {
+          "document_id": "document-demo-evaluation",
+          "page_number": 1,
+          "block_id": "block-demo-clearance",
+          "bbox": {
+            "x_min": 40,
+            "y_min": 60,
+            "x_max": 500,
+            "y_max": 100
+          }
+        }
+      ],
+      "source_block_ids": [
+        "block-demo-clearance"
+      ],
+      "standard": {
+        "standard_code": "DEMO 00001-2026",
+        "standard_name": "虚构设备设计演示规范",
+        "edition": "2026演示版",
+        "revision": null,
+        "language": "zh-CN"
+      },
+      "section_path": [
+        "虚构演示章"
+      ],
+      "section_id": "section-demo-main",
+      "clause_id": "clause-demo-clearance",
+      "clause_number": "1.1.1",
+      "is_explanation": false,
+      "is_mandatory": null,
+      "parent_chunk_id": null,
+      "table_id": null,
+      "figure_id": null,
+      "formula_ids": [],
+      "related_asset_ids": [],
+      "chunking_version": "fixture-clause-first-1.0",
+      "exceeds_max_tokens": false
+    },
+    {
+      "schema_version": "1.0",
+      "chunk_id": "chunk-demo-prohibition",
+      "logical_chunk_id": "logical-demo-prohibition",
+      "document_id": "document-demo-evaluation",
+      "content": "【虚构测试文本，不是规范要求】演示设备通道不得堆放物品；本条不判定任何法律效力。",
+      "context_header": "虚构设备设计演示规范｜正文｜1.1.2",
+      "embedding_text": "虚构设备设计演示规范｜正文｜1.1.2\n\n【虚构测试文本，不是规范要求】演示设备通道不得堆放物品；本条不判定任何法律效力。",
+      "token_count": 40,
+      "content_type": "clause",
+      "page_start": 1,
+      "page_end": 1,
+      "source_refs": [
+        {
+          "document_id": "document-demo-evaluation",
+          "page_number": 1,
+          "block_id": "block-demo-prohibition",
+          "bbox": {
+            "x_min": 40,
+            "y_min": 80,
+            "x_max": 500,
+            "y_max": 120
+          }
+        }
+      ],
+      "source_block_ids": [
+        "block-demo-prohibition"
+      ],
+      "standard": {
+        "standard_code": "DEMO 00001-2026",
+        "standard_name": "虚构设备设计演示规范",
+        "edition": "2026演示版",
+        "revision": null,
+        "language": "zh-CN"
+      },
+      "section_path": [
+        "虚构演示章"
+      ],
+      "section_id": "section-demo-main",
+      "clause_id": "clause-demo-prohibition",
+      "clause_number": "1.1.2",
+      "is_explanation": false,
+      "is_mandatory": null,
+      "parent_chunk_id": null,
+      "table_id": null,
+      "figure_id": null,
+      "formula_ids": [],
+      "related_asset_ids": [],
+      "chunking_version": "fixture-clause-first-1.0",
+      "exceeds_max_tokens": false
+    },
+    {
+      "schema_version": "1.0",
+      "chunk_id": "chunk-demo-formula",
+      "logical_chunk_id": "logical-demo-formula",
+      "document_id": "document-demo-evaluation",
+      "content": "{\"equations\":[{\"equation_number\":\"1.2.1-1\",\"latex\":\"R = a b\"}],\"symbol_explanations\":[{\"latex\":\"R\",\"content\":\"演示承载力符号，无工程计算用途。\"},{\"latex\":\"a\",\"content\":\"演示参数甲。\"},{\"latex\":\"b\",\"content\":\"演示参数乙。\"}]}",
+      "context_header": "虚构设备设计演示规范｜正文｜1.2.1",
+      "embedding_text": "虚构设备设计演示规范｜正文｜1.2.1\n\n{\"equations\":[{\"equation_number\":\"1.2.1-1\",\"latex\":\"R = a b\"}],\"symbol_explanations\":[{\"latex\":\"R\",\"content\":\"演示承载力符号，无工程计算用途。\"},{\"latex\":\"a\",\"content\":\"演示参数甲。\"},{\"latex\":\"b\",\"content\":\"演示参数乙。\"}]}",
+      "token_count": 196,
+      "content_type": "formula",
+      "page_start": 2,
+      "page_end": 2,
+      "source_refs": [
+        {
+          "document_id": "document-demo-evaluation",
+          "page_number": 2,
+          "block_id": "block-demo-formula",
+          "bbox": {
+            "x_min": 40,
+            "y_min": 100,
+            "x_max": 500,
+            "y_max": 140
+          }
+        }
+      ],
+      "source_block_ids": [
+        "block-demo-formula"
+      ],
+      "standard": {
+        "standard_code": "DEMO 00001-2026",
+        "standard_name": "虚构设备设计演示规范",
+        "edition": "2026演示版",
+        "revision": null,
+        "language": "zh-CN"
+      },
+      "section_path": [
+        "虚构演示章"
+      ],
+      "section_id": "section-demo-main",
+      "clause_id": "clause-demo-formula",
+      "clause_number": "1.2.1",
+      "is_explanation": false,
+      "is_mandatory": null,
+      "parent_chunk_id": null,
+      "table_id": null,
+      "figure_id": null,
+      "formula_ids": [
+        "formula-demo-capacity"
+      ],
+      "related_asset_ids": [],
+      "chunking_version": "fixture-clause-first-1.0",
+      "exceeds_max_tokens": false
+    },
+    {
+      "schema_version": "1.0",
+      "chunk_id": "chunk-demo-table",
+      "logical_chunk_id": "logical-demo-table",
+      "document_id": "document-demo-evaluation",
+      "content": "{\"table_number\":\"1.3.1\",\"title\":\"虚构设备安装类别与检查间距\",\"columns\":[{\"key\":\"category\",\"header_path\":[\"安装类别\"]},{\"key\":\"distance\",\"header_path\":[\"检查间距\"]}],\"data\":[{\"category\":\"演示甲类\",\"distance\":\"120 mm\"},{\"category\":\"演示乙类\",\"distance\":\"180 mm\"}],\"notes\":[{\"number\":\"1\",\"content\":\"所有记录仅为软件测试数据，不可用于实际设计。\"}]}",
+      "context_header": "虚构设备设计演示规范｜正文｜1.3.1",
+      "embedding_text": "虚构设备设计演示规范｜正文｜1.3.1\n\n{\"table_number\":\"1.3.1\",\"title\":\"虚构设备安装类别与检查间距\",\"columns\":[{\"key\":\"category\",\"header_path\":[\"安装类别\"]},{\"key\":\"distance\",\"header_path\":[\"检查间距\"]}],\"data\":[{\"category\":\"演示甲类\",\"distance\":\"120 mm\"},{\"category\":\"演示乙类\",\"distance\":\"180 mm\"}],\"notes\":[{\"number\":\"1\",\"content\":\"所有记录仅为软件测试数据，不可用于实际设计。\"}]}",
+      "token_count": 293,
+      "content_type": "table",
+      "page_start": 3,
+      "page_end": 3,
+      "source_refs": [
+        {
+          "document_id": "document-demo-evaluation",
+          "page_number": 3,
+          "block_id": "block-demo-table",
+          "bbox": {
+            "x_min": 40,
+            "y_min": 120,
+            "x_max": 500,
+            "y_max": 160
+          }
+        }
+      ],
+      "source_block_ids": [
+        "block-demo-table"
+      ],
+      "standard": {
+        "standard_code": "DEMO 00001-2026",
+        "standard_name": "虚构设备设计演示规范",
+        "edition": "2026演示版",
+        "revision": null,
+        "language": "zh-CN"
+      },
+      "section_path": [
+        "虚构演示章"
+      ],
+      "section_id": "section-demo-main",
+      "clause_id": "clause-demo-table",
+      "clause_number": "1.3.1",
+      "is_explanation": false,
+      "is_mandatory": null,
+      "parent_chunk_id": null,
+      "table_id": "table-demo-installation",
+      "figure_id": null,
+      "formula_ids": [],
+      "related_asset_ids": [],
+      "chunking_version": "fixture-clause-first-1.0",
+      "exceeds_max_tokens": false
+    },
+    {
+      "schema_version": "1.0",
+      "chunk_id": "chunk-demo-figure",
+      "logical_chunk_id": "logical-demo-figure",
+      "document_id": "document-demo-evaluation",
+      "content": "图 1.4.1 虚构设备布置图；展示演示设备、检修侧和通道的相对关系。",
+      "context_header": "虚构设备设计演示规范｜正文｜1.4.1",
+      "embedding_text": "虚构设备设计演示规范｜正文｜1.4.1\n\n图 1.4.1 虚构设备布置图；展示演示设备、检修侧和通道的相对关系。",
+      "token_count": 35,
+      "content_type": "figure",
+      "page_start": 4,
+      "page_end": 4,
+      "source_refs": [
+        {
+          "document_id": "document-demo-evaluation",
+          "page_number": 4,
+          "block_id": "block-demo-figure",
+          "bbox": {
+            "x_min": 40,
+            "y_min": 140,
+            "x_max": 500,
+            "y_max": 180
+          }
+        }
+      ],
+      "source_block_ids": [
+        "block-demo-figure"
+      ],
+      "standard": {
+        "standard_code": "DEMO 00001-2026",
+        "standard_name": "虚构设备设计演示规范",
+        "edition": "2026演示版",
+        "revision": null,
+        "language": "zh-CN"
+      },
+      "section_path": [
+        "虚构演示章"
+      ],
+      "section_id": "section-demo-main",
+      "clause_id": "clause-demo-figure",
+      "clause_number": "1.4.1",
+      "is_explanation": false,
+      "is_mandatory": null,
+      "parent_chunk_id": null,
+      "table_id": null,
+      "figure_id": "figure-demo-layout",
+      "formula_ids": [],
+      "related_asset_ids": [],
+      "chunking_version": "fixture-clause-first-1.0",
+      "exceeds_max_tokens": false
+    },
+    {
+      "schema_version": "1.0",
+      "chunk_id": "chunk-demo-explanation",
+      "logical_chunk_id": "logical-demo-explanation",
+      "document_id": "document-demo-evaluation",
+      "content": "【虚构条文说明】演示检修净距用于说明可达性；120 mm 仅为软件测试数值，不能作为工程设计依据。",
+      "context_header": "虚构设备设计演示规范｜条文说明｜1.1.1",
+      "embedding_text": "虚构设备设计演示规范｜条文说明｜1.1.1\n\n【虚构条文说明】演示检修净距用于说明可达性；120 mm 仅为软件测试数值，不能作为工程设计依据。",
+      "token_count": 49,
+      "content_type": "clause",
+      "page_start": 5,
+      "page_end": 5,
+      "source_refs": [
+        {
+          "document_id": "document-demo-evaluation",
+          "page_number": 5,
+          "block_id": "block-demo-explanation",
+          "bbox": {
+            "x_min": 40,
+            "y_min": 160,
+            "x_max": 500,
+            "y_max": 200
+          }
+        }
+      ],
+      "source_block_ids": [
+        "block-demo-explanation"
+      ],
+      "standard": {
+        "standard_code": "DEMO 00001-2026",
+        "standard_name": "虚构设备设计演示规范",
+        "edition": "2026演示版",
+        "revision": null,
+        "language": "zh-CN"
+      },
+      "section_path": [
+        "虚构演示章"
+      ],
+      "section_id": "section-demo-main",
+      "clause_id": "clause-demo-explanation",
+      "clause_number": "1.1.1",
+      "is_explanation": true,
+      "is_mandatory": null,
+      "parent_chunk_id": null,
+      "table_id": null,
+      "figure_id": null,
+      "formula_ids": [],
+      "related_asset_ids": [],
+      "chunking_version": "fixture-clause-first-1.0",
+      "exceeds_max_tokens": false
+    }
+  ],
+  "chunking_version": "fixture-clause-first-1.0",
+  "strategy_id": "fixture-clause-first",
+  "source_document_artifact": null
+}

@@ -7,6 +7,10 @@ Task 6.1 Understanding、Task 6.2 Rewrite、Task 6.3 Expansion/HyDE 已实现为
 Task 6.4 已通过公开工厂组合这些能力，实现完整 `QueryService.plan/execute`。
 本模块不创建模型 SDK、Embedding、数据库客户端，不实现 BM25、向量搜索、融合、Generation。
 
+Task 6.5 的人工金标校验、消融和指标计算由独立 Evaluation 适配器完成，不改变这里的业务逻辑
+或公共契约。使用与真实/模拟结果边界见 [评估说明](../../../../docs/task-6.5-query-evaluation.md)；
+Evaluation 仅通过公开工厂、Protocol 和既有 trace 日志观测，不导入本模块 internal。
+
 ## Task 6.4：公开服务与最小调用
 
 其他业务模块只导入 `engineering_rag.modules.query.api`；共享类型从 contracts 导入。

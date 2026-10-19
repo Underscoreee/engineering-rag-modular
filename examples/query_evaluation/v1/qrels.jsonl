@@ -1,0 +1,9 @@
+{"query_id":"q-clearance","chunk_id":"chunk-demo-clearance","relevance":3,"annotation_status":"draft","review_id":null}
+{"query_id":"q-clearance","chunk_id":"chunk-demo-prohibition","relevance":0,"annotation_status":"draft","review_id":null}
+{"query_id":"q-prohibition","chunk_id":"chunk-demo-prohibition","relevance":3,"annotation_status":"draft","review_id":null}
+{"query_id":"q-formula","chunk_id":"chunk-demo-formula","relevance":3,"annotation_status":"draft","review_id":null}
+{"query_id":"q-table","chunk_id":"chunk-demo-table","relevance":3,"annotation_status":"draft","review_id":null}
+{"query_id":"q-figure","chunk_id":"chunk-demo-figure","relevance":3,"annotation_status":"draft","review_id":null}
+{"query_id":"q-explanation","chunk_id":"chunk-demo-explanation","relevance":3,"annotation_status":"draft","review_id":null}
+{"query_id":"q-comparison","chunk_id":"chunk-demo-clearance","relevance":2,"annotation_status":"draft","review_id":null}
+{"query_id":"q-comparison","chunk_id":"chunk-demo-prohibition","relevance":2,"annotation_status":"draft","review_id":null}

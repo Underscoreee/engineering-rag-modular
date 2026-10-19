@@ -1,0 +1,26 @@
+{
+  "schema_version": "1.0",
+  "dataset_id": "query-evaluation-demo",
+  "dataset_version": "1.0-draft",
+  "description": "虚构工程文本和未人工核验的 draft 标签，只用于流程演示，不是真实 Golden Dataset。",
+  "created_at": "2026-10-18T00:00:00Z",
+  "corpus_snapshot_id": "fictional-engineering-corpus-v1",
+  "corpus_sha256": "036ea9e9e3749202798254d0df1ad48c408cbfa01e091141623b21d1d84a05b4",
+  "chunking_version": "fixture-clause-first-1.0",
+  "document_schema_version": "2.4",
+  "annotation_guidelines_version": "1.0",
+  "query_count": 8,
+  "qrels_count": 9,
+  "files_sha256": {
+    "queries.jsonl": "6f65a7620a5474d8e3d5fbbefb762675dcd93eb69c18030d81ffef7d9e2c031c",
+    "qrels.jsonl": "e2787e27bf9577a1e115bd97057e4a9a39122bac47402215de1eb00390c682f0",
+    "review_log.jsonl": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "annotation_guidelines.md": "6a22063871ae99c852c274c593dea2ca8f2eaa7e8c73b2eaf95ab38c014ab838"
+  },
+  "query_schema_version": "2.0",
+  "chunk_schema_version": "1.0",
+  "is_test_fixture": true,
+  "source_document_id": "document-demo-evaluation",
+  "source_document_sha256": null,
+  "source_pdf_sha256": null
+}
