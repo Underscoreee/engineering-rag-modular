@@ -25,8 +25,17 @@ class GenerationSettings(BaseModel):
     max_attempts: Annotated[int, Field(ge=1, le=2, strict=True)] = 2
 
 
+class EvidenceQuote(BaseModel):
+    """An untrusted verbatim quote proposal, not a second public Citation DTO."""
+
+    model_config = ConfigDict(extra="forbid")
+
+    evidence_id: NonEmptyStr
+    quoted_text: NonEmptyStr
+
+
 class GenerationOutput(BaseModel):
-    """The model proposes evidence IDs, never source identities or quotations."""
+    """Only IDs and optional quote proposals; source identity stays server-owned."""
 
     model_config = ConfigDict(extra="forbid")
 
@@ -34,6 +43,7 @@ class GenerationOutput(BaseModel):
     evidence_ids: list[NonEmptyStr] = Field(max_length=256)
     grounding_status: GroundingStatus
     limitations: list[NonEmptyStr] = Field(max_length=16)
+    quotes: list[EvidenceQuote] = Field(default_factory=list, max_length=256)
 
     @field_validator("answer")
     @classmethod
@@ -49,3 +59,6 @@ class GenerationError(RuntimeError):
     def __init__(self, code: str) -> None:
         self.code = code
         super().__init__(f"Generation failed ({code})")
+
+
+INSUFFICIENT_ANSWER = "当前提供的证据不足，无法确认该问题的规范结论。"

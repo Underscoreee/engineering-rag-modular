@@ -99,3 +99,10 @@ Task 7.1 使用请求级证据注册表、稳定排名和整块字符预算，�
 输出校验后仅从真实输入证据映射来源。quoted_text=null，不冒充完整引文或逐句支持校验。
 维护者授权缺少人工核验真实证据时生成示例继续；真实 API 示例测试不等于规范质量验收。
 详细约束见 [ADR-GEN-001](adr-generation-context.md)。
+
+## ADR-GEN-002：请求级引用映射与答案校验 — Adopted
+
+Task 7.2 将最小映射拆为内部 CitationMapper/AnswerValidator，复用同一 Context 注册表，
+校验来源、整页范围、引文子串、去重及请求绑定。私有输出可带 quotes；不改公共契约。
+无语义验证器时，对非完整原文复制的答案保守降为 partially_grounded，避免将有效 ID 当作
+事实正确证明。详情见 [ADR-GEN-002](adr-generation-citation-validation.md)。

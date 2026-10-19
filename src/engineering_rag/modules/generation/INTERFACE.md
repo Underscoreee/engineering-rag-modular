@@ -1,10 +1,10 @@
-# Generation 接口（Task 7.1）
+# Generation 接口（Task 7.2）
 
 ## 职责与边界
 
 接收问题与已检索证据，构建有预算的上下文，通过注入的 StructuredLLMClient 生成结构化
-答案，返回 AnswerResult 和最小安全引用。不调用 Query/检索、数据库、PDF、Chunking。
-完整逐句蕴含、段落引用覆盖与质量评估留待 Task 7.2，不在本阶段声称完成。
+答案，经独立 CitationMapper/AnswerValidator 返回 AnswerResult 与可追溯引用。
+不调用 Query/检索、数据库、PDF、Chunking；未实现完整逐句蕴含、段落引用覆盖或工程事实证明。
 
 ## 公开入口与契约
 
@@ -44,7 +44,7 @@ GenerationSettings（不包含凭证）：
 | llm | 必填既有 StructuredLLMConfig：模型/可信版本、timeout、输出 token 上限、temperature |
 | provider | 必填，由组合入口读取既有配置传入，用于结果模型信息 |
 | max_context_chars | 默认 48000：序列化应用 input + output_schema 的字符估算上限 |
-| max_answer_chars | 默认 12000：answer 与 limitations 的总字符上限 |
+| max_answer_chars | 默认 12000：answer、limitations 与可选 quotes 的总字符上限 |
 | max_history_chars / max_history_turns | 默认 4000 / 8，允许 0 |
 | max_attempts | 默认 2，允许 1～2，没有 HTTP 层隐藏重试 |
 
@@ -66,7 +66,7 @@ ContextBuilder 为私有实现，返回 payload、E1/E2…注册表、估算用�
    公式、适用条件、符号、表头、数据、表注、条文 content 原样保存，不截断或重建原文。
 5. 剩余预算保留最近完整连续历史后缀，恢复原顺序；历史回答/引用不自动当作当前证据。
 
-Prompt 版本 engineering-generation-1.0。固定 instructions 仅来自应用常量；
+Prompt 版本 engineering-generation-1.1。固定 instructions 仅来自应用常量；
 question/history/evidence 分别序列化为不可信数据，嵌入证据的指令不提升到系统。
 要求保留原始数值、单位、否定条件、适用范围，区分正文/说明与强制性三态，不猜版本效力。
 不自行添加 Expansion/HyDE 或历史回答；但公共 RetrievalResult 本身无法证明调用方是否
@@ -75,7 +75,8 @@ question/history/evidence 分别序列化为不可信数据，嵌入证据的指
 ## 输出、引用与 grounding
 
 模型输出私有 GenerationOutput：answer、evidence_ids、grounding_status、limitations，
-extra=forbid。正式执行 response.validate_output(request, GenerationOutput)，绑定
+以及可选 quotes（默认 []）。每个 quote 仅有 evidence_id、quoted_text，其他来源字段拒绝。
+正式执行 response.validate_output(request, GenerationOutput)，绑定
 request_id/model_id/可信 revision/Schema 并严格校验，不仅检查 JSON 语法。
 
 AnswerResult（外层 1.0，不变）：
@@ -84,21 +85,71 @@ AnswerResult（外层 1.0，不变）：
   不调用 LLM。
 - grounded/partially_grounded 必须引用至少一个本次有效 ID；insufficient_evidence 必须无
   已使用 ID。未知 ID 或明显状态矛盾显式失败，不替换证据。
-- 模型 grounded 但存在 limitations 或跳过证据：降为 partially_grounded 并加 warning。
+- grounded 还要求整份 answer 等于某一已引用 content 的完整文本（仅容许安全空白差异），且没有 limitations
+  或跳过证据；否则保守降为 partially_grounded 并加 warning。一个有效 ID 不证明逐句支持。
 - insufficient_evidence 不发布模型可能编造的确定结论，返回固定不足文本。
 - 按模型 evidence_ids 的首次使用列表顺序去重，映射 C1/C2…；真实 chunk/document/clause/
   page 范围只能从注册表获得，不让模型自由生成来源。缺失 clause_id 保留 null。
-- quoted_text=null：不伪造引文，不声称完成原文子串或逐句引文校验。
-- 组装后调用既有 validate_answer_citations，检查来源身份和页范围。
+- 没有 quote 时 quoted_text=null；提供 quote 时必须通过下述原文校验。
+- 映射后由 AnswerValidator 严格重校验 AnswerResult/Citation、请求绑定、来源字段、原文和
+  状态；无证据的安全分支同样校验。仅成功结果返回，错误不静默清理或替换。
 
-grounded 是经结构与明显矛盾检查后的模型支持声明，不是逐句语义正确或法律效力证明。
-本阶段不验证 answer 自由文本中每个数值/条文号的真实性，也不做段落级引用覆盖。
+grounded 仅在整答案复制完整证据的窄条件下保留；子串可能遗漏前置否定或适用条件，不能
+据此保留 grounded。即使完整复制，也不等于相关性、适用性或法律效力已证明。
+所有有依据的结果均附来源/引文校验不等于逐句语义证明的 warning。未验证自由回答的每个
+数值/条文号，也未实现段落级引用覆盖；这些不是本轮验收已通过的能力。
+
+## CitationMapper 与 AnswerValidator（内部组件）
+
+固定数据流：ContextBuilder → StructuredLLMClient → 正式私有输出校验 → CitationMapper
+→ AnswerValidator → AnswerResult。组件不导出为新的跨模块 Protocol，公开 generate 签名不变。
+
+```python
+# Generation 内部入口，其他模块只调用 generate：
+# CitationMapper.map(output: GenerationOutput, context: GenerationContext) -> CitationMapping
+# AnswerValidator(max_answer_chars=...).validate(
+#     answer, context=context, mapping=mapping, limitations=...
+# ) -> AnswerResult
+```
+
+CitationMapper 使用**实际进入 Prompt 的同一个注册表**，逐字段比对 Prompt 行与来源对象，
+捕获模型复制绕过校验、同 chunk_id 冲突、来源属性被改、注册表多出未入 Prompt 对象等问题。
+只按 evidence_ids 的首次使用顺序去重，不修改证据内容、score 或 rank，不合并不同来源。
+CitationMapping 仅保存有序 ID/Citation 和原 Context 对象绑定，不另建证据注册表。
+即使不同请求都使用 E1，也不能跨请求复用映射；模型响应另由 validate_output 绑定 request_id。
+
+Citation 来源只取注册表的 chunk_id/document_id/clause_id/pages，缺失可选身份保持 null。
+页范围必须等于原记录的**完整范围**，没有逐页引文定位证据时不缩小范围。
+标准名称/代码/条文编号、is_explanation/is_mandatory/content_type 在同一 Context 原样保留
+并检查，不加入现有公共 Citation。下游需要这些属性时按 evidence_chunk_id 回查本次输入；
+公共 Citation 没有这些独立字段，不伪称已扩充或全部序列化入 Citation。
+
+### 原文引文规则
+
+- 私有 quotes 为模型的不可信提议，ID 必须同时在当前注册表和本次 evidence_ids 中。
+- 同 ID 完全相同的 quote 去重，不同 quote 报 quote_conflict；不把多个片段拼成伪造原文。
+- 首先检查原始 content 子串；仅允许 ASCII 空格、tab、CR/LF 连续排版空白折叠为一个空格，
+  保持词之间边界，不删除空白后把 `1 2` 匹配成 `12`。
+- 拒绝截断数字、正负号或 LaTeX 命令/转义序列的子串，如 `0.1` 不能引用 `0.10`。
+  不进行数值模糊匹配、Unicode/比较符号替换、数学等价或语义相似度判断。
+- Formula/Table 的原文以 Chunk.content 实际保存的字符串为准。JSON 内容不自动解码成另一个
+  语义视图，LaTeX 必须采用已存转义形式；无法字面匹配的引文拒绝，不伪称已验证。
+- quoted_text 保存模型原提议，不自动改写成匹配版本；空白引文、错值、错符号等显式失败。
+- AnswerValidator 会再次检查引文，不能仅凭 Mapper 结果或 citation_id 就放行。
+
+AnswerValidator 用严格 Pydantic 校验拒绝页码字符串/bool、非法字段/版本、空白答案、非法
+Citation；拒绝未映射/重复冲突引用、错误 document/clause/pages 和跨请求映射。
+insufficient_evidence 只允许既有固定不足文本及空引用。限制说明保留于 warnings。
+结构化引用中的伪造标准名/编号通过 extra=forbid 拒绝；自由回答中提到的所有标准/条文号
+尚无通用语义核验，不把该限制伪装成已完成的事实校验。
 
 ## 错误、重试与生命周期
 
 GenerationError.code 包括 invalid_request、invalid_evidence、evidence_conflict、
 context_budget、invalid_output、unknown_evidence_id、grounding_conflict、output_budget、
-citation_mapping、model_failure，以及既有适配器的 authentication/permission/quota/
+citation_mapping、invalid_registry、source_metadata_conflict、orphan_quote、quote_conflict、
+quote_mismatch、citation_scope、citation_conflict、invalid_answer、model_failure，
+以及既有适配器的 authentication/permission/quota/
 rate_limit/server_error/timeout/connection/refused/truncated_output/model_mismatch/invalid_json。
 
 超时、连接和 ValueError 类结构化错误按 max_attempts 有界重试。认证、限流、服务端错误及
@@ -139,7 +190,7 @@ answer = generator.generate(request)  # 实际 API 调用；示例证据明确�
 ```bash
 .venv/bin/python -m scripts.generation_smoke --env-file .env \
   --request examples/generation_request.example.json \
-  --output-dir data/eval/task7_1/runs/real-example-v1 --allow-real-api
+  --output-dir data/eval/task7_2/runs/real-example-v1 --allow-real-api
 ```
 
 产物 answer.json、report.json 保存模型、用量、耗时与最小引用校验，

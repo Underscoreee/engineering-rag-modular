@@ -47,6 +47,25 @@ def application_chars(payload: dict[str, JsonValue]) -> int:
     )
 
 
+def evidence_payload(evidence_id: str, item: RetrievalResult) -> dict[str, JsonValue]:
+    """Single authoritative projection shared by context and source validation."""
+    return {
+        "evidence_id": evidence_id,
+        "chunk_id": item.chunk_id,
+        "logical_chunk_id": item.logical_chunk_id,
+        "document_id": item.document_id,
+        "standard": item.standard.model_dump(mode="json"),
+        "clause_id": item.clause_id,
+        "clause_number": item.clause_number,
+        "page_start": item.page_start,
+        "page_end": item.page_end,
+        "is_explanation": item.is_explanation,
+        "is_mandatory": item.is_mandatory,
+        "content_type": item.content_type.value if item.content_type else None,
+        "content": item.content,
+    }
+
+
 class ContextBuilder:
     def __init__(self, settings: GenerationSettings) -> None:
         self._settings = GenerationSettings.model_validate_json(settings.model_dump_json())
@@ -87,21 +106,7 @@ class ContextBuilder:
                 raise GenerationError("invalid_evidence")
             evidence_id = f"E{index}"
             # IDs/edition and null source attributes are preserved, not inferred.
-            row: JsonValue = {
-                "evidence_id": evidence_id,
-                "chunk_id": item.chunk_id,
-                "logical_chunk_id": item.logical_chunk_id,
-                "document_id": item.document_id,
-                "standard": item.standard.model_dump(mode="json"),
-                "clause_id": item.clause_id,
-                "clause_number": item.clause_number,
-                "page_start": item.page_start,
-                "page_end": item.page_end,
-                "is_explanation": item.is_explanation,
-                "is_mandatory": item.is_mandatory,
-                "content_type": item.content_type.value if item.content_type else None,
-                "content": item.content,
-            }
+            row: JsonValue = evidence_payload(evidence_id, item)
             payload["evidence"] = [*rows, row]
             if application_chars(payload) > limit:
                 omitted.append(OmittedEvidence(item.chunk_id, "whole_evidence_exceeds_budget"))

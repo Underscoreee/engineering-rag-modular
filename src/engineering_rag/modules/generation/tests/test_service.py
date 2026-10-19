@@ -19,7 +19,9 @@ def test_normal_generation_and_source_mapping_no_mutation():
     value = request(trace={"trace_id": "fictional-trace"})
     before = value.model_dump_json()
     answer = service.generate(value)
-    assert answer.grounding_status == "grounded"
+    # Task 7.2: IDs alone do not verify the model's paraphrase claim by claim.
+    assert answer.grounding_status == "partially_grounded"
+    assert any("claim support is unverified" in warning.message for warning in answer.warnings)
     assert AnswerResult.model_validate_json(answer.model_dump_json()) == answer
     assert value.model_dump_json() == before
     assert not validate_answer_citations(answer, value.evidence)
@@ -32,7 +34,7 @@ def test_normal_generation_and_source_mapping_no_mutation():
     assert call["usage"] == {"input_tokens": 20, "output_tokens": 10, "total_tokens": 30}
     assert call["elapsed_seconds"] >= 0
     assert call["trace_id"] == "fictional-trace"
-    assert call["grounding_status"] == "grounded"
+    assert call["grounding_status"] == "partially_grounded"
     assert value.question not in json.dumps(call, ensure_ascii=False)
     assert value.evidence[0].content not in json.dumps(call, ensure_ascii=False)
     clone = service.calls

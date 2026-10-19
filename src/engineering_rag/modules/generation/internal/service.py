@@ -10,18 +10,18 @@ from uuid import uuid4
 
 from engineering_rag.contracts.answers import (
     AnswerResult,
-    Citation,
     GenerationRequest,
     GroundingStatus,
     ModelMetadata,
-    validate_answer_citations,
 )
 from engineering_rag.contracts.common import ContractError
 from engineering_rag.contracts.llm import StructuredLLMRequest
 from engineering_rag.contracts.protocols import StructuredLLMClient
 
+from .answer_validator import AnswerValidator
+from .citation_mapper import CitationMapper
 from .context import ContextBuilder, GenerationContext
-from .models import GenerationError, GenerationOutput, GenerationSettings
+from .models import INSUFFICIENT_ANSWER, GenerationError, GenerationOutput, GenerationSettings
 
 _LOGGER = getLogger(__name__)
 _FAILURE_CODES = frozenset(
@@ -39,7 +39,6 @@ _FAILURE_CODES = frozenset(
         "invalid_json",
     }
 )
-INSUFFICIENT_ANSWER = "当前提供的证据不足，无法确认该问题的规范结论。"
 
 
 def _warning(message: str) -> ContractError:
@@ -51,6 +50,8 @@ class DefaultGenerationService:
         self._llm = llm
         self._settings = GenerationSettings.model_validate_json(settings.model_dump_json())
         self._builder = ContextBuilder(self._settings)
+        self._mapper = CitationMapper()
+        self._validator = AnswerValidator(max_answer_chars=self._settings.max_answer_chars)
         self._calls: list[dict[str, object]] = []
         self._lock = RLock()
 
@@ -72,11 +73,21 @@ class DefaultGenerationService:
             warnings.append(_warning(f"History turns omitted: {context.history_omitted}"))
         if not context.registry:
             warnings.append(_warning("No complete evidence available; LLM was not called"))
-            return AnswerResult(
+            result = AnswerResult(
                 answer=INSUFFICIENT_ANSWER,
                 grounding_status="insufficient_evidence",
                 warnings=warnings,
             )
+            mapping = self._mapper.map(
+                GenerationOutput(
+                    answer=INSUFFICIENT_ANSWER,
+                    evidence_ids=[],
+                    grounding_status="insufficient_evidence",
+                    limitations=[],
+                ),
+                context,
+            )
+            return self._validator.validate(result, context=context, mapping=mapping)
         config = self._settings.llm.model_copy(deep=True)
         if request.config is not None:
             config = config.model_copy(
@@ -157,52 +168,30 @@ class DefaultGenerationService:
         warnings: list[ContractError],
         revision: str | None,
     ) -> AnswerResult:
-        if len(output.answer) + sum(
-            map(len, output.limitations)
-        ) > self._settings.max_answer_chars or any(not item.strip() for item in output.limitations):
+        if (
+            len(output.answer)
+            + sum(map(len, output.limitations))
+            + sum(len(quote.quoted_text) for quote in output.quotes)
+            > self._settings.max_answer_chars
+        ) or any(not item.strip() for item in output.limitations):
             raise GenerationError("output_budget")
-        ids = list(dict.fromkeys(output.evidence_ids))
-        if any(evidence_id not in context.registry for evidence_id in ids):
-            raise GenerationError("unknown_evidence_id")
-        status = output.grounding_status
-        insufficient = status == GroundingStatus.INSUFFICIENT_EVIDENCE
-        if (insufficient and ids) or (not insufficient and not ids):
-            raise GenerationError("grounding_conflict")
-        final_warnings = list(warnings)
-        if output.limitations:
-            final_warnings.append(
-                _warning("Model reported limitations: " + "；".join(output.limitations))
-            )
-        if status == GroundingStatus.GROUNDED and (output.limitations or context.omitted):
-            status = GroundingStatus.PARTIALLY_GROUNDED
-            final_warnings.append(_warning("Grounding downgraded: limitations or omitted evidence"))
-        if status == GroundingStatus.PARTIALLY_GROUNDED and not output.limitations:
-            final_warnings.append(_warning("Model declared only partial support"))
-        citations = []
-        for index, evidence_id in enumerate(ids, 1):
-            item = context.registry[evidence_id]
-            citations.append(
-                Citation(
-                    citation_id=f"C{index}",
-                    evidence_chunk_id=item.chunk_id,
-                    document_id=item.document_id,
-                    clause_id=item.clause_id,
-                    page_start=item.page_start,
-                    page_end=item.page_end,
-                    quoted_text=None,
-                )
-            )
+        mapping = self._mapper.map(output, context)
         result = AnswerResult(
-            answer=INSUFFICIENT_ANSWER if insufficient else output.answer,
-            citations=citations,
-            grounding_status=status,
+            answer=INSUFFICIENT_ANSWER
+            if output.grounding_status == GroundingStatus.INSUFFICIENT_EVIDENCE
+            else output.answer,
+            citations=list(mapping.citations),
+            grounding_status=output.grounding_status,
             model=ModelMetadata(
                 provider=self._settings.provider,
                 model_id=self._settings.llm.model_id,
                 model_version=revision,
             ),
-            warnings=final_warnings,
+            warnings=list(warnings),
         )
-        if validate_answer_citations(result, list(context.registry.values())):
-            raise GenerationError("citation_mapping")
-        return result
+        return self._validator.validate(
+            result,
+            context=context,
+            mapping=mapping,
+            limitations=output.limitations,
+        )
